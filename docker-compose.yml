@@ -1,9 +1,7 @@
 version: '3.8'
 services:
   postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: postgres:alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,3 +11,15 @@ services:
       - ./data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/airbnb
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
