@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # Data
 /data
+
+# Environment
+.env
