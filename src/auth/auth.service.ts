@@ -40,19 +40,12 @@ export class AuthService {
       data: { hashedRefreshToken, activationLink },
       where: { id: newUser.id },
     });
-
-    res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
+    this.setRefreshTokenCookie(tokens.refresh_token, res);
     return tokens;
   }
   async login(loginDto: LoginDto, res: Response) {
     const { email, password } = loginDto;
-    const user = await this.prismaService.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('User not found');
-    if (!user.isEmailVerified) throw new BadRequestException('User Email not Verified');
-
+    const user = await this.validateUser(email);
     const isMatchPass = await bcrypt.compare(password, user.password);
     if (!isMatchPass) throw new UnauthorizedException('User not found');
 
@@ -63,10 +56,7 @@ export class AuthService {
       data: { hashedRefreshToken },
       where: { id: user.id },
     });
-    res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
+    this.setRefreshTokenCookie(tokens.refresh_token, res);
     return tokens;
   }
   async logout(refreshToken: string, res: Response) {
@@ -118,6 +108,21 @@ export class AuthService {
     };
   }
 
+  /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
+  private setRefreshTokenCookie(refresh_token: string, res: Response) {
+    const maxAge = parseInt(process.env.MAX_REFRESH_TOKEN_AGE || '0', 10);
+    res.cookie('refresh_token', refresh_token, {
+      maxAge,
+      httpOnly: true,
+    });
+  }
+  /** VALIDATE USER HELPER FUNCTION */
+  async validateUser(email: string) {
+    const user = await this.prismaService.user.findUnique({ where: { email } });
+    if (!user) throw new UnauthorizedException('User not found');
+    if (!user.isEmailVerified) throw new BadRequestException('User Email not Verified');
+    return user;
+  }
   // GET TOKENS METHOD
   async getTokens(sub: string, email: string, role: string) {
     const jwtPayload: { sub: string; email: string; role: string } = {
