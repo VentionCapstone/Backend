@@ -16,7 +16,11 @@ export class AccommodationService {
     return newAccommodation;
   }
 
-  async updateAccommodation(id: string, updateAccommodationBody: any): Promise<any> {
+  async updateAccommodation(
+    id: string,
+    updateAccommodationBody: any,
+    ownerId: string
+  ): Promise<any> {
     const existingAccommodation = await this.prisma.accommodation.findUnique({
       where: { id },
       include: {
@@ -26,6 +30,10 @@ export class AccommodationService {
 
     if (!existingAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
+    }
+
+    if (ownerId !== existingAccommodation.ownerId) {
+      throw new Error('You not owner of this accommodation');
     }
 
     const updatedAccommodation = await this.prisma.accommodation.update({
@@ -39,7 +47,7 @@ export class AccommodationService {
     return updatedAccommodation;
   }
 
-  async deleteAccommodation(id: string) {
+  async deleteAccommodation(id: string, ownerId: string) {
     const deletedAccommodation = await this.prisma.accommodation.delete({
       where: { id },
       include: {
@@ -47,32 +55,18 @@ export class AccommodationService {
       },
     });
 
-    // const deletedAccommodation = await this.prisma.accommodation.findUnique({
-    //   where: { id },
-    //   include: {
-    //     address: true,
-    //   },
-    // });
-
     if (!deletedAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
-    console.log(
-      'file: accommodation.service.ts:52 ~ AccommodationService ~ deleteAccommodation ~ deletedAccommodation:',
-      deletedAccommodation
-    );
-    console.log(
-      'file: accommodation.service.ts:56 ~ AccommodationService ~ deleteAccommodation ~ deletedAccommodation.address.id:',
-      deletedAccommodation.address.id
-    );
+    if (ownerId !== deletedAccommodation.ownerId) {
+      throw new Error('You not owner of this accommodation');
+    }
+
     const deletedAddress = await this.prisma.address.delete({
       where: { id: deletedAccommodation.address.id },
     });
 
-    if (!deletedAccommodation) {
-      throw new NotFoundException(`Accommodation with id ${id} not found`);
-    }
     if (!deletedAddress) {
       throw new NotFoundException(`Can't delete Accommodation Address`);
     }
@@ -94,13 +88,17 @@ export class AccommodationService {
     return accommodation;
   }
 
-  async addFileToAccommodation(id: string, file: any): Promise<any> {
+  async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
     const existingAccommodation = await this.prisma.accommodation.findUnique({
       where: { id },
     });
 
     if (!existingAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
+    }
+
+    if (ownerId !== existingAccommodation.ownerId) {
+      throw new Error('You not owner of this accommodation');
     }
 
     const base64Data = file.buffer.toString('base64');

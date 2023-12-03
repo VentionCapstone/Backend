@@ -11,6 +11,7 @@ import {
   Put,
   Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AccommodationService } from './accommodation.service';
@@ -27,7 +28,10 @@ import {
   ApiBody,
   ApiConsumes,
 } from '@nestjs/swagger';
+import {} from '@nestjs/common';
+import { UserGuard } from 'src/common/guards/user.guard';
 
+@UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
 @Controller('accommodation')
 export class AccommodationController {
@@ -54,14 +58,12 @@ export class AccommodationController {
     @Req() req: any
     //******  TO  ******
   ) {
-    console.log(body);
-
     try {
       const createAccommodationAndAdress = {
         ...body.accommodation,
         previewImgUrl: body.accommodation.previewImgUrl || 'none',
         //******  FROM  ******
-        ownerId: 'ownerID is here',
+        ownerId: req.user.id,
         //******  TO  ******
         address: {
           create: body.address,
@@ -120,14 +122,19 @@ export class AccommodationController {
       })
     )
     file: Express.Multer.File,
-    @Param('id') id: string
+    @Param('id') id: string,
+    @Req() req: any
   ) {
     try {
       if (!file) {
         throw new Error('No file provided.');
       }
 
-      const updatedAccommodation = await this.accommodationService.addFileToAccommodation(id, file);
+      const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
+        id,
+        file,
+        req.user.id
+      );
 
       return { success: true, data: updatedAccommodation };
     } catch (error) {
@@ -157,7 +164,8 @@ export class AccommodationController {
   @Put('/update/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
-    @Param('id') id: string
+    @Param('id') id: string,
+    @Req() req: any
   ) {
     try {
       const updateAccommodationAndAdress = {
@@ -169,7 +177,8 @@ export class AccommodationController {
 
       const updatedAccommodation = await this.accommodationService.updateAccommodation(
         id,
-        updateAccommodationAndAdress
+        updateAccommodationAndAdress,
+        req.user.id
       );
 
       return { success: true, data: updatedAccommodation };
@@ -198,9 +207,9 @@ export class AccommodationController {
     required: true,
   })
   @Delete('/delete/:id')
-  async deleteAccommodation(@Param('id') id: string) {
+  async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     try {
-      await this.accommodationService.deleteAccommodation(id);
+      await this.accommodationService.deleteAccommodation(id, req.user.id);
       return { success: true, data: {} };
     } catch (error) {
       return { success: false, error: error.message };
