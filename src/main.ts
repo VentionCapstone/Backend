@@ -6,6 +6,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const port = process.env.API_PORT || 3000;
+
   if (process.env.MODE !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Airbnb clone')
@@ -17,6 +19,6 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  await app.listen(3000);
+  await app.listen(port);
 }
 bootstrap();
