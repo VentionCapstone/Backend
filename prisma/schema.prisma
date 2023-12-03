@@ -1,18 +1,19 @@
 model User {
-  id              String         @id @default(uuid())
-  firstName       String
-  lastName        String
-  email           String         @unique
-  password        String
-  role            Role
-  isEmailVerified Boolean
-  isVerified      Boolean
-  status          Status
-  profile         UserProfile    @relation(fields: [profileId], references: [id])
-  profileId       String
-  Booking         Booking[]
-  Review          Review[]
-  notifications   Notification[]
+  id                 String         @id @default(uuid())
+  firstName          String?
+  lastName           String?
+  email              String         @unique
+  password           String
+  role               Role           @default(USER)
+  isEmailVerified    Boolean        @default(false)
+  isVerified         Boolean        @default(false)
+  isDeleted          Boolean        @default(false)
+  hashedRefreshToken String?
+  activationLink     String?
+  Profile            UserProfile[]
+  Booking            Booking[]
+  Review             Review[]
+  notifications      Notification[]
 }
 
 model UserProfile {
@@ -23,7 +24,8 @@ model UserProfile {
   language    String
   uiTheme     UiTheme @default(LIGHT)
   description String?
-  User        User[]
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
 }
 
 model Booking {
