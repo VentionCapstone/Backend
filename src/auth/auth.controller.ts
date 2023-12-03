@@ -1,15 +1,19 @@
 import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto';
+import { EmailVerificationDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { UserGuard } from '../common/guards/user.guard';
+import { VerificationSerivce } from './verification.service';
 
 @ApiTags('USER')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly verificationService: VerificationSerivce
+  ) {}
 
   @ApiOperation({ summary: 'SIGN UP USER' })
   @ApiResponse({ status: 201, description: 'tokens' })
@@ -46,5 +50,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.refreshToken(id, refreshToken, res);
+  }
+
+  @ApiOperation({ summary: 'VERIFY EMAIL' })
+  @ApiResponse({ status: 200, description: 'Email Verified Succesfully' })
+  @Post('verify')
+  verifyEmail(@Body() body: EmailVerificationDto) {
+    return this.verificationService.verify(body);
   }
 }

@@ -9,13 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
-import { v4 } from 'uuid';
+import { VerificationSerivce } from './verification.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly verificationService: VerificationSerivce
   ) {}
 
   async register(registerDto: RegisterDto, res: Response) {
@@ -34,7 +35,7 @@ export class AuthService {
     });
     const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
     const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
-    const activationLink = v4();
+    const activationLink = await this.verificationService.send(newUser.email);
 
     await this.prismaService.user.update({
       data: { hashedRefreshToken, activationLink },
