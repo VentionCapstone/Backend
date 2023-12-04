@@ -24,19 +24,16 @@ export class AmenitiesService {
   }
 
   async addAmenities(id: string, dto: AmenitiesDto) {
-    //get amenities from body and add to db
     try {
       const newAmenities = await this.prisma.amenity.create({
         data: { ...dto, accommodationId: id },
       });
       return { message: 'Success adding amenities', newAmenities };
     } catch (error) {
-      //if amenities already exist for this apartment id
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new InternalServerErrorException('Amenities for this accomodation already exist');
         }
-        //if such apartment doesn`t exist = incorrect foreign key is provided
         if (error.code === 'P2003') {
           throw new NotFoundException('Incorrect apartment id');
         }
@@ -46,7 +43,6 @@ export class AmenitiesService {
   }
 
   async updateAmenities(id: string, dto: AmenitiesDto) {
-    //get amenities from body and update in the db
     try {
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
@@ -65,9 +61,7 @@ export class AmenitiesService {
     }
   }
 
-  // NOT SURE IF WE NEED THIS FUNCTIONALITY
   async deleteAmenities(id: string) {
-    // find amenities by accomodation id
     try {
       const findAmenities = await this.prisma.amenity.findUnique({
         where: {

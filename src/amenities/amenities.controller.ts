@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Post, Put, Query, UseGuards } from '@nes
 import { AmenitiesService } from './amenities.service';
 import { AmenitiesDto } from './dto';
 import { UserGuard } from 'src/common/guards/user.guard';
-import {} from '@nestjs/common';
 
 @UseGuards(UserGuard)
 @Controller('amenities')
