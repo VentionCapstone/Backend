@@ -27,10 +27,10 @@ export class AuthController {
   ) {}
 
   @ApiOperation({ summary: 'SIGN UP USER' })
-  @ApiResponse({ status: 201, description: 'tokens' })
+  @ApiResponse({ status: 201, description: 'link sent' })
   @Post('signup')
-  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.register(registerDto, res);
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @ApiOperation({ summary: 'SIGN IN USER' })

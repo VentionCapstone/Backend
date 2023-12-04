@@ -21,7 +21,7 @@ export class AuthService {
     private readonly verificationService: VerificationSerivce
   ) {}
 
-  async register(registerDto: RegisterDto, res: Response) {
+  async register(registerDto: RegisterDto) {
     const { email, password, confirm_password } = registerDto;
     const findUser = await this.prismaService.user.findUnique({ where: { email } });
     if (findUser) {
@@ -43,8 +43,10 @@ export class AuthService {
       data: { hashedRefreshToken, activationLink },
       where: { id: newUser.id },
     });
-    this.setRefreshTokenCookie(tokens.refresh_token, res);
-    return tokens;
+    return {
+      success: true,
+      message: 'User created successfully, please check your email to verify your account',
+    };
   }
   async login(loginDto: LoginDto, res: Response) {
     const { email, password } = loginDto;
