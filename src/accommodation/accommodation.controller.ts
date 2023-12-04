@@ -36,7 +36,6 @@ import { UserGuard } from 'src/common/guards/user.guard';
 @Controller('accommodation')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
-  //########## NEED TO BE UPDATED ##########
   @ApiOperation({ summary: 'CREATE ACCOMMODATION' })
   @ApiResponse({
     status: 201,
@@ -51,20 +50,12 @@ export class AccommodationController {
     },
   })
   @Post('/create')
-  async createAccommodation(
-    @Body() body: CreateAccommodationAndAddressDto,
-    //******  FROM  ******
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @Req() req: any
-    //******  TO  ******
-  ) {
+  async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     try {
       const createAccommodationAndAdress = {
         ...body.accommodation,
         previewImgUrl: body.accommodation.previewImgUrl || 'none',
-        //******  FROM  ******
         ownerId: req.user.id,
-        //******  TO  ******
         address: {
           create: body.address,
         },
