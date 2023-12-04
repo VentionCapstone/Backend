@@ -15,6 +15,7 @@ import { AmenitiesModule } from './amenities/amenities.module';
     AuthModule,
     AmenitiesModule,
     AccommodationModule,
+    AmenitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
