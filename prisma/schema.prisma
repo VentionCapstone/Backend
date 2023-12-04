@@ -99,7 +99,7 @@ model Address {
   street        String
   city          String
   country       String
-  zipCode       Int
+  zipCode       String
   latitude      Float
   longitude     Float
   Accommodation Accommodation[]

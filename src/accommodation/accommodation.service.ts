@@ -1,19 +1,33 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotOwnerException } from 'src/exceptions/not-owner.exception';
 
 @Injectable()
 export class AccommodationService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAccommodation(createAccommodationBody: any) {
-    const newAccommodation = await this.prisma.accommodation.create({
-      include: {
-        address: true,
-      },
-      data: createAccommodationBody,
-    });
+    try {
+      const newAccommodation = await this.prisma.accommodation.create({
+        include: {
+          address: true,
+        },
+        data: createAccommodationBody,
+      });
+      console.log(
+        'file: accommodation.service.ts:17 ~ AccommodationService ~ createAccommodation ~ newAccommodation:',
+        newAccommodation
+      );
 
-    return newAccommodation;
+      return newAccommodation;
+    } catch (error) {
+      console.log(
+        'file: accommodation.service.ts:20 ~ AccommodationService ~ createAccommodation ~ error:',
+        error
+      );
+
+      throw new HttpException('Failed to create accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async updateAccommodation(
@@ -21,85 +35,115 @@ export class AccommodationService {
     updateAccommodationBody: any,
     ownerId: string
   ): Promise<any> {
-    const existingAccommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
+    let existingAccommodation;
+    try {
+      existingAccommodation = await this.prisma.accommodation.findUnique({
+        where: { id },
+        include: {
+          address: true,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Failed to get updating accommodation',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
 
     if (!existingAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
-    if (ownerId !== existingAccommodation.ownerId) {
-      throw new Error('You not owner of this accommodation');
+    if (ownerId !== existingAccommodation.ownerId) throw new NotOwnerException();
+
+    try {
+      const updatedAccommodation = await this.prisma.accommodation.update({
+        where: { id },
+        include: {
+          address: true,
+        },
+        data: updateAccommodationBody,
+      });
+
+      return updatedAccommodation;
+    } catch (error) {
+      throw new HttpException('Failed to update accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    const updatedAccommodation = await this.prisma.accommodation.update({
-      where: { id },
-      include: {
-        address: true,
-      },
-      data: updateAccommodationBody,
-    });
-
-    return updatedAccommodation;
   }
 
   async deleteAccommodation(id: string, ownerId: string) {
-    const deletedAccommodation = await this.prisma.accommodation.delete({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
+    let deletedAccommodation;
+
+    try {
+      deletedAccommodation = await this.prisma.accommodation.delete({
+        where: { id },
+        include: {
+          address: true,
+        },
+      });
+    } catch (error) {
+      throw new HttpException('Failed to delete accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     if (!deletedAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
-    if (ownerId !== deletedAccommodation.ownerId) {
-      throw new Error('You not owner of this accommodation');
+    if (ownerId !== deletedAccommodation.ownerId) throw new NotOwnerException();
+
+    try {
+      const deletedAddress = await this.prisma.address.delete({
+        where: { id: deletedAccommodation.address.id },
+      });
+
+      if (!deletedAddress) {
+        throw new NotFoundException(`Can't delete Accommodation Address`);
+      }
+
+      return deletedAccommodation;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new HttpException('Failed to delete accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    const deletedAddress = await this.prisma.address.delete({
-      where: { id: deletedAccommodation.address.id },
-    });
-
-    if (!deletedAddress) {
-      throw new NotFoundException(`Can't delete Accommodation Address`);
-    }
-
-    return deletedAccommodation;
   }
   async getOneAccommodation(id: string) {
-    const accommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
+    try {
+      const accommodation = await this.prisma.accommodation.findUnique({
+        where: { id },
+        include: {
+          address: true,
+        },
+      });
 
-    if (!accommodation) {
-      throw new NotFoundException(`Accommodation with id ${id} not found`);
+      if (!accommodation) {
+        throw new NotFoundException(`Accommodation with id ${id} not found`);
+      }
+
+      return accommodation;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new HttpException('Failed to get accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return accommodation;
   }
 
   async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
-    const existingAccommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-    });
+    let existingAccommodation;
+    try {
+      existingAccommodation = await this.prisma.accommodation.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Failed to get updating accommodation',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
 
     if (!existingAccommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
-    if (ownerId !== existingAccommodation.ownerId) {
-      throw new Error('You not owner of this accommodation');
-    }
+    if (ownerId !== existingAccommodation.ownerId) throw new NotOwnerException();
 
     const base64Data = file.buffer.toString('base64');
 
@@ -107,11 +151,18 @@ export class AccommodationService {
       previewImgUrl: base64Data,
     };
 
-    const updatedAccommodation = await this.prisma.accommodation.update({
-      where: { id },
-      data: updateAccommodationAndAdress,
-    });
+    try {
+      const updatedAccommodation = await this.prisma.accommodation.update({
+        where: { id },
+        data: updateAccommodationAndAdress,
+      });
 
-    return updatedAccommodation;
+      return updatedAccommodation;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to add image file to accommodation.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
