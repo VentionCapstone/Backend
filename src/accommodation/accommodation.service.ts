@@ -14,18 +14,9 @@ export class AccommodationService {
         },
         data: createAccommodationBody,
       });
-      console.log(
-        'file: accommodation.service.ts:17 ~ AccommodationService ~ createAccommodation ~ newAccommodation:',
-        newAccommodation
-      );
 
       return newAccommodation;
     } catch (error) {
-      console.log(
-        'file: accommodation.service.ts:20 ~ AccommodationService ~ createAccommodation ~ error:',
-        error
-      );
-
       throw new HttpException('Failed to create accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
