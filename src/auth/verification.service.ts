@@ -14,7 +14,7 @@ export class VerificationSerivce {
     private readonly prismaService: PrismaService
   ) {}
 
-  async send(email: string): Promise<string> {
+  send(email: string): string {
     const hash = crypto.randomBytes(32).toString('hex');
     const TWO_DAYS = 1000 * 60 * 60 * 24 * 2;
     const expires = Date.now() + TWO_DAYS;
@@ -40,27 +40,31 @@ export class VerificationSerivce {
   }
 
   async verify(body: EmailVerificationDto) {
-    const [email, expires, hash] = base64url.decode(body.token).split('$$');
-    if (!email || !expires || !hash) throw new BadRequestException('Invalid link');
+    try {
+      const [email, expires, hash] = base64url.decode(body.token).split('$$');
+      if (!email || !expires || !hash) throw new BadRequestException('Invalid link');
 
-    const user = await this.prismaService.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
-    if (!user) throw new NotFoundException('User not found');
-    if (user.isEmailVerified) throw new BadRequestException('Email already verified');
-    if (user.activationLink !== body.token) throw new BadRequestException('Invalid link');
+      const user = await this.prismaService.user.findUnique({
+        where: { email: email.toLowerCase() },
+      });
+      if (!user) throw new NotFoundException('User not found');
+      if (user.isEmailVerified) throw new BadRequestException('Email already verified');
+      if (user.activationLink !== body.token) throw new BadRequestException('Invalid link');
 
-    const isExpired = +expires < Date.now();
-    if (isExpired) throw new GoneException('Link expired');
+      const isExpired = +expires < Date.now();
+      if (isExpired) throw new GoneException('Link expired');
 
-    await this.prismaService.user.update({
-      where: { id: user.id },
-      data: { activationLink: null, isEmailVerified: true },
-    });
+      await this.prismaService.user.update({
+        where: { id: user.id },
+        data: { activationLink: null, isEmailVerified: true },
+      });
 
-    return {
-      success: true,
-      message: 'Email verified succesfully',
-    };
+      return {
+        success: true,
+        message: 'Email verified succesfully',
+      };
+    } catch {
+      throw new BadRequestException('Could not verify email');
+    }
   }
 }

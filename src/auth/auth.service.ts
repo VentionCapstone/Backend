@@ -113,23 +113,27 @@ export class AuthService {
     };
   }
   async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: User) {
-    const { email: newEmail } = emailUpdateDto;
+    try {
+      const { email: newEmail } = emailUpdateDto;
 
-    if (user.email === newEmail) {
-      if (user.isEmailVerified) throw new BadRequestException('You already verified this email!');
-    } else {
-      const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
-      if (findUser) throw new ConflictException('This email is already in use! Please try again');
+      if (user.email === newEmail) {
+        if (user.isEmailVerified) throw new BadRequestException('You already verified this email!');
+      } else {
+        const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
+        if (findUser) throw new ConflictException('This email is already in use! Please try again');
+      }
+
+      const activationLink = await this.verificationService.send(newEmail);
+      await this.prismaService.user.update({
+        data: { activationLink, email: newEmail, isEmailVerified: false },
+        where: { id: user.id },
+      });
+      return {
+        message: 'Email update request sent',
+      };
+    } catch {
+      throw new BadRequestException('Could not update email');
     }
-
-    const activationLink = await this.verificationService.send(newEmail);
-    await this.prismaService.user.update({
-      data: { activationLink, email: newEmail, isEmailVerified: false },
-      where: { id: user.id },
-    });
-    return {
-      message: 'Email update request sent',
-    };
   }
 
   /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
