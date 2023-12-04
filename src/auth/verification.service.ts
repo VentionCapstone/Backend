@@ -41,15 +41,17 @@ export class VerificationSerivce {
 
   async verify(body: EmailVerificationDto) {
     const [email, expires, hash] = base64url.decode(body.token).split('$$');
-    if (!email || !expires || !hash) throw new BadRequestException('Invalid token');
+    if (!email || !expires || !hash) throw new BadRequestException('Invalid link');
 
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.prismaService.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
     if (!user) throw new NotFoundException('User not found');
     if (user.isEmailVerified) throw new BadRequestException('Email already verified');
-    if (user.activationLink !== body.token) throw new BadRequestException('Invalid token');
+    if (user.activationLink !== body.token) throw new BadRequestException('Invalid link');
 
     const isExpired = +expires < Date.now();
-    if (isExpired) throw new GoneException('Token expired');
+    if (isExpired) throw new GoneException('Link expired');
 
     await this.prismaService.user.update({
       where: { id: user.id },

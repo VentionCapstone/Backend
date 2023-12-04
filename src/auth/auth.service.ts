@@ -1,15 +1,17 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto, RegisterDto } from './dto';
+import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
 import { VerificationSerivce } from './verification.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -106,6 +108,25 @@ export class AuthService {
     return {
       tokens,
       message: 'Tokens have been refreshed successfully',
+    };
+  }
+  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: User) {
+    const { email: newEmail } = emailUpdateDto;
+
+    if (user.email === newEmail) {
+      if (user.isEmailVerified) throw new BadRequestException('You already verified this email!');
+    } else {
+      const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
+      if (findUser) throw new ConflictException('This email is already in use! Please try again');
+    }
+
+    const activationLink = await this.verificationService.send(newEmail);
+    await this.prismaService.user.update({
+      data: { activationLink, email: newEmail, isEmailVerified: false },
+      where: { id: user.id },
+    });
+    return {
+      message: 'Email update request sent',
     };
   }
 
