@@ -9,22 +9,22 @@ import {} from '@nestjs/common';
 export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
-  @Get('/get')
+  @Get('get')
   getAmenities(@Query('id') id: string) {
     return this.amenitiesService.getAmenities(id);
   }
 
-  @Put('/update')
+  @Put('update')
   updateAmenities(@Query('id') id: string, @Body() dto: AmenitiesDto) {
     return this.amenitiesService.updateAmenities(id, dto);
   }
 
-  @Post('/add')
+  @Post('add')
   addAmenities(@Query('id') id: string, @Body() dto: AmenitiesDto) {
     return this.amenitiesService.addAmenities(id, dto);
   }
 
-  @Delete('/delete')
+  @Delete('delete')
   deleteAmenities(@Query('id') id: string) {
     return this.amenitiesService.deleteAmenities(id);
   }
