@@ -5,77 +5,77 @@ export class AmenitiesDto {
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  wifi: boolean;
+  hasWifi: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  parking: boolean;
+  hasParking: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  swimmingPool: boolean;
+  hasSwimmingPool: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  petAllowance: boolean;
+  hasPetAllowance: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  quiteArea: boolean;
+  isQuiteArea: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  backyard: boolean;
+  hasBackyard: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  smokingAllowance: boolean;
+  hasSmokingAllowance: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  childFriendly: boolean;
+  isChildFriendly: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  hospitalNearby: boolean;
+  hasHospitalNearby: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  closeToCenter: boolean;
+  isCloseToCenter: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  laundryService: boolean;
+  hasLaundryService: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  kitchen: boolean;
+  hasKitchen: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  airConditioning: boolean;
+  hasAirConditioning: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  tv: boolean;
+  hasTv: boolean;
 
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()
-  airportTransfer: boolean;
+  hasAirportTransfer: boolean;
 
   @ApiProperty()
   @IsString()

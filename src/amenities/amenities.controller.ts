@@ -22,15 +22,18 @@ export class AmenitiesController {
   @Get('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
-  @ApiUnauthorizedResponse()
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Success getting amenities',
     type: ResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Incorrect apartment id',
+    description: 'Not Found',
     type: ErrorDto,
   })
   getAmenities(@Param('id') id: string) {
@@ -40,15 +43,18 @@ export class AmenitiesController {
   @Put('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'UPDATE AMENITIES LIST' })
-  @ApiUnauthorizedResponse()
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Success updating amenities',
     type: ResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Record to update not found.',
+    description: 'Not Found',
     type: ErrorDto,
   })
   @ApiBody({ type: AmenitiesDto })
@@ -59,7 +65,10 @@ export class AmenitiesController {
   @Post('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'ADD AMENITIES LIST' })
-  @ApiUnauthorizedResponse()
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiResponse({
     status: 201,
     description: 'Success adding amenities',
@@ -67,11 +76,11 @@ export class AmenitiesController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Incorrect apartment id',
+    description: 'Not Found',
     type: ErrorDto,
   })
   @ApiResponse({
-    status: 500,
+    status: 409,
     description: 'Amenities for this accomodation already exist',
     type: ErrorDto,
   })
@@ -83,15 +92,18 @@ export class AmenitiesController {
   @Delete('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'DELETE AMENITIES LIST' })
-  @ApiUnauthorizedResponse()
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Success deleting amenities',
     type: ResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Incorrect apartment id',
+    description: 'Not Found',
     type: ErrorDto,
   })
   deleteAmenities(@Param('id') id: string) {
