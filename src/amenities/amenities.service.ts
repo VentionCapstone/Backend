@@ -17,7 +17,7 @@ export class AmenitiesService {
       if (!amenities) {
         throw new NotFoundException('Incorrect apartment id');
       }
-      return { message: 'Success getting amenities', amenities };
+      return { message: 'Success getting amenities', data: amenities };
     } catch (error) {
       throw error;
     }
@@ -28,7 +28,7 @@ export class AmenitiesService {
       const newAmenities = await this.prisma.amenity.create({
         data: { ...dto, accommodationId: id },
       });
-      return { message: 'Success adding amenities', newAmenities };
+      return { message: 'Success adding amenities', data: newAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -50,11 +50,11 @@ export class AmenitiesService {
         },
         data: { ...dto },
       });
-      return { message: 'Success updating amenities', updatedAmenities };
+      return { message: 'Success updating amenities', data: updatedAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new InternalServerErrorException('Record to update not found.');
+          throw new NotFoundException('Record to update not found.');
         }
       }
       throw error;
@@ -76,7 +76,7 @@ export class AmenitiesService {
             accommodationId: id,
           },
         });
-        return { message: 'Success deleting amenities', deletedAmenities };
+        return { message: 'Success deleting amenities', data: deletedAmenities };
       }
     } catch (error) {
       throw error;
