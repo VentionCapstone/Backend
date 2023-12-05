@@ -2,7 +2,14 @@ import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards } from '@nes
 import { AmenitiesService } from './amenities.service';
 import { AmenitiesDto } from './dto';
 import { UserGuard } from 'src/common/guards/user.guard';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { ResponseDto } from './dto/amenititesResponse.dto';
 import { ErrorDto } from './dto/error.dto';
 
@@ -13,7 +20,9 @@ export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
   @Get('get/:id')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
+  @ApiUnauthorizedResponse()
   @ApiResponse({
     status: 201,
     description: 'Success getting amenities',
@@ -29,7 +38,9 @@ export class AmenitiesController {
   }
 
   @Put('update/:id')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'UPDATE AMENITIES LIST' })
+  @ApiUnauthorizedResponse()
   @ApiResponse({
     status: 201,
     description: 'Success updating amenities',
@@ -46,7 +57,9 @@ export class AmenitiesController {
   }
 
   @Post('add/:id')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'ADD AMENITIES LIST' })
+  @ApiUnauthorizedResponse()
   @ApiResponse({
     status: 201,
     description: 'Success adding amenities',
@@ -68,7 +81,9 @@ export class AmenitiesController {
   }
 
   @Delete('delete/:id')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'DELETE AMENITIES LIST' })
+  @ApiUnauthorizedResponse()
   @ApiResponse({
     status: 201,
     description: 'Success deleting amenities',
