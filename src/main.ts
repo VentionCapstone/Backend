@@ -8,18 +8,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const port = process.env.API_PORT || 3000;
-  app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(CookieParser());
-  const config = new DocumentBuilder()
-    .setTitle('Booking example')
-    .setDescription('The Booking API description')
-    .setVersion('1.0')
-    .addTag('Booking')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
 
+  app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.use(CookieParser());
+  if (process.env.MODE !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Booking example')
+      .setDescription('The Booking API description')
+      .setVersion('1.0')
+      .addTag('Booking')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
   await app.listen(port, () => {
     console.log('listening on port ' + port);
   });
