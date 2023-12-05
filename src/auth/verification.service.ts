@@ -14,29 +14,25 @@ export class VerificationSerivce {
     private readonly prismaService: PrismaService
   ) {}
 
-  send(email: string): string {
-    const hash = crypto.randomBytes(32).toString('hex');
-    const TWO_DAYS = 1000 * 60 * 60 * 24 * 2;
-    const expires = Date.now() + TWO_DAYS;
-    const token = base64url(`${email}$$${expires}$$${hash}`);
+  async send(email: string): Promise<string> {
+    try {
+      const hash = crypto.randomBytes(32).toString('hex');
+      const expires = Date.now() + this.config.get('EMAIL_EXPIRATION_TIME_MS');
+      const token = base64url(`${email}$$${expires}$$${hash}`);
 
-    const url = new URL(this.config.get('MAILER_CALLBACK_URL')!);
-    url.searchParams.append('token', token);
+      const url = new URL(this.config.get('MAILER_CALLBACK_URL')!);
+      url.searchParams.append('token', token);
 
-    this.mailerService.sendHtmlEmail(
-      email,
-      'Verify your email',
-      `
-<div style="background-color: #f5f5f5; padding: 20px;">
-  <div style="background-color: #fff; padding: 20px; border-radius: 5px;text-align: center;">
-    <h1>Verify your email</h1>
-    <p>Click the link below to verify your email</p>
-    <a href="${url}">Verify your email</a>
-  </div>
-</div>`
-    );
+      await this.mailerService.sendHtmlEmail(
+        email,
+        'Verify your email',
+        this.generateEmailBody(url.href)
+      );
 
-    return token;
+      return token;
+    } catch {
+      throw new BadRequestException('Could not send verification email');
+    }
   }
 
   async verify(body: EmailVerificationDto) {
@@ -66,5 +62,16 @@ export class VerificationSerivce {
     } catch {
       throw new BadRequestException('Could not verify email');
     }
+  }
+
+  private generateEmailBody(url: string) {
+    return `
+    <div style="background-color: #f5f5f5; padding: 20px;">
+      <div style="background-color: #fff; padding: 20px; border-radius: 5px;text-align: center;">
+        <h1>Verify your email</h1>
+        <p>Click the link below to verify your email</p>
+        <a href="${url}">Verify your email</a>
+      </div>
+    </div>`;
   }
 }

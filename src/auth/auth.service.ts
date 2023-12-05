@@ -22,31 +22,36 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, password, confirm_password } = registerDto;
-    const findUser = await this.prismaService.user.findUnique({ where: { email } });
-    if (findUser) {
-      throw new BadRequestException('This email is already in use! Please try again');
-    }
-    if (password !== confirm_password) {
-      throw new BadRequestException('Passwords do not match! Please try again');
-    }
-    const hashed_password: string = await bcrypt.hash(password, 12);
+    try {
+      const { email, password, confirm_password } = registerDto;
+      const findUser = await this.prismaService.user.findUnique({ where: { email } });
+      if (findUser) {
+        throw new BadRequestException('This email is already in use! Please try again');
+      }
+      if (password !== confirm_password) {
+        throw new BadRequestException('Passwords do not match! Please try again');
+      }
+      const hashed_password: string = await bcrypt.hash(password, 12);
 
-    const newUser = await this.prismaService.user.create({
-      data: { email, password: hashed_password },
-    });
-    const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-    const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
-    const activationLink = await this.verificationService.send(newUser.email);
+      const newUser = await this.prismaService.user.create({
+        data: { email, password: hashed_password },
+      });
+      const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const activationLink = await this.verificationService.send(newUser.email);
 
-    await this.prismaService.user.update({
-      data: { hashedRefreshToken, activationLink },
-      where: { id: newUser.id },
-    });
-    return {
-      success: true,
-      message: 'User created successfully, please check your email to verify your account',
-    };
+      await this.prismaService.user.update({
+        data: { hashedRefreshToken, activationLink },
+        where: { id: newUser.id },
+      });
+      return {
+        success: true,
+        message: 'User created successfully, please check your email to verify your account',
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException('Could not create user');
+    }
   }
   async login(loginDto: LoginDto, res: Response) {
     const { email, password } = loginDto;
