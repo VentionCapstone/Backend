@@ -19,7 +19,7 @@ import { ErrorDto } from './dto/error.dto';
 export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
-  @Get('get/:id')
+  @Get('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
   @ApiUnauthorizedResponse()
@@ -37,7 +37,7 @@ export class AmenitiesController {
     return this.amenitiesService.getAmenities(id);
   }
 
-  @Put('update/:id')
+  @Put('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'UPDATE AMENITIES LIST' })
   @ApiUnauthorizedResponse()
@@ -56,7 +56,7 @@ export class AmenitiesController {
     return this.amenitiesService.updateAmenities(id, dto);
   }
 
-  @Post('add/:id')
+  @Post('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'ADD AMENITIES LIST' })
   @ApiUnauthorizedResponse()
@@ -80,7 +80,7 @@ export class AmenitiesController {
     return this.amenitiesService.addAmenities(id, dto);
   }
 
-  @Delete('delete/:id')
+  @Delete('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'DELETE AMENITIES LIST' })
   @ApiUnauthorizedResponse()
