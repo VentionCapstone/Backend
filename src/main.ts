@@ -12,6 +12,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(CookieParser());
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGIN,
+  });
+
   if (process.env.MODE !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Booking example')
