@@ -7,8 +7,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "Amenity" DROP COLUMN "numberOfRooms",
-DROP COLUMN "squareMeters",
+ALTER TABLE "Amenity"
 ADD COLUMN     "airConditioning" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "airportTransfer" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "backyard" BOOLEAN NOT NULL DEFAULT false,
