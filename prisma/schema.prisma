@@ -62,25 +62,25 @@ model Accommodation {
 }
 
 model Amenity {
-  id               String  @id @default(uuid())
-  wifi             Boolean @default(false)
-  parking          Boolean @default(false)
-  swimmingPool     Boolean @default(false)
-  petAllowance     Boolean @default(false)
-  quiteArea        Boolean @default(false)
-  backyard         Boolean @default(false)
-  smokingAllowance Boolean @default(false)
-  childFriendly    Boolean @default(false)
-  hospitalNearby   Boolean @default(false)
-  closeToCenter    Boolean @default(false)
-  laundryService   Boolean @default(false)
-  kitchen          Boolean @default(false)
-  airConditioning  Boolean @default(false)
-  tv               Boolean @default(false)
-  airportTransfer  Boolean @default(false)
-  otherAmenities   String?
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  accommodationId String        @unique
+  id                  String        @id @default(uuid())
+  hasWifi             Boolean       @default(false)
+  hasParking          Boolean       @default(false)
+  hasSwimmingPool     Boolean       @default(false)
+  hasPetAllowance     Boolean       @default(false)
+  isQuiteArea         Boolean       @default(false)
+  hasBackyard         Boolean       @default(false)
+  hasSmokingAllowance Boolean       @default(false)
+  isChildFriendly     Boolean       @default(false)
+  hasHospitalNearby   Boolean       @default(false)
+  isCloseToCenter     Boolean       @default(false)
+  hasLaundryService   Boolean       @default(false)
+  hasKitchen          Boolean       @default(false)
+  hasAirConditioning  Boolean       @default(false)
+  hasTv               Boolean       @default(false)
+  hasAirportTransfer  Boolean       @default(false)
+  otherAmenities      String?
+  accommodation       Accommodation @relation(fields: [accommodationId], references: [id])
+  accommodationId     String        @unique
 }
 
 model Media {
