@@ -6,14 +6,14 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseDto } from './dto/amenititesResponse.dto';
 import { ErrorDto } from './dto/error.dto';
 
-@ApiTags('amenities')
+@ApiTags('AMENITIES')
 @UseGuards(UserGuard)
 @Controller('amenities')
 export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
   @Get('get/:id')
-  @ApiOperation({ summary: 'Get amenities list' })
+  @ApiOperation({ summary: 'GET AMENITIES LIST' })
   @ApiResponse({
     status: 201,
     description: 'Success getting amenities',
@@ -29,7 +29,7 @@ export class AmenitiesController {
   }
 
   @Put('update/:id')
-  @ApiOperation({ summary: 'Update amenities list' })
+  @ApiOperation({ summary: 'UPDATE AMENITIES LIST' })
   @ApiResponse({
     status: 201,
     description: 'Success updating amenities',
@@ -40,13 +40,13 @@ export class AmenitiesController {
     description: 'Record to update not found.',
     type: ErrorDto,
   })
-  @ApiBody({ type: [AmenitiesDto] })
+  @ApiBody({ type: AmenitiesDto })
   updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
     return this.amenitiesService.updateAmenities(id, dto);
   }
 
   @Post('add/:id')
-  @ApiOperation({ summary: 'Add amenities list' })
+  @ApiOperation({ summary: 'ADD AMENITIES LIST' })
   @ApiResponse({
     status: 201,
     description: 'Success adding amenities',
@@ -62,13 +62,13 @@ export class AmenitiesController {
     description: 'Amenities for this accomodation already exist',
     type: ErrorDto,
   })
-  @ApiBody({ type: [AmenitiesDto] })
+  @ApiBody({ type: AmenitiesDto })
   addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
     return this.amenitiesService.addAmenities(id, dto);
   }
 
   @Delete('delete/:id')
-  @ApiOperation({ summary: 'Delete amenities list' })
+  @ApiOperation({ summary: 'DELETE AMENITIES LIST' })
   @ApiResponse({
     status: 201,
     description: 'Success deleting amenities',
