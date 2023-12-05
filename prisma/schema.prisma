@@ -42,18 +42,23 @@ model Booking {
 }
 
 model Accommodation {
-  id           String    @id @default(uuid())
-  addressId    String
-  thumbnailUrl String
-  ownerId      String
-  description  String
-  price        Float
-  availability Boolean
-  address      Address   @relation(fields: [addressId], references: [id])
-  amenities    Amenity[]
-  media        Media[]
-  reviews      Review[]
-  Booking      Booking[]
+  id            String    @id @default(uuid())
+  addressId     String
+  thumbnailUrl  String
+  ownerId       String
+  squareMeters  Int
+  numberOfRooms Int
+  price         Int
+  availability  Boolean
+  availableFrom DateTime
+  availableTo   DateTime
+  description   String?
+  previewImgUrl String
+  address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities     Amenity[]
+  media         Media[]
+  reviews       Review[]
+  Booking       Booking[]
 }
 
 model Amenity {
@@ -74,7 +79,6 @@ model Amenity {
   tv               Boolean @default(false)
   airportTransfer  Boolean @default(false)
   otherAmenities   String?
-
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   accommodationId String        @unique
 }
