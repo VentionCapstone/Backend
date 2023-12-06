@@ -13,17 +13,19 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(CookieParser());
+
   if (process.env.MODE !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Booking example')
       .setDescription('The Booking API description')
       .setVersion('1.0')
-      .addTag('Booking')
+      .addBearerAuth()
+      .addCookieAuth('refresh_token')
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
-
+  
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
 
   await app.listen(port, () => {

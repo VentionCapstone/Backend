@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { User } from '../../auth/entities/auth.entity';
@@ -34,9 +28,7 @@ export class UserGuard implements CanActivate {
       const findUser = await this.prismaService.user.findUnique({
         where: { email: user.email },
       });
-      if (!user) throw new UnauthorizedException('Invalid token provided');
-
-      if (!findUser?.isEmailVerified) throw new BadRequestException('Admin is not active');
+      if (!findUser) throw new UnauthorizedException('Invalid token provided');
 
       req.user = findUser;
 
