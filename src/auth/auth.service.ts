@@ -1,47 +1,57 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto, RegisterDto } from './dto';
+import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
-import { v4 } from 'uuid';
+import { VerificationSerivce } from './verification.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly verificationService: VerificationSerivce
   ) {}
 
-  async register(registerDto: RegisterDto, res: Response) {
-    const { email, password, confirm_password } = registerDto;
-    const findUser = await this.prismaService.user.findUnique({ where: { email } });
-    if (findUser) {
-      throw new BadRequestException('This email is already in use! Please try again');
-    }
-    if (password !== confirm_password) {
-      throw new BadRequestException('Passwords do not match! Please try again');
-    }
-    const hashed_password: string = await bcrypt.hash(password, 12);
+  async register(registerDto: RegisterDto) {
+    try {
+      const { email, password, confirm_password } = registerDto;
+      const findUser = await this.prismaService.user.findUnique({ where: { email } });
+      if (findUser) {
+        throw new BadRequestException('This email is already in use! Please try again');
+      }
+      if (password !== confirm_password) {
+        throw new BadRequestException('Passwords do not match! Please try again');
+      }
+      const hashed_password: string = await bcrypt.hash(password, 12);
 
-    const newUser = await this.prismaService.user.create({
-      data: { email, password: hashed_password },
-    });
-    const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-    const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
-    const activationLink = v4();
+      const newUser = await this.prismaService.user.create({
+        data: { email, password: hashed_password },
+      });
+      const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const activationLink = await this.verificationService.send(newUser.email);
 
-    await this.prismaService.user.update({
-      data: { hashedRefreshToken, activationLink },
-      where: { id: newUser.id },
-    });
-    this.setRefreshTokenCookie(tokens.refresh_token, res);
-    return tokens;
+      await this.prismaService.user.update({
+        data: { hashedRefreshToken, activationLink },
+        where: { id: newUser.id },
+      });
+      return {
+        success: true,
+        message: 'User created successfully, please check your email to verify your account',
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException('Could not create user');
+    }
   }
   async login(loginDto: LoginDto, res: Response) {
     const { email, password } = loginDto;
@@ -106,6 +116,29 @@ export class AuthService {
       tokens,
       message: 'Tokens have been refreshed successfully',
     };
+  }
+  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: User) {
+    try {
+      const { email: newEmail } = emailUpdateDto;
+
+      if (user.email === newEmail) {
+        if (user.isEmailVerified) throw new BadRequestException('You already verified this email!');
+      } else {
+        const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
+        if (findUser) throw new ConflictException('This email is already in use! Please try again');
+      }
+
+      const activationLink = await this.verificationService.send(newEmail);
+      await this.prismaService.user.update({
+        data: { activationLink, email: newEmail, isEmailVerified: false },
+        where: { id: user.id },
+      });
+      return {
+        message: 'Email update request sent',
+      };
+    } catch {
+      throw new BadRequestException('Could not update email');
+    }
   }
 
   /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
