@@ -68,7 +68,8 @@ export class AccommodationService {
         },
       });
     } catch (error) {
-      if (error.code === 'P2025') throw new NotFoundException('Cannot find deleting accommodation');
+      if (error.code === ErrorsTypes.PRISMA_NOT_FOUND)
+        throw new NotFoundException('Cannot find deleting accommodation');
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE);
     }
 
@@ -77,7 +78,7 @@ export class AccommodationService {
         where: { id: deletedAccommodation.address.id },
       });
     } catch (error) {
-      if (error.code === 'P2025')
+      if (error.code === ErrorsTypes.PRISMA_NOT_FOUND)
         throw new NotFoundException('Cannot find deleting accommodation address');
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE);
     }
