@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -15,6 +15,10 @@ export class AmenitiesService {
       const list = columns
         .filter((column) => !excludedColumns.includes(column.column_name))
         .map((column) => column.column_name);
+
+      if (!columns) {
+        throw new NotFoundException('No amenities list found');
+      }
 
       return { message: 'Success getting amenities list', data: list };
     } catch (error) {
@@ -47,7 +51,7 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new InternalServerErrorException('Amenities for this accomodation already exist');
+          throw new ConflictException('Amenities for this accomodation already exist');
         }
         if (error.code === 'P2003') {
           throw new NotFoundException('No amenities found for this accomodation id');
@@ -78,22 +82,18 @@ export class AmenitiesService {
 
   async deleteAmenities(id: string) {
     try {
-      const findAmenities = await this.prisma.amenity.findUnique({
+      const deletedAmenities = await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
         },
       });
-      if (!findAmenities) {
-        throw new NotFoundException('No amenities found for this accomodation id');
-      } else {
-        const deletedAmenities = await this.prisma.amenity.delete({
-          where: {
-            accommodationId: id,
-          },
-        });
-        return { message: 'Success deleting amenities', data: deletedAmenities };
-      }
+      return { message: 'Success deleting amenities', data: deletedAmenities };
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('No amenities found for this accomodation id');
+        }
+      }
       throw error;
     }
   }
