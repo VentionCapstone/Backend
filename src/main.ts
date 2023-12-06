@@ -12,6 +12,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(CookieParser());
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGIN,
+  });
 
   if (process.env.MODE !== 'production') {
     const config = new DocumentBuilder()
@@ -30,10 +33,12 @@ async function bootstrap() {
         },
         'JWT-auth'
       )
+      .addCookieAuth('refresh_token')
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
+  
   await app.listen(port, () => {
     console.log('listening on port ' + port);
   });
