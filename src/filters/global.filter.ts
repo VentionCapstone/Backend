@@ -23,7 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const errorObj = ERRORS[key] || ERRORS['DEFAULT'];
 
       if (!ERRORS[key] && status === 404) {
-        response.status(errorObj.statusCode).json({
+        response.status(404).json({
           success: false,
           error: ` Error in ${request.method} method to ${request.originalUrl}, ${status}. We dont have this endpoint ${request.method} ${request.originalUrl}`,
         });
