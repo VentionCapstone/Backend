@@ -14,7 +14,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     this.logger.error(
-      `${request.method} ${request.originalUrl} ${status} error: ${exception.message}`
+      `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${exception.message}`
     );
 
     if (!(exception instanceof GlobalException)) {
