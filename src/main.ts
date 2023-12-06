@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
+import { GlobalExceptionFilter } from './filters/global.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,7 +28,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
-  
+
+  app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
+
   await app.listen(port, () => {
     console.log('listening on port ' + port);
   });
