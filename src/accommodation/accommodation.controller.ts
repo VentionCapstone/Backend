@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  NotFoundException,
   Param,
   ParseFilePipe,
   Post,
@@ -50,22 +51,18 @@ export class AccommodationController {
   })
   @Post('/create')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
-    try {
-      const createAccommodationAndAdress = {
-        ...body.accommodation,
-        previewImgUrl: body.accommodation.previewImgUrl || 'none',
-        ownerId: req.user.id,
-        address: {
-          create: body.address,
-        },
-      };
-      const createdAccommodation = await this.accommodationService.createAccommodation(
-        createAccommodationAndAdress
-      );
-      return { success: true, data: createdAccommodation };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    const createAccommodationAndAdress = {
+      ...body.accommodation,
+      previewImgUrl: body.accommodation.previewImgUrl || 'none',
+      ownerId: req.user.id,
+      address: {
+        create: body.address,
+      },
+    };
+    const createdAccommodation = await this.accommodationService.createAccommodation(
+      createAccommodationAndAdress
+    );
+    return { success: true, data: createdAccommodation };
   }
 
   @ApiOperation({ summary: 'ADD IMAGE TO ACCOMMODATION' })
@@ -115,21 +112,15 @@ export class AccommodationController {
     @Param('id') id: string,
     @Req() req: any
   ) {
-    try {
-      if (!file) {
-        throw new Error('No file provided.');
-      }
+    if (!file) throw new NotFoundException('File for updation not provided');
 
-      const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
-        id,
-        file,
-        req.user.id
-      );
+    const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
+      id,
+      file,
+      req.user.id
+    );
 
-      return { success: true, data: updatedAccommodation };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    return { success: true, data: updatedAccommodation };
   }
 
   @ApiOperation({ summary: 'UPDATE ACCOMMODATION' })
@@ -157,24 +148,20 @@ export class AccommodationController {
     @Param('id') id: string,
     @Req() req: any
   ) {
-    try {
-      const updateAccommodationAndAdress = {
-        ...body.accommodation,
-        address: {
-          update: body.address,
-        },
-      };
+    const updateAccommodationAndAdress = {
+      ...body.accommodation,
+      address: {
+        update: body.address,
+      },
+    };
 
-      const updatedAccommodation = await this.accommodationService.updateAccommodation(
-        id,
-        updateAccommodationAndAdress,
-        req.user.id
-      );
+    const updatedAccommodation = await this.accommodationService.updateAccommodation(
+      id,
+      updateAccommodationAndAdress,
+      req.user.id
+    );
 
-      return { success: true, data: updatedAccommodation };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    return { success: true, data: updatedAccommodation };
   }
 
   @ApiOperation({ summary: 'DELETE ACCOMMODATION' })
@@ -198,12 +185,8 @@ export class AccommodationController {
   })
   @Delete('/delete/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
-    try {
-      await this.accommodationService.deleteAccommodation(id, req.user.id);
-      return { success: true, data: {} };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    await this.accommodationService.deleteAccommodation(id, req.user.id);
+    return { success: true, data: {} };
   }
 
   @ApiOperation({ summary: 'GET ACCOMMODATION' })
@@ -227,12 +210,7 @@ export class AccommodationController {
   })
   @Get('/get/:id')
   async findOne(@Param('id') id: string) {
-    try {
-      const accommodation = await this.accommodationService.getOneAccommodation(id);
-
-      return { success: true, data: accommodation };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+    const accommodation = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data: accommodation };
   }
 }

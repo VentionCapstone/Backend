@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccommodationModule } from './accommodation/accommodation.module';
@@ -17,6 +17,6 @@ import { AmenitiesModule } from './amenities/amenities.module';
     AccommodationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Logger],
 })
 export class AppModule {}
