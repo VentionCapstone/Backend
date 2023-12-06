@@ -1,21 +1,36 @@
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto';
+import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiGoneResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
+import { VerificationSerivce } from './verification.service';
+import { User } from '@prisma/client';
 
 @ApiTags('USER')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly verificationService: VerificationSerivce
+  ) {}
 
   @ApiOperation({ summary: 'SIGN UP USER' })
-  @ApiResponse({ status: 201, description: 'tokens' })
+  @ApiResponse({ status: 201, description: 'link sent' })
   @Post('signup')
-  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.register(registerDto, res);
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @ApiOperation({ summary: 'SIGN IN USER' })
@@ -26,6 +41,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'SIGN OUT USER' })
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Message: User Logged Out Succesfully' })
   @UseGuards()
   @Post('signout')
@@ -37,6 +53,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'REFRESH TOKEN' })
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Refresh Tokens' })
   @UseGuards(UserGuard)
   @Get(':id/refresh')
@@ -46,5 +63,25 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.refreshToken(id, refreshToken, res);
+  }
+
+  @ApiOperation({ summary: 'VERIFY EMAIL' })
+  @ApiBadRequestResponse({ description: 'Invalid link' })
+  @ApiGoneResponse({ description: 'Link expired' })
+  @ApiOkResponse({ description: 'Verified Succesfully' })
+  @Post('verify')
+  verifyEmail(@Body() body: EmailVerificationDto) {
+    return this.verificationService.verify(body);
+  }
+
+  @ApiOperation({ summary: 'UPDATE EMAIL REQUEST' })
+  @ApiBearerAuth()
+  @ApiBadRequestResponse({ description: 'Email already verified' })
+  @ApiConflictResponse({ description: 'Email already in use' })
+  @ApiOkResponse({ description: 'Link sent' })
+  @UseGuards(UserGuard)
+  @Put('email')
+  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: User) {
+    return this.authService.updateEmailRequest(body, user);
   }
 }
