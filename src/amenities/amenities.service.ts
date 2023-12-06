@@ -7,6 +7,21 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class AmenitiesService {
   constructor(private prisma: PrismaService) {}
 
+  async getAmenitiesList() {
+    try {
+      const columns: Array<{ column_name: string }> = await this.prisma
+        .$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'Amenity';`;
+      const excludedColumns = ['accommodationId', 'id'];
+      const list = columns
+        .filter((column) => !excludedColumns.includes(column.column_name))
+        .map((column) => column.column_name);
+
+      return { message: 'Success getting amenities list', data: list };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getAmenities(id: string) {
     try {
       const amenities = await this.prisma.amenity.findUnique({
@@ -15,7 +30,7 @@ export class AmenitiesService {
         },
       });
       if (!amenities) {
-        throw new NotFoundException('Incorrect apartment id');
+        throw new NotFoundException('No amenities found for this accomodation id');
       }
       return { message: 'Success getting amenities', data: amenities };
     } catch (error) {
@@ -35,7 +50,7 @@ export class AmenitiesService {
           throw new InternalServerErrorException('Amenities for this accomodation already exist');
         }
         if (error.code === 'P2003') {
-          throw new NotFoundException('Incorrect apartment id');
+          throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
       throw error;
@@ -54,7 +69,7 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException('Record to update not found.');
+          throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
       throw error;
@@ -69,7 +84,7 @@ export class AmenitiesService {
         },
       });
       if (!findAmenities) {
-        throw new NotFoundException('Incorrect apartment id');
+        throw new NotFoundException('No amenities found for this accomodation id');
       } else {
         const deletedAmenities = await this.prisma.amenity.delete({
           where: {

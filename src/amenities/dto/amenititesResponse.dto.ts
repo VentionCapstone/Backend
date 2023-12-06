@@ -16,3 +16,11 @@ export class ResponseDto {
   @ApiProperty()
   data: AmenitiesResponseDto;
 }
+
+export class getListResponseDto {
+  @ApiProperty()
+  message: string;
+
+  @ApiProperty()
+  data: Array<string>;
+}

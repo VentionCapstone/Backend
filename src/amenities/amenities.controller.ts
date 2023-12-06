@@ -10,7 +10,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ResponseDto } from './dto/amenititesResponse.dto';
+import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
 import { ErrorDto } from './dto/error.dto';
 
 @ApiTags('AMENITIES')
@@ -19,9 +19,25 @@ import { ErrorDto } from './dto/error.dto';
 export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
-  @Get('/:id')
+  @Get('/list')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success getting amenities list',
+    type: getListResponseDto,
+  })
+  getAmenitiesList() {
+    return this.amenitiesService.getAmenitiesList();
+  }
+
+  @Get('/:id')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'GET AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -42,7 +58,7 @@ export class AmenitiesController {
 
   @Put('/:id')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'UPDATE AMENITIES LIST' })
+  @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -64,7 +80,7 @@ export class AmenitiesController {
 
   @Post('/:id')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADD AMENITIES LIST' })
+  @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -91,7 +107,7 @@ export class AmenitiesController {
 
   @Delete('/:id')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'DELETE AMENITIES LIST' })
+  @ApiOperation({ summary: 'DELETE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
