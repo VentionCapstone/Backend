@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -8,14 +8,18 @@ export class AccommodationService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAccommodation(createAccommodationBody: any) {
-    const newAccommodation = await this.prisma.accommodation.create({
-      include: {
-        address: true,
-      },
-      data: createAccommodationBody,
-    });
+    try {
+      const newAccommodation = await this.prisma.accommodation.create({
+        include: {
+          address: true,
+        },
+        data: createAccommodationBody,
+      });
 
-    return newAccommodation;
+      return newAccommodation;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE);
+    }
   }
 
   async updateAccommodation(
@@ -23,72 +27,90 @@ export class AccommodationService {
     updateAccommodationBody: any,
     ownerId: string
   ): Promise<any> {
-    const existingAccommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
+    let existingAccommodation;
+    try {
+      existingAccommodation = await this.prisma.accommodation.findUnique({
+        where: { id, ownerId },
+        include: {
+          address: true,
+        },
+      });
+    } catch (err) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
+    }
 
-    if (!existingAccommodation) throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_FOUND);
+    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
 
-    if (ownerId !== existingAccommodation.ownerId)
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_OWNER);
-
-    const updatedAccommodation = await this.prisma.accommodation.update({
-      where: { id },
-      include: {
-        address: true,
-      },
-      data: updateAccommodationBody,
-    });
-
-    return updatedAccommodation;
+    try {
+      const updatedAccommodation = await this.prisma.accommodation.update({
+        where: { id },
+        include: {
+          address: true,
+        },
+        data: updateAccommodationBody,
+      });
+      return updatedAccommodation;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
+    }
   }
 
   async deleteAccommodation(id: string, ownerId: string) {
-    const deletedAccommodation = await this.prisma.accommodation.delete({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
+    let deletedAccommodation;
+    try {
+      deletedAccommodation = await this.prisma.accommodation.delete({
+        where: {
+          id,
+          ownerId,
+        },
+        include: {
+          address: true,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025') throw new NotFoundException('Cannot find deleting accommodation');
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE);
+    }
 
-    if (!deletedAccommodation) throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_FOUND);
-
-    if (ownerId !== deletedAccommodation.ownerId)
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_OWNER);
-
-    const deletedAddress = await this.prisma.address.delete({
-      where: { id: deletedAccommodation.address.id },
-    });
-
-    if (!deletedAddress) throw new GlobalException(ErrorsTypes.ACCOMMODATION_CANNOT_DELETE_ADDRESS);
-
-    return deletedAccommodation;
+    try {
+      await this.prisma.address.delete({
+        where: { id: deletedAccommodation.address.id },
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new NotFoundException('Cannot find deleting accommodation address');
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE);
+    }
+    return;
   }
+
   async getOneAccommodation(id: string) {
-    const accommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-      include: {
-        address: true,
-      },
-    });
-
-    if (!accommodation) throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_FOUND);
-
+    let accommodation;
+    try {
+      accommodation = await this.prisma.accommodation.findUnique({
+        where: { id },
+        include: {
+          address: true,
+        },
+      });
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET);
+    }
+    if (!accommodation) throw new NotFoundException('Can not find accommodation');
     return accommodation;
   }
 
   async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
-    const existingAccommodation = await this.prisma.accommodation.findUnique({
-      where: { id },
-    });
+    let existingAccommodation;
+    try {
+      existingAccommodation = await this.prisma.accommodation.findUnique({
+        where: { id, ownerId },
+      });
+    } catch (err) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
+    }
 
-    if (!existingAccommodation) throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_FOUND);
-
-    if (ownerId !== existingAccommodation.ownerId)
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_NOT_OWNER);
+    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
 
     const base64Data = file.buffer.toString('base64');
 
@@ -96,11 +118,15 @@ export class AccommodationService {
       previewImgUrl: base64Data,
     };
 
-    const updatedAccommodation = await this.prisma.accommodation.update({
-      where: { id },
-      data: updateAccommodationAndAdress,
-    });
+    try {
+      const updatedAccommodation = await this.prisma.accommodation.update({
+        where: { id },
+        data: updateAccommodationAndAdress,
+      });
 
-    return updatedAccommodation;
+      return updatedAccommodation;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
+    }
   }
 }

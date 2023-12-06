@@ -5,6 +5,7 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  NotFoundException,
   Param,
   ParseFilePipe,
   Post,
@@ -29,8 +30,6 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
-import ErrorsTypes from 'src/errors/errors.enum';
-import { GlobalException } from 'src/exceptions/global.exception';
 
 @UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
@@ -113,7 +112,7 @@ export class AccommodationController {
     @Param('id') id: string,
     @Req() req: any
   ) {
-    if (!file) throw new GlobalException(ErrorsTypes.ACCOMMODATION_NO_FILE_PROVIDED);
+    if (!file) throw new NotFoundException('File for updation not provided');
 
     const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
       id,
