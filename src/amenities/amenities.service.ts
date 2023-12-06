@@ -2,6 +2,8 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { GlobalException } from 'src/exceptions/global.exception';
+import ErrorsTypes from 'src/errors/errors.enum';
 
 @Injectable()
 export class AmenitiesService {
@@ -22,7 +24,7 @@ export class AmenitiesService {
 
       return { message: 'Success getting amenities list', data: list };
     } catch (error) {
-      throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET);
     }
   }
 
@@ -38,7 +40,8 @@ export class AmenitiesService {
       }
       return { message: 'Success getting amenities', data: amenities };
     } catch (error) {
-      throw error;
+      if (error instanceof NotFoundException) throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET);
     }
   }
 
@@ -57,7 +60,7 @@ export class AmenitiesService {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
-      throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD);
     }
   }
 
@@ -76,7 +79,7 @@ export class AmenitiesService {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
-      throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE);
     }
   }
 
@@ -94,7 +97,7 @@ export class AmenitiesService {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
-      throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE);
     }
   }
 }

@@ -11,7 +11,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
-import { ErrorDto } from './dto/error.dto';
 
 @ApiTags('AMENITIES')
 @UseGuards(UserGuard)
@@ -30,6 +29,14 @@ export class AmenitiesController {
     status: 200,
     description: 'Success getting amenities list',
     type: getListResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   getAmenitiesList() {
     return this.amenitiesService.getAmenitiesList();
@@ -50,7 +57,10 @@ export class AmenitiesController {
   @ApiResponse({
     status: 404,
     description: 'Not Found',
-    type: ErrorDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   getAmenities(@Param('id') id: string) {
     return this.amenitiesService.getAmenities(id);
@@ -71,7 +81,10 @@ export class AmenitiesController {
   @ApiResponse({
     status: 404,
     description: 'Not Found',
-    type: ErrorDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
   updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
@@ -93,12 +106,14 @@ export class AmenitiesController {
   @ApiResponse({
     status: 404,
     description: 'Not Found',
-    type: ErrorDto,
   })
   @ApiResponse({
     status: 409,
     description: 'Amenities for this accomodation already exist',
-    type: ErrorDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
   addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
@@ -120,7 +135,10 @@ export class AmenitiesController {
   @ApiResponse({
     status: 404,
     description: 'Not Found',
-    type: ErrorDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   deleteAmenities(@Param('id') id: string) {
     return this.amenitiesService.deleteAmenities(id);

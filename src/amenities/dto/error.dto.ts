@@ -2,11 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ErrorDto {
   @ApiProperty()
-  message: string;
+  success: boolean;
 
   @ApiProperty()
-  error: string;
-
-  @ApiProperty()
-  statusCode: number;
+  error: object;
 }
