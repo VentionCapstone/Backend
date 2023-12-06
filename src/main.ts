@@ -25,7 +25,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
-  
+
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
 
   await app.listen(port, () => {

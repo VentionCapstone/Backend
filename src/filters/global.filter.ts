@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ERRORS from 'src/errors/errors.config';
@@ -26,6 +26,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         response.status(404).json({
           success: false,
           error: ` Error in ${request.method} method to ${request.originalUrl}, ${status}. We dont have this endpoint ${request.method} ${request.originalUrl}`,
+        });
+        return;
+      }
+      if (!ERRORS[key] && status === HttpStatus.BAD_REQUEST) {
+        response.status(status).json({
+          success: false,
+          error: exception.getResponse(),
         });
         return;
       }
