@@ -20,7 +20,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
       const key = exception.message;
 
-      const errorObj = ERRORS[key] || (status === 404 && ERRORS['NOT_FOUND']) || ERRORS['DEFAULT'];
+      const errorObj = ERRORS[key] || ERRORS['DEFAULT'];
+
+      if (!ERRORS[key] && status === 404) {
+        response.status(errorObj.statusCode).json({
+          success: false,
+          error: ` Error in ${request.method} method to ${request.originalUrl}, ${status}. We dont have this endpoint ${request.method} ${request.originalUrl}`,
+        });
+        return;
+      }
 
       response.status(errorObj.statusCode).json({
         success: false,

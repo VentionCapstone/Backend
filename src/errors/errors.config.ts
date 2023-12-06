@@ -6,10 +6,6 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Internal Server Error.',
   },
-  NOT_FOUND: {
-    statusCode: 404,
-    message: 'We do not have this page',
-  },
 
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE]: {
     statusCode: 500,
