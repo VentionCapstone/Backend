@@ -13,7 +13,7 @@ model User {
   Profile            UserProfile[]
   Booking            Booking[]
   Review             Review[]
-  notifications      Notification[]
+  Notifications      Notification[]
 }
 
 model UserProfile {
@@ -25,7 +25,7 @@ model UserProfile {
   uiTheme     UiTheme @default(LIGHT)
   description String?
   userId      String  @unique
-  user        User    @relation(fields: [userId], references: [id])
+  User        User    @relation(fields: [userId], references: [id])
 }
 
 model Booking {
@@ -36,9 +36,9 @@ model Booking {
   startDate       DateTime
   endDate         DateTime
   status          Status        @default(PENDING)
-  user            User          @relation(fields: [userId], references: [id])
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  payment         Payment       @relation(fields: [paymentId], references: [id])
+  User            User          @relation(fields: [userId], references: [id])
+  Accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  Payment         Payment       @relation(fields: [paymentId], references: [id])
 }
 
 model Accommodation {
@@ -54,10 +54,10 @@ model Accommodation {
   availableTo   DateTime
   description   String?
   previewImgUrl String
-  address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  amenities     Amenity[]
-  media         Media[]
-  reviews       Review[]
+  Address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  Amenities     Amenity[]
+  Media         Media[]
+  Reviews       Review[]
   Booking       Booking[]
 }
 
@@ -65,7 +65,7 @@ model Amenity {
   id              String        @id @default(uuid())
   wifi            Boolean
   parking         Boolean
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  Accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   accommodationId String
 }
 
@@ -73,7 +73,7 @@ model Media {
   id              String        @id @default(uuid())
   imageUrl        String
   thumbnailUrl    String
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  Accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   accommodationId String
 }
 
@@ -82,7 +82,7 @@ model Notification {
   type    String
   title   String
   message String
-  users   User[]
+  Users   User[]
 }
 
 model Payment {
@@ -112,8 +112,8 @@ model Review {
   title           String
   feedback        String
   rating          Int
-  user            User          @relation(fields: [userId], references: [id])
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  User            User          @relation(fields: [userId], references: [id])
+  Accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
 }
 
 enum Role {
