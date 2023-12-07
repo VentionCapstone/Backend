@@ -1,10 +1,16 @@
 import { ErrorDefinition } from './error.interface';
 import ErrorsTypes from './errors.enum';
+import PrismaErrorCodes from './prismaErrorCodes.enum';
 
 const ERRORS: ErrorDefinition = {
   DEFAULT: {
     statusCode: 500,
     message: 'Internal Server Error.',
+  },
+
+  [PrismaErrorCodes.RECORD_NOT_FOUND]: {
+    statusCode: 500,
+    message: 'Failed to get this record from db.',
   },
 
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING]: {
