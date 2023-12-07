@@ -18,7 +18,7 @@ import { UserGuard } from '../common/guards/user.guard';
 import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
 
-@ApiTags('USER')
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
   constructor(
