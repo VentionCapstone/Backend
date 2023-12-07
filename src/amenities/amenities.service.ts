@@ -4,6 +4,7 @@ import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
+import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 
 @Injectable()
 export class AmenitiesService {
@@ -53,10 +54,10 @@ export class AmenitiesService {
       return { message: 'Success adding amenities', data: newAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
+        if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
           throw new ConflictException('Amenities for this accomodation already exist');
         }
-        if (error.code === 'P2003') {
+        if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED) {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
@@ -75,7 +76,7 @@ export class AmenitiesService {
       return { message: 'Success updating amenities', data: updatedAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }
@@ -93,7 +94,7 @@ export class AmenitiesService {
       return { message: 'Success deleting amenities', data: deletedAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
       }

@@ -66,31 +66,6 @@ export class AmenitiesController {
     return this.amenitiesService.getAmenities(id);
   }
 
-  @Put('/:id')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Success updating amenities',
-    type: ResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  @ApiBody({ type: AmenitiesDto })
-  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
-    return this.amenitiesService.updateAmenities(id, dto);
-  }
-
   @Post('/:id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
@@ -118,6 +93,31 @@ export class AmenitiesController {
   @ApiBody({ type: AmenitiesDto })
   addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
     return this.amenitiesService.addAmenities(id, dto);
+  }
+
+  @Put('/:id')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success updating amenities',
+    type: ResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiBody({ type: AmenitiesDto })
+  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
+    return this.amenitiesService.updateAmenities(id, dto);
   }
 
   @Delete('/:id')
