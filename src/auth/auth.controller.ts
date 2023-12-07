@@ -43,7 +43,7 @@ export class AuthController {
   @ApiOperation({ summary: 'SIGN OUT USER' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Message: User Logged Out Succesfully' })
-  @UseGuards()
+  @UseGuards(UserGuard)
   @Post('signout')
   signOut(
     @CookieGetter('refresh_token') refreshToken: string,
@@ -55,7 +55,6 @@ export class AuthController {
   @ApiOperation({ summary: 'REFRESH TOKEN' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Refresh Tokens' })
-  @UseGuards(UserGuard)
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,

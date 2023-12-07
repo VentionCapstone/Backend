@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
@@ -55,6 +55,7 @@ export class AuthService {
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REGISTER);
     }
   }
+
   async login(loginDto: LoginDto, res: Response) {
     try {
       const { email, password } = loginDto;
@@ -104,7 +105,11 @@ export class AuthService {
 
   async refreshToken(userId: string, refreshToken: string, res: Response) {
     try {
-      const decodedToken = this.jwtService.decode(refreshToken);
+      const decodedToken = await this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      if (!decodedToken) throw new BadRequestException('Invalid refresh token');
 
       if (userId != decodedToken['sub']) throw new BadRequestException('User not found');
 
@@ -114,6 +119,7 @@ export class AuthService {
       if (!user || !user.hashedRefreshToken) throw new BadRequestException('User not found');
 
       const tokenMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+
       if (!tokenMatch) throw new ForbiddenException('Forbidden');
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
@@ -132,6 +138,9 @@ export class AuthService {
         message: 'Tokens have been refreshed successfully',
       };
     } catch (error) {
+      if (error instanceof TokenExpiredError)
+        throw new UnauthorizedException('Refresh token expired');
+
       if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS);
     }

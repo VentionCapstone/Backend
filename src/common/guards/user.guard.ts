@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { User } from '../../auth/entities/auth.entity';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -36,7 +36,8 @@ export class UserGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      console.log(error);
+      if (error instanceof TokenExpiredError)
+        throw new UnauthorizedException('Access token expired');
       if (error instanceof UnauthorizedException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
     }
