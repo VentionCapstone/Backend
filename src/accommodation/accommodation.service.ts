@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
+import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 
 @Injectable()
 export class AccommodationService {
@@ -68,7 +69,8 @@ export class AccommodationService {
         },
       });
     } catch (error) {
-      if (error.code === 'P2025') throw new NotFoundException('Cannot find deleting accommodation');
+      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
+        throw new NotFoundException('Cannot find deleting accommodation');
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE);
     }
 
@@ -77,7 +79,7 @@ export class AccommodationService {
         where: { id: deletedAccommodation.address.id },
       });
     } catch (error) {
-      if (error.code === 'P2025')
+      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
         throw new NotFoundException('Cannot find deleting accommodation address');
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE);
     }

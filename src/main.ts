@@ -22,7 +22,18 @@ async function bootstrap() {
       .setTitle('Booking example')
       .setDescription('The Booking API description')
       .setVersion('1.0')
-      .addBearerAuth()
+      .addTag('Booking')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth'
+      )
       .addCookieAuth('refresh_token')
       .build();
     const document = SwaggerModule.createDocument(app, config);

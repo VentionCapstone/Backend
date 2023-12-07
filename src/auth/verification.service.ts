@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from 'src/mailer/mailer.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailVerificationDto } from './dto';
+import { GlobalException } from 'src/exceptions/global.exception';
+import ErrorsTypes from 'src/errors/errors.enum';
 
 @Injectable()
 export class VerificationSerivce {
@@ -31,7 +33,7 @@ export class VerificationSerivce {
 
       return token;
     } catch {
-      throw new BadRequestException('Could not send verification email');
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_SEND_VERIFICATION_EMAIL);
     }
   }
 
@@ -59,8 +61,14 @@ export class VerificationSerivce {
         success: true,
         message: 'Email verified succesfully',
       };
-    } catch {
-      throw new BadRequestException('Could not verify email');
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException ||
+        error instanceof GoneException
+      )
+        throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_VERIFY_EMAIL);
     }
   }
 
