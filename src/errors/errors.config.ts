@@ -37,6 +37,7 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to get existsting accommodation.',
   },
+
   [ErrorsTypes.AUTH_FAILED_TO_REGISTER]: {
     statusCode: 500,
     message: 'Failed to register user.',
@@ -76,6 +77,27 @@ const ERRORS: ErrorDefinition = {
   [ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY]: {
     statusCode: 500,
     message: 'Failed to verify user token.',
+  },
+
+  [ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get amenities list.',
+  },
+  [ErrorsTypes.AMENITIES_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get amenities.',
+  },
+  [ErrorsTypes.AMENITIES_FAILED_TO_ADD]: {
+    statusCode: 500,
+    message: 'Failed to add amenities.',
+  },
+  [ErrorsTypes.AMENITIES_FAILED_TO_UPDATE]: {
+    statusCode: 500,
+    message: 'Failed to update amenities.',
+  },
+  [ErrorsTypes.AMENITIES_FAILED_TO_DELETE]: {
+    statusCode: 500,
+    message: 'Failed to delete amenities.',
   },
 };
 
