@@ -10,7 +10,7 @@ model User {
   isDeleted          Boolean        @default(false)
   hashedRefreshToken String?
   activationLink     String?
-  Profile            UserProfile[]
+  Profile            UserProfile?
   Booking            Booking[]
   Review             Review[]
   Notifications      Notification[]
@@ -19,6 +19,7 @@ model User {
 model UserProfile {
   id          String  @id @default(uuid())
   phoneNumber String
+  imageUrl    String?
   gender      Gender
   country     String
   language    String
@@ -62,11 +63,25 @@ model Accommodation {
 }
 
 model Amenity {
-  id              String        @id @default(uuid())
-  wifi            Boolean
-  parking         Boolean
-  Accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  accommodationId String
+  id                  String        @id @default(uuid())
+  hasWifi             Boolean       @default(false)
+  hasParking          Boolean       @default(false)
+  hasSwimmingPool     Boolean       @default(false)
+  hasPetAllowance     Boolean       @default(false)
+  isQuiteArea         Boolean       @default(false)
+  hasBackyard         Boolean       @default(false)
+  hasSmokingAllowance Boolean       @default(false)
+  isChildFriendly     Boolean       @default(false)
+  hasHospitalNearby   Boolean       @default(false)
+  isCloseToCenter     Boolean       @default(false)
+  hasLaundryService   Boolean       @default(false)
+  hasKitchen          Boolean       @default(false)
+  hasAirConditioning  Boolean       @default(false)
+  hasTv               Boolean       @default(false)
+  hasAirportTransfer  Boolean       @default(false)
+  otherAmenities      String?
+  Accommodation       Accommodation @relation(fields: [accommodationId], references: [id])
+  accommodationId     String        @unique
 }
 
 model Media {

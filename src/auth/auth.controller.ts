@@ -18,7 +18,7 @@ import { UserGuard } from '../common/guards/user.guard';
 import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
 
-@ApiTags('USER')
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -55,7 +55,6 @@ export class AuthController {
   @ApiOperation({ summary: 'REFRESH TOKEN' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Refresh Tokens' })
-  @UseGuards(UserGuard)
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,
