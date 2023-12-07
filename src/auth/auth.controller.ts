@@ -1,3 +1,4 @@
+
 import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
@@ -18,7 +19,7 @@ import { UserGuard } from '../common/guards/user.guard';
 import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
 
-@ApiTags('USER')
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
   constructor(
