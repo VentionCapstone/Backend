@@ -19,7 +19,7 @@ model User {
 model UserProfile {
   id          String  @id @default(uuid())
   phoneNumber String
-  photoUrl    String?
+  imageUrl    String?
   gender      Gender
   country     String
   language    String
