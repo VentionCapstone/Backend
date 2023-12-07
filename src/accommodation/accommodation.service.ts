@@ -1,6 +1,7 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NotOwnerException } from 'src/exceptions/not-owner.exception';
+import { GlobalException } from 'src/exceptions/global.exception';
+import ErrorsTypes from 'src/errors/errors.enum';
 
 @Injectable()
 export class AccommodationService {
@@ -17,7 +18,7 @@ export class AccommodationService {
 
       return newAccommodation;
     } catch (error) {
-      throw new HttpException('Failed to create accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE);
     }
   }
 
@@ -29,23 +30,16 @@ export class AccommodationService {
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({
-        where: { id },
+        where: { id, ownerId },
         include: {
           address: true,
         },
       });
-    } catch (error) {
-      throw new HttpException(
-        'Failed to get updating accommodation',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+    } catch (err) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
     }
 
-    if (!existingAccommodation) {
-      throw new NotFoundException(`Accommodation with id ${id} not found`);
-    }
-
-    if (ownerId !== existingAccommodation.ownerId) throw new NotOwnerException();
+    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
 
     try {
       const updatedAccommodation = await this.prisma.accommodation.update({
@@ -55,86 +49,68 @@ export class AccommodationService {
         },
         data: updateAccommodationBody,
       });
-
       return updatedAccommodation;
     } catch (error) {
-      throw new HttpException('Failed to update accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
     }
   }
 
   async deleteAccommodation(id: string, ownerId: string) {
     let deletedAccommodation;
-
     try {
       deletedAccommodation = await this.prisma.accommodation.delete({
-        where: { id },
+        where: {
+          id,
+          ownerId,
+        },
         include: {
           address: true,
         },
       });
     } catch (error) {
-      throw new HttpException('Failed to delete accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error.code === 'P2025') throw new NotFoundException('Cannot find deleting accommodation');
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE);
     }
-
-    if (!deletedAccommodation) {
-      throw new NotFoundException(`Accommodation with id ${id} not found`);
-    }
-
-    if (ownerId !== deletedAccommodation.ownerId) throw new NotOwnerException();
 
     try {
-      const deletedAddress = await this.prisma.address.delete({
+      await this.prisma.address.delete({
         where: { id: deletedAccommodation.address.id },
       });
-
-      if (!deletedAddress) {
-        throw new NotFoundException(`Can't delete Accommodation Address`);
-      }
-
-      return deletedAccommodation;
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to delete accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error.code === 'P2025')
+        throw new NotFoundException('Cannot find deleting accommodation address');
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE);
     }
+    return;
   }
+
   async getOneAccommodation(id: string) {
+    let accommodation;
     try {
-      const accommodation = await this.prisma.accommodation.findUnique({
+      accommodation = await this.prisma.accommodation.findUnique({
         where: { id },
         include: {
           address: true,
         },
       });
-
-      if (!accommodation) {
-        throw new NotFoundException(`Accommodation with id ${id} not found`);
-      }
-
-      return accommodation;
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to get accommodation.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET);
     }
+    if (!accommodation) throw new NotFoundException('Can not find accommodation');
+    return accommodation;
   }
 
   async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({
-        where: { id },
+        where: { id, ownerId },
       });
-    } catch (error) {
-      throw new HttpException(
-        'Failed to get updating accommodation',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+    } catch (err) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
     }
 
-    if (!existingAccommodation) {
-      throw new NotFoundException(`Accommodation with id ${id} not found`);
-    }
-
-    if (ownerId !== existingAccommodation.ownerId) throw new NotOwnerException();
+    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
 
     const base64Data = file.buffer.toString('base64');
 
@@ -150,10 +126,7 @@ export class AccommodationService {
 
       return updatedAccommodation;
     } catch (error) {
-      throw new HttpException(
-        'Failed to add image file to accommodation.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
     }
   }
 }

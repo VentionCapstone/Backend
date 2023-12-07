@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccommodationModule } from './accommodation/accommodation.module';
@@ -17,6 +17,6 @@ import { UserModule } from './user/user.module';
     AccommodationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Logger],
 })
 export class AppModule {}
