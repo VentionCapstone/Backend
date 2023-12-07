@@ -1,4 +1,3 @@
-
 import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
@@ -56,7 +55,6 @@ export class AuthController {
   @ApiOperation({ summary: 'REFRESH TOKEN' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Refresh Tokens' })
-  @UseGuards(UserGuard)
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,

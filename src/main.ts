@@ -22,7 +22,6 @@ async function bootstrap() {
       .setTitle('Booking example')
       .setDescription('The Booking API description')
       .setVersion('1.0')
-      .addTag('Booking')
       .addBearerAuth(
         {
           type: 'http',

@@ -8,5 +8,4 @@
 ALTER TABLE "Address" ALTER COLUMN "zipCode" SET DATA TYPE TEXT;
 
 -- AlterTable
-ALTER TABLE "UserProfile" DROP COLUMN "photoUrl",
-ADD COLUMN     "imageUrl" TEXT;
+ALTER TABLE "UserProfile" ADD COLUMN "imageUrl" TEXT;
