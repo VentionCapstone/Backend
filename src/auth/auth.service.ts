@@ -74,7 +74,8 @@ export class AuthService {
       this.setRefreshTokenCookie(tokens.refresh_token, res);
       return tokens;
     } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException)
+        throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN);
     }
   }

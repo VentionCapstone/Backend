@@ -213,4 +213,26 @@ export class AccommodationController {
     const accommodation = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: accommodation };
   }
+
+  @ApiOperation({ summary: 'GET ALL YOUR ACCOMMODATIONS' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(CreateAccommodationAndAddressDto),
+          },
+        },
+      },
+    },
+  })
+  @Get('/getAll')
+  async findAll(@Req() res: any) {
+    const accommodations = await this.accommodationService.getListOfAccommodations(res.user.id);
+    return { success: true, data: accommodations };
+  }
 }

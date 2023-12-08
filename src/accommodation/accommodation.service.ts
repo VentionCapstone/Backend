@@ -131,4 +131,20 @@ export class AccommodationService {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
     }
   }
+
+  async getListOfAccommodations(ownerId: string) {
+    let accommodation;
+    try {
+      accommodation = await this.prisma.accommodation.findMany({
+        where: { ownerId },
+        include: {
+          address: true,
+        },
+      });
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
+    }
+    if (!accommodation) throw new NotFoundException('Can not find any accommodations.');
+    return accommodation;
+  }
 }
