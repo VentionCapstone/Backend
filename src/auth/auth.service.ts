@@ -14,13 +14,15 @@ import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly verificationService: VerificationSerivce
+    private readonly verificationService: VerificationSerivce,
+    private readonly config: ConfigService
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -174,6 +176,8 @@ export class AuthService {
     res.cookie('refresh_token', refresh_token, {
       maxAge,
       httpOnly: true,
+      sameSite: this.config.get('COOKIE_SAME_SITE') as 'strict' | 'lax' | 'none' | undefined,
+      secure: this.config.get('COOKIE_SECURE') === 'true',
     });
   }
   /** VALIDATE USER HELPER FUNCTION */
