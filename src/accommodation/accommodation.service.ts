@@ -12,7 +12,7 @@ export class AccommodationService {
     try {
       const newAccommodation = await this.prisma.accommodation.create({
         include: {
-          address: true,
+          Address: true,
         },
         data: createAccommodationBody,
       });
@@ -33,7 +33,7 @@ export class AccommodationService {
       existingAccommodation = await this.prisma.accommodation.findUnique({
         where: { id, ownerId },
         include: {
-          address: true,
+          Address: true,
         },
       });
     } catch (err) {
@@ -46,7 +46,7 @@ export class AccommodationService {
       const updatedAccommodation = await this.prisma.accommodation.update({
         where: { id },
         include: {
-          address: true,
+          Address: true,
         },
         data: updateAccommodationBody,
       });
@@ -65,7 +65,7 @@ export class AccommodationService {
           ownerId,
         },
         include: {
-          address: true,
+          Address: true,
         },
       });
     } catch (error) {
@@ -76,7 +76,7 @@ export class AccommodationService {
 
     try {
       await this.prisma.address.delete({
-        where: { id: deletedAccommodation.address.id },
+        where: { id: deletedAccommodation.addressId },
       });
     } catch (error) {
       if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
@@ -92,7 +92,7 @@ export class AccommodationService {
       accommodation = await this.prisma.accommodation.findUnique({
         where: { id },
         include: {
-          address: true,
+          Address: true,
         },
       });
     } catch (error) {

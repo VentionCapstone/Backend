@@ -82,7 +82,7 @@ export class UserService {
       return await this.prismaService.userProfile.create({
         data: {
           ...data,
-          user: {
+          User: {
             connect: {
               id: createUserDto.userId,
             },
