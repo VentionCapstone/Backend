@@ -129,10 +129,7 @@ export class AuthService {
         where: { id: userId },
       });
 
-      res.cookie('refresh_token', tokens.refresh_token, {
-        maxAge: 15 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
+      this.setRefreshTokenCookie(tokens.refresh_token, res);
       return {
         tokens,
         message: 'Tokens have been refreshed successfully',
