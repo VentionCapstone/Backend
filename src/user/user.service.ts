@@ -71,7 +71,7 @@ export class UserService {
 
       const data = {
         phoneNumber: createUserDto.phoneNumber,
-        photoUrl: createUserDto.photoUrl,
+        imageUrl: createUserDto.imageUrl,
         gender: createUserDto.gender,
         country: createUserDto.country,
         language: createUserDto.language,
@@ -119,7 +119,7 @@ export class UserService {
 
       const data = {
         phoneNumber: updateUserDto.phoneNumber,
-        photoUrl: updateUserDto.photoUrl,
+        imageUrl: updateUserDto.imageUrl,
         gender: updateUserDto.gender,
         country: updateUserDto.country,
         language: updateUserDto.language,

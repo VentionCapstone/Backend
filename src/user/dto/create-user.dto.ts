@@ -17,7 +17,7 @@ export class CreateUserDto {
 
   @ApiProperty({ example: 'https://example.com/photo.png', description: 'Photo URL' })
   @IsString()
-  photoUrl: string;
+  imageUrl: string;
 
   @ApiProperty({ example: 'MALE', description: 'Male' })
   @IsEnum(Gender)
