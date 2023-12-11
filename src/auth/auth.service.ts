@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
@@ -14,13 +14,15 @@ import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly verificationService: VerificationSerivce
+    private readonly verificationService: VerificationSerivce,
+    private readonly config: ConfigService
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -55,6 +57,7 @@ export class AuthService {
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REGISTER);
     }
   }
+
   async login(loginDto: LoginDto, res: Response) {
     try {
       const { email, password } = loginDto;
@@ -71,7 +74,7 @@ export class AuthService {
       });
 
       this.setRefreshTokenCookie(tokens.refresh_token, res);
-      return tokens;
+      return { tokens, id: user.id };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN);
@@ -104,7 +107,11 @@ export class AuthService {
 
   async refreshToken(userId: string, refreshToken: string, res: Response) {
     try {
-      const decodedToken = this.jwtService.decode(refreshToken);
+      const decodedToken = await this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      if (!decodedToken) throw new BadRequestException('Invalid refresh token');
 
       if (userId != decodedToken['sub']) throw new BadRequestException('User not found');
 
@@ -114,6 +121,7 @@ export class AuthService {
       if (!user || !user.hashedRefreshToken) throw new BadRequestException('User not found');
 
       const tokenMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+
       if (!tokenMatch) throw new ForbiddenException('Forbidden');
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
@@ -123,15 +131,15 @@ export class AuthService {
         where: { id: userId },
       });
 
-      res.cookie('refresh_token', tokens.refresh_token, {
-        maxAge: 15 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
+      this.setRefreshTokenCookie(tokens.refresh_token, res);
       return {
         tokens,
         message: 'Tokens have been refreshed successfully',
       };
     } catch (error) {
+      if (error instanceof TokenExpiredError)
+        throw new UnauthorizedException('Refresh token expired');
+
       if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS);
     }
@@ -168,6 +176,8 @@ export class AuthService {
     res.cookie('refresh_token', refresh_token, {
       maxAge,
       httpOnly: true,
+      sameSite: this.config.get('COOKIE_SAME_SITE') as 'strict' | 'lax' | 'none' | undefined,
+      secure: this.config.get('COOKIE_SECURE') === 'true',
     });
   }
   /** VALIDATE USER HELPER FUNCTION */
