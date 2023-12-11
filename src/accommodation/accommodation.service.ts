@@ -139,7 +139,7 @@ export class AccommodationService {
       accommodation = await this.prisma.accommodation.findMany({
         where: { ownerId },
         include: {
-          address: true,
+          Address: true,
         },
       });
     } catch (error) {

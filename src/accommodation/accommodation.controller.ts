@@ -56,7 +56,7 @@ export class AccommodationController {
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
       thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
       ownerId: req.user.id,
-      address: {
+      Address: {
         create: body.address,
       },
     };
@@ -151,7 +151,7 @@ export class AccommodationController {
   ) {
     const updateAccommodationAndAdress = {
       ...body.accommodation,
-      address: {
+      Address: {
         update: body.address,
       },
     };
