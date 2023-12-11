@@ -28,17 +28,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
 
       const key = exception.message;
-      const errorObj = ERRORS[key] || ERRORS[ErrorsTypes.DEFAULT];
+      const { statusCode, message } = ERRORS[key] || ERRORS[ErrorsTypes.DEFAULT];
 
-      response.status(errorObj.statusCode).json({
+      response.status(statusCode).json({
         success: false,
-        error: { statusCode: errorObj.statusCode, message: errorObj.message },
+        error: { statusCode, message },
       });
     } catch (error) {
-      const errorObj = ERRORS[ErrorsTypes.DEFAULT];
-      response.status(errorObj.statusCode).json({
+      const { statusCode, message } = ERRORS[ErrorsTypes.DEFAULT];
+      response.status(statusCode).json({
         success: false,
-        error: { statusCode: errorObj.statusCode, message: errorObj.message },
+        error: { statusCode, message },
       });
     }
   }

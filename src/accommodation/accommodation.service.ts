@@ -145,7 +145,6 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
     }
-    if (!accommodation) throw new NotFoundException('Can not find any accommodations.');
     return accommodation;
   }
 }
