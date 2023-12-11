@@ -118,6 +118,7 @@ export class AccommodationService {
 
     const updateAccommodationAndAdress = {
       previewImgUrl: base64Data,
+      thumbnailUrl: base64Data,
     };
 
     try {

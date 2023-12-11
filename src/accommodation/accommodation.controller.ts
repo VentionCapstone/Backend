@@ -54,6 +54,7 @@ export class AccommodationController {
     const createAccommodationAndAdress = {
       ...body.accommodation,
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
+      thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
       ownerId: req.user.id,
       address: {
         create: body.address,
