@@ -14,7 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(CookieParser());
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGIN,
+    origin: process.env.ANY_ORIGIN === 'true' ? true : process.env.FRONTEND_URL,
+    credentials: true,
   });
 
   if (process.env.MODE !== 'production') {

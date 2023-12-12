@@ -3,7 +3,7 @@ import ErrorsTypes from './errors.enum';
 import PrismaErrorCodes from './prismaErrorCodes.enum';
 
 const ERRORS: ErrorDefinition = {
-  DEFAULT: {
+  [ErrorsTypes.DEFAULT]: {
     statusCode: 500,
     message: 'Internal Server Error.',
   },
