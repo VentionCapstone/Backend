@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -9,6 +14,24 @@ import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 @Injectable()
 export class AmenitiesService {
   constructor(private prisma: PrismaService) {}
+
+  async verifyOwner(userId: string, accommodationId: string) {
+    try {
+      const accommodation = await this.prisma.accommodation.findUnique({
+        where: {
+          id: accommodationId,
+        },
+        select: {
+          ownerId: true,
+        },
+      });
+      if (!accommodation) throw new NotFoundException('No accomodation found with this id');
+      return userId === accommodation?.ownerId;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new GlobalException(ErrorsTypes.AMENITIES_OWNER_FAILED_TO_VERIFY);
+    }
+  }
 
   async getAmenitiesList() {
     try {
@@ -46,7 +69,9 @@ export class AmenitiesService {
     }
   }
 
-  async addAmenities(id: string, dto: AmenitiesDto) {
+  async addAmenities(id: string, dto: AmenitiesDto, userId: string) {
+    const isOwner = await this.verifyOwner(userId, id);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
       const newAmenities = await this.prisma.amenity.create({
         data: { ...dto, accommodationId: id },
@@ -65,8 +90,11 @@ export class AmenitiesService {
     }
   }
 
-  async updateAmenities(id: string, dto: AmenitiesDto) {
+  async updateAmenities(id: string, dto: AmenitiesDto, userId: string) {
+    const isOwner = await this.verifyOwner(userId, id);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
+      console.log(userId);
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
           accommodationId: id,
@@ -84,8 +112,11 @@ export class AmenitiesService {
     }
   }
 
-  async deleteAmenities(id: string) {
+  async deleteAmenities(id: string, userId: string) {
+    const isOwner = await this.verifyOwner(userId, id);
+    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
+      console.log(userId);
       const deletedAmenities = await this.prisma.amenity.delete({
         where: {
           accommodationId: id,

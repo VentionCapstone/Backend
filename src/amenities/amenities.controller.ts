@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards, Req } from '@nestjs/common';
 import { AmenitiesService } from './amenities.service';
 import { AmenitiesDto } from './dto';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -91,8 +91,8 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
-    return this.amenitiesService.addAmenities(id, dto);
+  addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto, @Req() req: any) {
+    return this.amenitiesService.addAmenities(id, dto, req.user.id);
   }
 
   @Put('/:id')
@@ -116,8 +116,8 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
-    return this.amenitiesService.updateAmenities(id, dto);
+  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto, @Req() req: any) {
+    return this.amenitiesService.updateAmenities(id, dto, req.user.id);
   }
 
   @Delete('/:id')
@@ -140,7 +140,7 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  deleteAmenities(@Param('id') id: string) {
-    return this.amenitiesService.deleteAmenities(id);
+  deleteAmenities(@Param('id') id: string, @Req() req: any) {
+    return this.amenitiesService.deleteAmenities(id, req.user.id);
   }
 }
