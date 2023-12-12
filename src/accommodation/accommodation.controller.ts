@@ -25,11 +25,11 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  getSchemaPath,
   ApiBody,
   ApiConsumes,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
+import AccommodationResponseDto from './dto/accommodation-response.dto';
 
 @UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
@@ -40,14 +40,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 201,
     description: 'Created accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
   })
   @Post('/create')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
@@ -70,14 +63,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
   })
   @ApiParam({
     name: 'id',
@@ -128,14 +114,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'Updated accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
   })
   @ApiParam({
     name: 'id',
@@ -194,14 +173,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'Accommodation with provided id',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
   })
   @ApiParam({
     name: 'id',
