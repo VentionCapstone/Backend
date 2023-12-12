@@ -19,7 +19,7 @@ export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
   @Get('/list')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -43,7 +43,7 @@ export class AmenitiesController {
   }
 
   @Get('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -67,7 +67,7 @@ export class AmenitiesController {
   }
 
   @Post('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -96,7 +96,7 @@ export class AmenitiesController {
   }
 
   @Put('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -121,7 +121,7 @@ export class AmenitiesController {
   }
 
   @Delete('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'DELETE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
