@@ -5,15 +5,15 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
-import { Response } from 'express';
-import * as bcrypt from 'bcryptjs';
-import { VerificationSerivce } from './verification.service';
 import { User } from '@prisma/client';
-import { GlobalException } from 'src/exceptions/global.exception';
+import * as bcrypt from 'bcryptjs';
+import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { PrismaService } from '../prisma/prisma.service';
+import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
+import { VerificationSerivce } from './verification.service';
 
 @Injectable()
 export class AuthService {
@@ -73,7 +73,8 @@ export class AuthService {
       this.setRefreshTokenCookie(tokens.refresh_token, res);
       return tokens;
     } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException)
+        throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN);
     }
   }
