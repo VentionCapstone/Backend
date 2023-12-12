@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards } from '@nestjs/common';
 import { AmenitiesService } from './amenities.service';
 import { AmenitiesDto } from './dto';
 import { UserGuard } from 'src/common/guards/user.guard';
@@ -11,6 +11,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @ApiTags('AMENITIES')
 @UseGuards(UserGuard)
@@ -91,8 +92,12 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto, @Req() req: any) {
-    return this.amenitiesService.addAmenities(id, dto, req.user.id);
+  addAmenities(
+    @Param('id') id: string,
+    @Body() dto: AmenitiesDto,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.amenitiesService.addAmenities(id, dto, userId);
   }
 
   @Put('/:id')
@@ -116,8 +121,12 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto, @Req() req: any) {
-    return this.amenitiesService.updateAmenities(id, dto, req.user.id);
+  updateAmenities(
+    @Param('id') id: string,
+    @Body() dto: AmenitiesDto,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.amenitiesService.updateAmenities(id, dto, userId);
   }
 
   @Delete('/:id')
@@ -140,7 +149,7 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  deleteAmenities(@Param('id') id: string, @Req() req: any) {
-    return this.amenitiesService.deleteAmenities(id, req.user.id);
+  deleteAmenities(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    return this.amenitiesService.deleteAmenities(id, userId);
   }
 }
