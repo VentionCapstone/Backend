@@ -94,7 +94,6 @@ export class AmenitiesService {
     const isOwner = await this.verifyOwner(userId, id);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
-      console.log(userId);
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
           accommodationId: id,
@@ -116,7 +115,6 @@ export class AmenitiesService {
     const isOwner = await this.verifyOwner(userId, id);
     if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
-      console.log(userId);
       const deletedAmenities = await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
