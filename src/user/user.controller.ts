@@ -1,10 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
+@ApiBearerAuth()
 @ApiTags('USER')
+@UseGuards(UserGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -31,20 +36,24 @@ export class UserController {
 
   @ApiOperation({ summary: 'CREATE USER PROFILE' })
   @Post('profile')
-  createProfile(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUserProfile(createUserDto);
+  createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+    return this.userService.createUserProfile(createUserDto, user);
   }
 
   @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
   @Patch('profile/:id')
-  updateProfile(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.updateUserProfile(id, updateUserDto);
+  updateProfile(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: User
+  ) {
+    return this.userService.updateUserProfile(id, updateUserDto, user);
   }
 
   @ApiOperation({ summary: 'DELETE USER PROFILE BY ID' })
   @Delete('profile/:id')
-  removeProfile(@Param('id') id: string) {
-    return this.userService.removeUserProfile(id);
+  removeProfile(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.userService.removeUserProfile(id, user);
   }
 }

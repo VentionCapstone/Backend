@@ -38,8 +38,4 @@ export class CreateUserDto {
   @ApiProperty({ example: 'I am a software engineer', description: 'Description' })
   @IsString()
   description: string;
-
-  @ApiProperty({ example: '1', description: 'User ID' })
-  @IsString()
-  userId: string;
 }
