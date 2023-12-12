@@ -27,6 +27,7 @@ import {
   ApiParam,
   ApiBody,
   ApiConsumes,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto from './dto/accommodation-response.dto';
@@ -197,7 +198,7 @@ export class AccommodationController {
         data: {
           type: 'array',
           items: {
-            $ref: getSchemaPath(CreateAccommodationAndAddressDto),
+            $ref: getSchemaPath(AccommodationResponseDto),
           },
         },
       },
