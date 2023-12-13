@@ -1,11 +1,7 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UiTheme, User } from '@prisma/client';
+import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,10 +34,13 @@ export class UserService {
         throw new NotFoundException('Users not found');
       }
 
-      return users;
+      return {
+        message: 'Users successfully fetched',
+        data: users,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to get users.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USERS_LIST_FAILED_TO_GET);
     }
   }
 
@@ -59,7 +58,7 @@ export class UserService {
       return user;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to get user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET);
     }
   }
 
@@ -76,7 +75,7 @@ export class UserService {
       return userProfile;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to get user profile.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_GET);
     }
   }
 
@@ -123,7 +122,7 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new HttpException('Failed to create user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_ADD);
     }
   }
 
@@ -159,7 +158,7 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
-      throw new HttpException('Failed to update user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE);
     }
   }
 
@@ -177,7 +176,7 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
-      throw new HttpException('Failed to delete user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
     }
   }
 }
