@@ -46,10 +46,10 @@ export class AmenitiesService {
     }
   }
 
-  async addAmenities(id: string, dto: AmenitiesDto) {
+  async addAmenities(id: string, dto: AmenitiesDto, userId: string) {
     try {
       const newAmenities = await this.prisma.amenity.create({
-        data: { ...dto, accommodationId: id },
+        data: { ...dto, accommodation: { connect: { id, ownerId: userId } } },
       });
       return { message: 'Success adding amenities', data: newAmenities };
     } catch (error) {
@@ -60,16 +60,24 @@ export class AmenitiesService {
         if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED) {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
+        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
+        }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD);
     }
   }
 
-  async updateAmenities(id: string, dto: AmenitiesDto) {
+  async updateAmenities(id: string, dto: AmenitiesDto, userId: string) {
     try {
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
           accommodationId: id,
+          accommodation: {
+            ownerId: userId,
+          },
         },
         data: { ...dto },
       });
@@ -77,25 +85,32 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException('No amenities found for this accomodation id');
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE);
     }
   }
 
-  async deleteAmenities(id: string) {
+  async deleteAmenities(id: string, userId: string) {
     try {
       const deletedAmenities = await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
+          accommodation: {
+            ownerId: userId,
+          },
         },
       });
       return { message: 'Success deleting amenities', data: deletedAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException('No amenities found for this accomodation id');
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE);

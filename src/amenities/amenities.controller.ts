@@ -11,6 +11,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @ApiTags('AMENITIES')
 @UseGuards(UserGuard)
@@ -19,7 +20,7 @@ export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
   @Get('/list')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -43,7 +44,7 @@ export class AmenitiesController {
   }
 
   @Get('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -67,7 +68,7 @@ export class AmenitiesController {
   }
 
   @Post('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -91,12 +92,16 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  addAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
-    return this.amenitiesService.addAmenities(id, dto);
+  addAmenities(
+    @Param('id') id: string,
+    @Body() dto: AmenitiesDto,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.amenitiesService.addAmenities(id, dto, userId);
   }
 
   @Put('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -116,12 +121,16 @@ export class AmenitiesController {
     description: 'Internal Server Error',
   })
   @ApiBody({ type: AmenitiesDto })
-  updateAmenities(@Param('id') id: string, @Body() dto: AmenitiesDto) {
-    return this.amenitiesService.updateAmenities(id, dto);
+  updateAmenities(
+    @Param('id') id: string,
+    @Body() dto: AmenitiesDto,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.amenitiesService.updateAmenities(id, dto, userId);
   }
 
   @Delete('/:id')
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'DELETE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
     status: 401,
@@ -140,7 +149,7 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  deleteAmenities(@Param('id') id: string) {
-    return this.amenitiesService.deleteAmenities(id);
+  deleteAmenities(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    return this.amenitiesService.deleteAmenities(id, userId);
   }
 }
