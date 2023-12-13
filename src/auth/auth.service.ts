@@ -12,8 +12,9 @@ import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { PrismaService } from '../prisma/prisma.service';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
+
+import { PrismaService } from '../prisma/prisma.service';
 import { VerificationSerivce } from './verification.service';
 
 @Injectable()

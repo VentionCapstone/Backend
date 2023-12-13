@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UiTheme, User } from '@prisma/client';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -10,18 +10,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async validateUserAutherization(id: string, userId: string) {
-    const userProfile = await this.prismaService.userProfile.findFirst({
-      where: { id },
-    });
-
-    if (!userProfile) {
-      throw new NotFoundException(`User Profile with ID ${id} not found`);
+  async validateUserAutherization(profileUserId: string, authUser: User) {
+    if (authUser.role === 'ADMIN') {
+      return true;
     }
 
-    if (userProfile.userId !== userId) {
-      throw new UnauthorizedException('You are not authorized to perform this action');
+    if (profileUserId !== authUser.id) {
+      throw new ForbiddenException('You are not authorized to perform this action');
     }
+
+    return true;
   }
 
   async findAll() {
@@ -30,16 +28,11 @@ export class UserService {
         include: { Profile: true },
       });
 
-      if (!users) {
-        throw new NotFoundException('Users not found');
-      }
-
       return {
         message: 'Users successfully fetched',
         data: users,
       };
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+    } catch {
       throw new GlobalException(ErrorsTypes.USERS_LIST_FAILED_TO_GET);
     }
   }
@@ -141,16 +134,20 @@ export class UserService {
     }
   }
 
-  async updateUserProfile(id: string, updateUserDto: UpdateUserDto, user: User) {
+  async updateUserProfile(id: string, updateUserDto: UpdateUserDto, authUser: User) {
     try {
-      if (!user) {
-        throw new NotFoundException("User doesn't exist");
+      const userProfile = await this.prismaService.userProfile.findFirst({
+        where: { id },
+      });
+
+      if (!userProfile) {
+        throw new NotFoundException(`User Profile with ID ${id} not found`);
       }
 
-      await this.validateUserAutherization(id, user.id);
+      await this.validateUserAutherization(userProfile.userId, authUser);
 
       await this.prismaService.user.update({
-        where: { id: user.id },
+        where: { id: userProfile.userId },
         data: {
           firstName: updateUserDto.firstName,
           lastName: updateUserDto.lastName,
@@ -172,19 +169,22 @@ export class UserService {
         data: data,
       });
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE);
     }
   }
 
-  async removeUserProfile(id: string, user: User) {
+  async removeUserProfile(id: string, authUser: User) {
     try {
-      console.log('user', user);
-      if (!user) {
-        throw new NotFoundException("User doesn't exist");
+      const userProfile = await this.prismaService.userProfile.findFirst({
+        where: { id },
+      });
+
+      if (!userProfile) {
+        throw new NotFoundException(`User Profile with ID ${id} not found`);
       }
 
-      await this.validateUserAutherization(id, user.id);
+      await this.validateUserAutherization(userProfile.userId, authUser);
 
       await this.prismaService.userProfile.delete({
         where: { id },
@@ -194,7 +194,7 @@ export class UserService {
         message: 'User Profile successfully deleted',
       };
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
     }
   }
