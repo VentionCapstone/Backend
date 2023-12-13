@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './filters/global.filter';
 
 async function bootstrap() {
@@ -23,17 +23,14 @@ async function bootstrap() {
       .setTitle('Booking example')
       .setDescription('The Booking API description')
       .setVersion('1.0')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Enter JWT token',
-          in: 'header',
-        },
-        'JWT-auth'
-      )
+      .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      })
       .addCookieAuth('refresh_token')
       .build();
     const document = SwaggerModule.createDocument(app, config);

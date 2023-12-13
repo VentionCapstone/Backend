@@ -5,16 +5,17 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
-import { Response } from 'express';
-import * as bcrypt from 'bcryptjs';
-import { VerificationSerivce } from './verification.service';
-import { User } from '@prisma/client';
-import { GlobalException } from 'src/exceptions/global.exception';
-import ErrorsTypes from 'src/errors/errors.enum';
 import { ConfigService } from '@nestjs/config';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { User } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
+import { Response } from 'express';
+import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
+
+import { PrismaService } from '../prisma/prisma.service';
+import { VerificationSerivce } from './verification.service';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +64,7 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.validateUser(email);
       const isMatchPass = await bcrypt.compare(password, user.password);
-      if (!isMatchPass) throw new UnauthorizedException('User not found');
+      if (!isMatchPass) throw new BadRequestException('User not found');
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
@@ -76,7 +77,8 @@ export class AuthService {
       this.setRefreshTokenCookie(tokens.refresh_token, res);
       return { tokens, id: user.id };
     } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException)
+        throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN);
     }
   }

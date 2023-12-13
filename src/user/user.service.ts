@@ -1,5 +1,7 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { UiTheme } from '@prisma/client';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { UiTheme, User } from '@prisma/client';
+import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,10 +10,31 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async validateUserAutherization(profileUserId: string, authUser: User) {
+    if (authUser.role === 'ADMIN') {
+      return true;
+    }
+
+    if (profileUserId !== authUser.id) {
+      throw new ForbiddenException('You are not authorized to perform this action');
+    }
+
+    return true;
+  }
+
   async findAll() {
-    return await this.prismaService.user.findMany({
-      include: { Profile: true },
-    });
+    try {
+      const users = await this.prismaService.user.findMany({
+        include: { Profile: true },
+      });
+
+      return {
+        message: 'Users successfully fetched',
+        data: users,
+      };
+    } catch {
+      throw new GlobalException(ErrorsTypes.USERS_LIST_FAILED_TO_GET);
+    }
   }
 
   async getUser(id: string) {
@@ -25,9 +48,22 @@ export class UserService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
 
-      return user;
+      return {
+        message: 'User successfully fetched',
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isVerified: user.isVerified,
+          isEmailVerified: user.isEmailVerified,
+          activationLink: user.activationLink,
+          Profile: user.Profile,
+        },
+      };
     } catch (error) {
-      throw new HttpException('Failed to get user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof NotFoundException) throw error;
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET);
     }
   }
 
@@ -41,28 +77,31 @@ export class UserService {
         throw new NotFoundException(`User Profile with ID ${id} not found`);
       }
 
-      return userProfile;
+      return {
+        message: 'User Profile successfully fetched',
+        data: userProfile,
+      };
     } catch (error) {
-      throw new HttpException('Failed to get user profile.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof NotFoundException) throw error;
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_GET);
     }
   }
 
-  async createUserProfile(createUserDto: CreateUserDto) {
+  async createUserProfile(createUserDto: CreateUserDto, userData: User) {
     try {
       const user = await this.prismaService.user.findUnique({
-        where: { id: createUserDto.userId },
+        where: { id: userData.id },
         include: { Profile: true },
       });
 
       if (!user) {
-        throw new NotFoundException(`User with ID ${createUserDto.userId} not found`);
+        throw new NotFoundException("User doesn't exist");
       } else if (user.Profile) {
         throw new NotFoundException(`User Profile with ID ${user.Profile.id} already exists`);
       }
 
-      // update user
       await this.prismaService.user.update({
-        where: { id: createUserDto.userId },
+        where: { id: user.id },
         data: {
           firstName: createUserDto.firstName,
           lastName: createUserDto.lastName,
@@ -71,7 +110,7 @@ export class UserService {
 
       const data = {
         phoneNumber: createUserDto.phoneNumber,
-        photoUrl: createUserDto.photoUrl,
+        imageUrl: createUserDto.imageUrl,
         gender: createUserDto.gender,
         country: createUserDto.country,
         language: createUserDto.language,
@@ -84,22 +123,19 @@ export class UserService {
           ...data,
           User: {
             connect: {
-              id: createUserDto.userId,
+              id: user.id,
             },
           },
         },
       });
     } catch (error) {
-      throw new HttpException('Failed to create user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof NotFoundException) throw error;
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_ADD);
     }
   }
 
-  async updateUserProfile(id: string, updateUserDto: UpdateUserDto) {
+  async updateUserProfile(id: string, updateUserDto: UpdateUserDto, authUser: User) {
     try {
-      if (!updateUserDto.userId) {
-        throw new NotFoundException(`User with ID ${updateUserDto.userId} not found`);
-      }
-
       const userProfile = await this.prismaService.userProfile.findFirst({
         where: { id },
       });
@@ -108,9 +144,10 @@ export class UserService {
         throw new NotFoundException(`User Profile with ID ${id} not found`);
       }
 
-      // update user
+      await this.validateUserAutherization(userProfile.userId, authUser);
+
       await this.prismaService.user.update({
-        where: { id: updateUserDto.userId },
+        where: { id: userProfile.userId },
         data: {
           firstName: updateUserDto.firstName,
           lastName: updateUserDto.lastName,
@@ -119,7 +156,7 @@ export class UserService {
 
       const data = {
         phoneNumber: updateUserDto.phoneNumber,
-        photoUrl: updateUserDto.photoUrl,
+        imageUrl: updateUserDto.imageUrl,
         gender: updateUserDto.gender,
         country: updateUserDto.country,
         language: updateUserDto.language,
@@ -132,17 +169,33 @@ export class UserService {
         data: data,
       });
     } catch (error) {
-      throw new HttpException('Failed to update user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE);
     }
   }
 
-  async removeUserProfile(id: string) {
+  async removeUserProfile(id: string, authUser: User) {
     try {
-      return await this.prismaService.userProfile.delete({
+      const userProfile = await this.prismaService.userProfile.findFirst({
         where: { id },
       });
+
+      if (!userProfile) {
+        throw new NotFoundException(`User Profile with ID ${id} not found`);
+      }
+
+      await this.validateUserAutherization(userProfile.userId, authUser);
+
+      await this.prismaService.userProfile.delete({
+        where: { id },
+      });
+
+      return {
+        message: 'User Profile successfully deleted',
+      };
     } catch (error) {
-      throw new HttpException('Failed to delete user.', HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
     }
   }
 }
