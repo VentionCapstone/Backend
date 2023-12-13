@@ -55,7 +55,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REGISTER);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REGISTER, error.message);
     }
   }
 
@@ -79,7 +79,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof BadRequestException)
         throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN, error.message);
     }
   }
 
@@ -103,7 +103,7 @@ export class AuthService {
       return response;
     } catch (error) {
       if (error instanceof ForbiddenException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGOUT);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGOUT, error.message);
     }
   }
 
@@ -143,7 +143,7 @@ export class AuthService {
         throw new UnauthorizedException('Refresh token expired');
 
       if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS, error.message);
     }
   }
 
@@ -168,7 +168,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof BadRequestException || error instanceof ConflictException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_EMAIL);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_EMAIL, error.message);
     }
   }
 
@@ -192,7 +192,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof BadRequestException)
         throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_VALIDATE);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_VALIDATE, error.message);
     }
   }
   // GET TOKENS METHOD
@@ -219,7 +219,7 @@ export class AuthService {
         refresh_token: refreshToken,
       };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_GET_TOKENS);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_GET_TOKENS, error.message);
     }
   }
 }

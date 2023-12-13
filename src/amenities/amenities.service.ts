@@ -25,7 +25,7 @@ export class AmenitiesService {
 
       return { message: 'Success getting amenities list', data: list };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET, error.message);
     }
   }
 
@@ -42,7 +42,7 @@ export class AmenitiesService {
       return { message: 'Success getting amenities', data: amenities };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET, error.message);
     }
   }
 
@@ -66,7 +66,7 @@ export class AmenitiesService {
           );
         }
       }
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD, error.message);
     }
   }
 
@@ -90,7 +90,7 @@ export class AmenitiesService {
           );
         }
       }
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE, error.message);
     }
   }
 
@@ -113,7 +113,7 @@ export class AmenitiesService {
           );
         }
       }
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE, error.message);
     }
   }
 }
