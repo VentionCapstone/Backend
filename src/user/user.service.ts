@@ -55,7 +55,17 @@ export class UserService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
 
-      return user;
+      return {
+        message: 'User successfully fetched',
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isEmailVerified: user.isEmailVerified,
+          Profile: user.Profile,
+        },
+      };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET);
@@ -72,7 +82,10 @@ export class UserService {
         throw new NotFoundException(`User Profile with ID ${id} not found`);
       }
 
-      return userProfile;
+      return {
+        message: 'User Profile successfully fetched',
+        data: userProfile,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_GET);
@@ -171,9 +184,13 @@ export class UserService {
 
       await this.validateUserAutherization(id, user.id);
 
-      return await this.prismaService.userProfile.delete({
+      await this.prismaService.userProfile.delete({
         where: { id },
       });
+
+      return {
+        message: 'User Profile successfully deleted',
+      };
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
