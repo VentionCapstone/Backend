@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -14,24 +9,6 @@ import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 @Injectable()
 export class AmenitiesService {
   constructor(private prisma: PrismaService) {}
-
-  async verifyOwner(userId: string, accommodationId: string) {
-    try {
-      const accommodation = await this.prisma.accommodation.findUnique({
-        where: {
-          id: accommodationId,
-        },
-        select: {
-          ownerId: true,
-        },
-      });
-      if (!accommodation) throw new NotFoundException('No accomodation found with this id');
-      return userId === accommodation?.ownerId;
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.AMENITIES_OWNER_FAILED_TO_VERIFY);
-    }
-  }
 
   async getAmenitiesList() {
     try {
@@ -70,11 +47,9 @@ export class AmenitiesService {
   }
 
   async addAmenities(id: string, dto: AmenitiesDto, userId: string) {
-    const isOwner = await this.verifyOwner(userId, id);
-    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
       const newAmenities = await this.prisma.amenity.create({
-        data: { ...dto, accommodationId: id },
+        data: { ...dto, accommodation: { connect: { id, ownerId: userId } } },
       });
       return { message: 'Success adding amenities', data: newAmenities };
     } catch (error) {
@@ -85,18 +60,24 @@ export class AmenitiesService {
         if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED) {
           throw new NotFoundException('No amenities found for this accomodation id');
         }
+        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
+        }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD);
     }
   }
 
   async updateAmenities(id: string, dto: AmenitiesDto, userId: string) {
-    const isOwner = await this.verifyOwner(userId, id);
-    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
           accommodationId: id,
+          accommodation: {
+            ownerId: userId,
+          },
         },
         data: { ...dto },
       });
@@ -104,7 +85,9 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException('No amenities found for this accomodation id');
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE);
@@ -112,19 +95,22 @@ export class AmenitiesService {
   }
 
   async deleteAmenities(id: string, userId: string) {
-    const isOwner = await this.verifyOwner(userId, id);
-    if (!isOwner) throw new UnauthorizedException('You are not authorized to perform this action');
     try {
       const deletedAmenities = await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
+          accommodation: {
+            ownerId: userId,
+          },
         },
       });
       return { message: 'Success deleting amenities', data: deletedAmenities };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException('No amenities found for this accomodation id');
+          throw new NotFoundException(
+            'No record with given accommodation id and owner id is found'
+          );
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE);
