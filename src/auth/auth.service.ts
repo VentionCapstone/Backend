@@ -64,7 +64,7 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.validateUser(email);
       const isMatchPass = await bcrypt.compare(password, user.password);
-      if (!isMatchPass) throw new UnauthorizedException('User not found');
+      if (!isMatchPass) throw new BadRequestException('User not found');
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
