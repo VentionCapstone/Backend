@@ -62,7 +62,9 @@ export class UserService {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          isVerified: user.isVerified,
           isEmailVerified: user.isEmailVerified,
+          activationLink: user.activationLink,
           Profile: user.Profile,
         },
       };
