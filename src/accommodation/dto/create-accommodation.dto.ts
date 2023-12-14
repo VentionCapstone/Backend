@@ -20,6 +20,10 @@ export default class CreateAccommodationDto {
 
   @IsNotEmpty()
   @IsInt()
+  allowedNumberOfPeople: number;
+
+  @IsNotEmpty()
+  @IsInt()
   price: number;
 
   @IsNotEmpty()

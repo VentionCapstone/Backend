@@ -17,6 +17,10 @@ export default class UpdateAccommodationDto {
 
   @IsOptional()
   @IsInt()
+  allowedNumberOfPeople: number;
+
+  @IsOptional()
+  @IsInt()
   price: number;
 
   @IsOptional()
