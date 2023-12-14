@@ -19,7 +19,7 @@ export class AccommodationService {
 
       return newAccommodation;
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE, error.message);
     }
   }
 
@@ -36,8 +36,11 @@ export class AccommodationService {
           Address: true,
         },
       });
-    } catch (err) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
+    } catch (error) {
+      throw new GlobalException(
+        ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING,
+        error.message
+      );
     }
 
     if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
@@ -52,7 +55,7 @@ export class AccommodationService {
       });
       return updatedAccommodation;
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
     }
   }
 
@@ -71,7 +74,7 @@ export class AccommodationService {
     } catch (error) {
       if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
         throw new NotFoundException('Cannot find deleting accommodation');
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
     }
 
     try {
@@ -81,7 +84,7 @@ export class AccommodationService {
     } catch (error) {
       if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
         throw new NotFoundException('Cannot find deleting accommodation address');
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE, error.message);
     }
     return;
   }
@@ -96,7 +99,7 @@ export class AccommodationService {
         },
       });
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
     if (!accommodation) throw new NotFoundException('Can not find accommodation');
     return accommodation;
@@ -108,8 +111,11 @@ export class AccommodationService {
       existingAccommodation = await this.prisma.accommodation.findUnique({
         where: { id, ownerId },
       });
-    } catch (err) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING);
+    } catch (error) {
+      throw new GlobalException(
+        ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING,
+        error.message
+      );
     }
 
     if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
@@ -129,7 +135,7 @@ export class AccommodationService {
 
       return updatedAccommodation;
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
     }
   }
 

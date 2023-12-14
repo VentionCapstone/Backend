@@ -8,15 +8,17 @@ import ErrorsTypes from 'src/errors/errors.enum';
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: GlobalException | any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     try {
       const request = ctx.getRequest<Request>();
       const status = exception.getStatus();
 
+      const errorObj = exception.getResponse();
+
       this.logger.error(
-        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${exception.message}`
+        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${errorObj.key}, cause: ${errorObj.message}`
       );
 
       if (!(exception instanceof GlobalException)) {
@@ -27,7 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         return;
       }
 
-      const key = exception.message;
+      const key = errorObj.key;
       const { statusCode, message } = ERRORS[key] || ERRORS[ErrorsTypes.DEFAULT];
 
       response.status(statusCode).json({
