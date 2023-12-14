@@ -32,8 +32,8 @@ export class VerificationSerivce {
       );
 
       return token;
-    } catch {
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_SEND_VERIFICATION_EMAIL);
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_SEND_VERIFICATION_EMAIL, error.message);
     }
   }
 
@@ -68,7 +68,7 @@ export class VerificationSerivce {
         error instanceof GoneException
       )
         throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_VERIFY_EMAIL);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_VERIFY_EMAIL, error.message);
     }
   }
 

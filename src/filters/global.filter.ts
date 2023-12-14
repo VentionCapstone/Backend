@@ -8,15 +8,17 @@ import ErrorsTypes from 'src/errors/errors.enum';
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: GlobalException | any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     try {
       const request = ctx.getRequest<Request>();
       const status = exception.getStatus();
 
+      const errorObj = exception.getResponse();
+
       this.logger.error(
-        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${exception.message}`
+        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${errorObj.key}, cause: ${errorObj.message}`
       );
 
       if (!(exception instanceof GlobalException)) {
@@ -27,18 +29,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         return;
       }
 
-      const key = exception.message;
-      const errorObj = ERRORS[key] || ERRORS[ErrorsTypes.DEFAULT];
+      const key = errorObj.key;
+      const { statusCode, message } = ERRORS[key] || ERRORS[ErrorsTypes.DEFAULT];
 
-      response.status(errorObj.statusCode).json({
+      response.status(statusCode).json({
         success: false,
-        error: { statusCode: errorObj.statusCode, message: errorObj.message },
+        error: { statusCode, message },
       });
     } catch (error) {
-      const errorObj = ERRORS[ErrorsTypes.DEFAULT];
-      response.status(errorObj.statusCode).json({
+      const { statusCode, message } = ERRORS[ErrorsTypes.DEFAULT];
+      response.status(statusCode).json({
         success: false,
-        error: { statusCode: errorObj.statusCode, message: errorObj.message },
+        error: { statusCode, message },
       });
     }
   }
