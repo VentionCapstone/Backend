@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import { OrderAndFilter } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -135,6 +136,66 @@ export class AccommodationService {
       return updatedAccommodation;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
+    }
+  }
+  async getAllAccommodations(options: OrderAndFilter) {
+    try {
+      const findManyOptions: any = {
+        where: {
+          availability: true,
+        },
+        include: {
+          Address: true,
+        },
+      };
+
+      if (options.orderBy) {
+        findManyOptions.orderBy = {
+          [options.orderBy]: options.sortOrder,
+        };
+      }
+
+      findManyOptions.where = {
+        price: {
+          gte: options.minPrice,
+          lte: options.maxPrice ?? parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0', 10),
+        },
+        numberOfRooms: {
+          gte: options.minRooms,
+          lte: options.maxRooms ?? parseInt(process.env.ACCOMMODATION_MAX_ROOMS || '0', 10),
+        },
+        allowedNumberOfPeople: {
+          gte: options.minPeople,
+          lte: options.maxPeople ?? parseInt(process.env.ACCOMMODATION_MAX_PEOPLE || '0', 10),
+        },
+      };
+
+      // findManyOptions.where.price = {
+      //   gte: options.minPrice,
+      //   lte: options.maxPrice ?? parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0', 10),
+      // };
+
+      // findManyOptions.where.numberOfRooms = {
+      //   gte: options.minRooms,
+      //   lte: options.maxRooms ?? parseInt(process.env.ACCOMMODATION_MAX_ROOMS || '0', 10),
+      // };
+
+      // findManyOptions.where.allowedNumberOfPeople = {
+      //   gte: options.minPeople,
+      //   lte: options.maxPeople ?? parseInt(process.env.ACCOMMODATION_MAX_PEOPLE || '0', 10),
+      // };
+
+      if (options.page && options.limit) {
+        findManyOptions.skip = (options.page - 1) * options.limit;
+        findManyOptions.take = options.limit;
+      }
+
+      const accommodations = await this.prisma.accommodation.findMany(findManyOptions);
+      if (!accommodations) throw new NotFoundException('There is no accommodations yet');
+
+      return accommodations;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET);
     }
   }
 }

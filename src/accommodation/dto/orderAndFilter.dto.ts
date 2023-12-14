@@ -21,37 +21,47 @@ export class OrderAndFilter {
   public sortOrder?: SortOrder = SortOrder.DESC;
 
   @Transform(({ value }) => +value)
+  @IsOptional()
+  @IsInt()
+  limit?: number = 12;
+
+  @Transform(({ value }) => +value)
+  @IsOptional()
+  @IsInt()
+  page?: number = 1;
+
+  @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(Infinity)
+  @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
   @IsOptional()
   minPrice?: number = 0;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(Number.POSITIVE_INFINITY)
+  @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
   @IsOptional()
-  maxPrice?: number = 1000000000000;
+  maxPrice?: number;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(Number.POSITIVE_INFINITY)
+  @Max(process.env.ACCOMMODATION_MAX_ROOMS ? +process.env.ACCOMMODATION_MAX_ROOMS : 2147483647)
   @IsOptional()
   minRooms?: number = 0;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(Number.POSITIVE_INFINITY)
+  @Max(process.env.ACCOMMODATION_MAX_ROOMS ? +process.env.ACCOMMODATION_MAX_ROOMS : 2147483647)
   @IsOptional()
-  maxRooms?: number = Infinity;
+  maxRooms?: number;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(Number.POSITIVE_INFINITY)
+  @Max(process.env.ACCOMMODATION_MAX_PEOPLE ? +process.env.ACCOMMODATION_MAX_PEOPLE : 2147483647)
   @IsOptional()
   minPeople?: number = 0;
 
@@ -59,6 +69,6 @@ export class OrderAndFilter {
   @IsOptional()
   @IsInt()
   @Min(0)
-  @Max(Number.POSITIVE_INFINITY)
-  maxPeople?: number = Number.POSITIVE_INFINITY;
+  @Max(process.env.ACCOMMODATION_MAX_PEOPLE ? +process.env.ACCOMMODATION_MAX_PEOPLE : 2147483647)
+  maxPeople?: number;
 }

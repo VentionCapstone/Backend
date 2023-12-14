@@ -6,7 +6,6 @@ import { AccommodationModule } from './accommodation/accommodation.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AmenitiesModule } from './amenities/amenities.module';
-import { AccommodationsListModule } from './accommodationsList/accommodationsList.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { AccommodationsListModule } from './accommodationsList/accommodationsLis
     UserModule,
     AmenitiesModule,
     AccommodationModule,
-    AccommodationsListModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -28,12 +29,14 @@ import {
   getSchemaPath,
   ApiBody,
   ApiConsumes,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
+import { OrderAndFilter } from './dto/orderAndFilter.dto';
 
 @UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
-@Controller('accommodation')
+@Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
   @ApiOperation({ summary: 'CREATE ACCOMMODATION' })
@@ -49,13 +52,13 @@ export class AccommodationController {
       },
     },
   })
-  @Post('/create')
+  @Post()
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
       ownerId: req.user.id,
-      address: {
+      Address: {
         create: body.address,
       },
     };
@@ -97,7 +100,7 @@ export class AccommodationController {
       },
     },
   })
-  @Post('/file/:id')
+  @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
     @UploadedFile(
@@ -142,7 +145,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Put('/update/:id')
+  @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
     @Param('id') id: string,
@@ -183,10 +186,33 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Delete('/delete/:id')
+  @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
     return { success: true, data: {} };
+  }
+
+  @ApiOperation({ summary: 'GET ALL YOUR ACCOMMODATIONS' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(CreateAccommodationAndAddressDto),
+          },
+        },
+      },
+    },
+  })
+  @Get('/')
+  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
+    const accommodationsList = await this.accommodationService.getAllAccommodations(orderAndFilter);
+    return { success: true, data: accommodationsList };
   }
 
   @ApiOperation({ summary: 'GET ACCOMMODATION' })
@@ -208,9 +234,9 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Get('/get/:id')
+  @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodation = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodation };
+    const accommodations = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data: accommodations };
   }
 }
