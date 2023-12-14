@@ -9,20 +9,20 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
-@ApiTags('USER')
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(AdminGuard)
-  @ApiOperation({ summary: 'GET ALL USERS' })
+  @ApiOperation({ summary: 'Get all users' })
   @Get()
   findAll() {
     return this.userService.findAll();
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'GET USER BY ID' })
+  @ApiOperation({ summary: 'Get user by id' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @Get(':id')
   getUser(@Param('id') id: string) {
@@ -30,7 +30,7 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'GET USER PROFILE BY ID' })
+  @ApiOperation({ summary: 'Get user profile by id' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
   @Get('profile/:id')
   getUserProfile(@Param('id') id: string) {
@@ -38,16 +38,16 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'CREATE USER PROFILE' })
-  @Post('profile')
+  @ApiOperation({ summary: 'Create user profile' })
+  @Post('')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
     return this.userService.createUserProfile(createUserDto, user);
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
+  @ApiOperation({ summary: 'Update user profile by id' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
-  @Patch('profile/:id')
+  @Patch('/:id')
   updateProfile(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -57,8 +57,8 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'DELETE USER PROFILE BY ID' })
-  @Delete('profile/:id')
+  @ApiOperation({ summary: 'Delete user profile by id' })
+  @Delete('/:id')
   removeProfile(@Param('id') id: string, @CurrentUser() user: User) {
     return this.userService.removeUserProfile(id, user);
   }

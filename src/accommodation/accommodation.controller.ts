@@ -32,11 +32,11 @@ import {
 import { UserGuard } from 'src/common/guards/user.guard';
 
 @UseGuards(UserGuard)
-@ApiTags('ACCOMMODATION')
+@ApiTags('accommodation')
 @Controller('accommodation')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
-  @ApiOperation({ summary: 'CREATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Create accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Created accommodation',
@@ -49,7 +49,7 @@ export class AccommodationController {
       },
     },
   })
-  @Post('/create')
+  @Post('')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
@@ -65,7 +65,7 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'ADD IMAGE TO ACCOMMODATION' })
+  @ApiOperation({ summary: 'Add image to accomodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
@@ -97,7 +97,7 @@ export class AccommodationController {
       },
     },
   })
-  @Post('/file/:id')
+  @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
     @UploadedFile(
@@ -123,7 +123,7 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'UPDATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Update accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Updated accommodation',
@@ -142,7 +142,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Put('/update/:id')
+  @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
     @Param('id') id: string,
@@ -164,7 +164,7 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'DELETE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Delete accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Deleted accommodation',
@@ -183,13 +183,13 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Delete('/delete/:id')
+  @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
     return { success: true, data: {} };
   }
 
-  @ApiOperation({ summary: 'GET ACCOMMODATION' })
+  @ApiOperation({ summary: 'Get accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Accommodation with provided id',
@@ -208,7 +208,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @Get('/get/:id')
+  @Get('/:id')
   async findOne(@Param('id') id: string) {
     const accommodation = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: accommodation };

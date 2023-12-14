@@ -13,15 +13,15 @@ import {
 import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
-@ApiTags('AMENITIES')
+@ApiTags('amenitites')
 @UseGuards(UserGuard)
 @Controller('amenities')
 export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
-  @Get('/list')
+  @Get('')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'GET AMENITIES LIST' })
+  @ApiOperation({ summary: 'Get amenities list' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -45,7 +45,7 @@ export class AmenitiesController {
 
   @Get('/:id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'GET AMENITIES BY ID' })
+  @ApiOperation({ summary: 'Get amenities by id' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -69,7 +69,7 @@ export class AmenitiesController {
 
   @Post('/:id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
+  @ApiOperation({ summary: 'Add amenities by id' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -102,7 +102,7 @@ export class AmenitiesController {
 
   @Put('/:id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
+  @ApiOperation({ summary: 'Update amenities by id' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
@@ -131,7 +131,7 @@ export class AmenitiesController {
 
   @Delete('/:id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'DELETE AMENITIES BY ID' })
+  @ApiOperation({ summary: 'Delete amenities by id' })
   @ApiUnauthorizedResponse({
     status: 401,
     description: 'Unauthorized',
