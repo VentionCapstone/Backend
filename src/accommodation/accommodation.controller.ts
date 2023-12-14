@@ -28,9 +28,11 @@ import {
   ApiBody,
   ApiConsumes,
   getSchemaPath,
+  ApiBearerAuth,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
-import AccommodationResponseDto from './dto/accommodation-response.dto';
+import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 
 @UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
@@ -43,6 +45,15 @@ export class AccommodationController {
     description: 'Created accommodation',
     type: AccommodationResponseDto,
   })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiBearerAuth()
   @Post('/create')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
@@ -50,7 +61,7 @@ export class AccommodationController {
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
       thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
       ownerId: req.user.id,
-      Address: {
+      address: {
         create: body.address,
       },
     };
@@ -65,6 +76,22 @@ export class AccommodationController {
     status: 201,
     description: 'Updated accommodation',
     type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'File is required',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiParam({
     name: 'id',
@@ -85,6 +112,7 @@ export class AccommodationController {
       },
     },
   })
+  @ApiBearerAuth()
   @Post('/file/:id')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
@@ -117,12 +145,25 @@ export class AccommodationController {
     description: 'Updated accommodation',
     type: AccommodationResponseDto,
   })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
   @ApiParam({
     name: 'id',
     type: String,
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Put('/update/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
@@ -131,7 +172,7 @@ export class AccommodationController {
   ) {
     const updateAccommodationAndAdress = {
       ...body.accommodation,
-      Address: {
+      address: {
         update: body.address,
       },
     };
@@ -158,12 +199,25 @@ export class AccommodationController {
       },
     },
   })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
   @ApiParam({
     name: 'id',
     type: String,
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Delete('/delete/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
@@ -176,12 +230,25 @@ export class AccommodationController {
     description: 'Accommodation with provided id',
     type: AccommodationResponseDto,
   })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
   @ApiParam({
     name: 'id',
     type: String,
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Get('/get/:id')
   async findOne(@Param('id') id: string) {
     const accommodation = await this.accommodationService.getOneAccommodation(id);
@@ -198,12 +265,17 @@ export class AccommodationController {
         data: {
           type: 'array',
           items: {
-            $ref: getSchemaPath(AccommodationResponseDto),
+            $ref: getSchemaPath(AccommodationDto),
           },
         },
       },
     },
   })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiBearerAuth()
   @Get('/getAll')
   async findAll(@Req() res: any) {
     const accommodations = await this.accommodationService.getListOfAccommodations(res.user.id);
