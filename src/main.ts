@@ -4,9 +4,42 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './filters/global.filter';
+import 'winston-daily-rotate-file';
+import { WinstonModule } from 'nest-winston';
+import { format, transports } from 'winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      transports: [
+        new transports.DailyRotateFile({
+          filename: `logs/%DATE%-error.log`,
+          level: 'error',
+          format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: false,
+          maxFiles: '30d',
+        }),
+        new transports.DailyRotateFile({
+          filename: `logs/%DATE%-combined.log`,
+          format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: false,
+          maxFiles: '30d',
+        }),
+        new transports.Console({
+          format: format.combine(
+            format.cli(),
+            format.splat(),
+            format.timestamp(),
+            format.printf((info) => {
+              return `${info.timestamp} ${info.level}: ${info.message}`;
+            })
+          ),
+        }),
+      ],
+    }),
+  });
 
   const port = process.env.API_PORT || 3000;
 
