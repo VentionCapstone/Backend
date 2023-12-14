@@ -11,6 +11,10 @@ export enum OrderBy {
   NUMBER_OF_PEOPLE = 'allowedNumberOfPeople',
 }
 
+const parseNumberOrDefault = (value: string | undefined): number => {
+  return value ? +value : 2147483647;
+};
+
 export class OrderAndFilter {
   @IsEnum(OrderBy)
   @IsOptional()
@@ -33,35 +37,35 @@ export class OrderAndFilter {
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PRICE))
   @IsOptional()
   minPrice?: number = 0;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PRICE))
   @IsOptional()
   maxPrice?: number;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_ROOMS ? +process.env.ACCOMMODATION_MAX_ROOMS : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_ROOMS))
   @IsOptional()
   minRooms?: number = 0;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_ROOMS ? +process.env.ACCOMMODATION_MAX_ROOMS : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_ROOMS))
   @IsOptional()
   maxRooms?: number;
 
   @Transform(({ value }) => +value)
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PEOPLE ? +process.env.ACCOMMODATION_MAX_PEOPLE : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PEOPLE))
   @IsOptional()
   minPeople?: number = 0;
 
@@ -69,6 +73,6 @@ export class OrderAndFilter {
   @IsOptional()
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PEOPLE ? +process.env.ACCOMMODATION_MAX_PEOPLE : 2147483647)
+  @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PEOPLE))
   maxPeople?: number;
 }

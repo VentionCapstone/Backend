@@ -170,21 +170,6 @@ export class AccommodationService {
         },
       };
 
-      // findManyOptions.where.price = {
-      //   gte: options.minPrice,
-      //   lte: options.maxPrice ?? parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0', 10),
-      // };
-
-      // findManyOptions.where.numberOfRooms = {
-      //   gte: options.minRooms,
-      //   lte: options.maxRooms ?? parseInt(process.env.ACCOMMODATION_MAX_ROOMS || '0', 10),
-      // };
-
-      // findManyOptions.where.allowedNumberOfPeople = {
-      //   gte: options.minPeople,
-      //   lte: options.maxPeople ?? parseInt(process.env.ACCOMMODATION_MAX_PEOPLE || '0', 10),
-      // };
-
       if (options.page && options.limit) {
         findManyOptions.skip = (options.page - 1) * options.limit;
         findManyOptions.take = options.limit;
