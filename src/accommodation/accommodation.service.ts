@@ -158,12 +158,26 @@ export class AccommodationService {
   async getAllAccommodations(options: OrderAndFilter) {
     try {
       const findManyOptions: any = {
+        select: {
+          id: true,
+          thumbnailUrl: true,
+          squareMeters: true,
+          numberOfRooms: true,
+          allowedNumberOfPeople: true,
+          price: true,
+          address: {
+            select: {
+              country: true,
+            },
+          },
+        },
+
         where: {
           availability: true,
         },
-        include: {
-          address: true,
-        },
+        // include: {
+        //   address: true,
+        // },
       };
 
       if (options.orderBy) {
