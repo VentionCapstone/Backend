@@ -37,6 +37,10 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to get existsting accommodation.',
   },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST]: {
+    statusCode: 500,
+    message: 'Failed to get list of accommodations.',
+  },
 
   [ErrorsTypes.AUTH_FAILED_TO_REGISTER]: {
     statusCode: 500,

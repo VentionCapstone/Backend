@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsString, IsInt, IsBoolean, IsDate, IsOptional, IsUrl, IsNotEmpty } from 'class-validator';
 
 export default class CreateAccommodationDto {
+  @IsOptional()
   @IsString()
   @IsUrl()
   thumbnailUrl: string;
