@@ -175,10 +175,7 @@ export class AccommodationService {
         findManyOptions.take = options.limit;
       }
 
-      const accommodations = await this.prisma.accommodation.findMany(findManyOptions);
-      if (!accommodations) throw new NotFoundException('There is no accommodations yet');
-
-      return accommodations;
+      return await this.prisma.accommodation.findMany(findManyOptions);
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET);
     }
