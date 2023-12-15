@@ -192,11 +192,11 @@ export class AccommodationController {
     return { success: true, data: {} };
   }
 
-  @ApiOperation({ summary: 'GET ALL YOUR ACCOMMODATIONS' })
+  @ApiOperation({ summary: 'Get all accommodations' })
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: 'Accommodations list',
+    description: 'All available accommodations list',
     schema: {
       properties: {
         success: { type: 'boolean' },
@@ -208,6 +208,10 @@ export class AccommodationController {
         },
       },
     },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
