@@ -18,9 +18,9 @@ export class PhoneNumberTransformInterceptor implements NestInterceptor {
     const phoneNumber = request.body?.phoneNumber;
     if (phoneNumber && typeof phoneNumber === 'string') {
       request.body.phoneNumber = this.formatPhoneNumber(phoneNumber);
-    } else {
-      throw new BadRequestException('phoneNumber must be a non-empty string');
+      return;
     }
+    throw new BadRequestException('phoneNumber must be a non-empty string');
   }
 
   private formatPhoneNumber(phoneNumber: string): string {
