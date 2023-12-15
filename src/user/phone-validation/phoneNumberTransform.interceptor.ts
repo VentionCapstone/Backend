@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import {
+  BadRequestException,
+  CallHandler,
+  ExecutionContext,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
@@ -14,6 +19,7 @@ export class PhoneNumberTransformInterceptor implements NestInterceptor {
     if (phoneNumber && typeof phoneNumber === 'string') {
       request.body.phoneNumber = this.formatPhoneNumber(phoneNumber);
     }
+    throw new BadRequestException('phoneNumber must be a string');
   }
 
   private formatPhoneNumber(phoneNumber: string): string {

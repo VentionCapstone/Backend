@@ -11,7 +11,7 @@ export class CreateUserDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty({ example: '+359 888 888 888', description: 'Phone Number' })
+  @ApiProperty({ example: '359 888 888 888', description: 'Phone Number' })
   @IsString()
   @IsPhoneNumber()
   phoneNumber: string;
