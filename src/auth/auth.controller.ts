@@ -27,14 +27,27 @@ export class AuthController {
   ) {}
 
   @ApiOperation({ summary: 'Sign up user' })
-  @ApiResponse({ status: 201, description: 'link sent' })
+  @ApiResponse({
+    status: 201,
+    description: `{
+    success: true,
+    message: 'User created successfully, please check your email to verify your account',
+  }`,
+  })
   @Post('signup')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @ApiOperation({ summary: 'Sign in user' })
-  @ApiResponse({ status: 200, description: 'tokens and id' })
+  @ApiResponse({
+    status: 200,
+    description: `{
+      { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
+        refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
+      }, id: "ce155ff3-5a38-412f-a7cb-328ef7cab68b"
+    }`,
+  })
   @HttpCode(200)
   @Post('signin')
   login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
@@ -43,7 +56,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Sign out user' })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Message: User Logged Out Succesfully' })
+  @ApiResponse({ status: 200, description: 'User logged out succesfully' })
   @UseGuards(UserGuard)
   @HttpCode(200)
   @Post('signout')
@@ -56,7 +69,15 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Refresh token' })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Refresh Tokens' })
+  @ApiResponse({
+    status: 200,
+    description: `{
+      { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
+    },
+    message: 'Tokens have been refreshed successfully',
+  }`,
+  })
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,
