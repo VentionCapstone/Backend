@@ -17,7 +17,9 @@ export class PhoneNumberTransformInterceptor implements NestInterceptor {
   }
 
   private formatPhoneNumber(phoneNumber: string): string {
-    const cleanedNumber = phoneNumber.replace(/[^\d)]/g, '');
-    return cleanedNumber.startsWith('+') ? cleanedNumber : `+${cleanedNumber}`;
+    const cleanedNumber = /^\d/.test(phoneNumber)
+      ? phoneNumber
+      : phoneNumber.replace(/[^\d)]/g, '');
+    return `+${cleanedNumber}`;
   }
 }
