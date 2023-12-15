@@ -25,7 +25,7 @@ export class UserService {
   async findAll() {
     try {
       const users = await this.prismaService.user.findMany({
-        include: { Profile: true },
+        include: { profile: true },
       });
 
       return {
@@ -41,7 +41,7 @@ export class UserService {
     try {
       const user = await this.prismaService.user.findUnique({
         where: { id },
-        include: { Profile: true },
+        include: { profile: true },
       });
 
       if (!user) {
@@ -58,7 +58,7 @@ export class UserService {
           isVerified: user.isVerified,
           isEmailVerified: user.isEmailVerified,
           activationLink: user.activationLink,
-          Profile: user.Profile,
+          profile: user.profile,
         },
       };
     } catch (error) {
@@ -91,13 +91,13 @@ export class UserService {
     try {
       const user = await this.prismaService.user.findUnique({
         where: { id: userData.id },
-        include: { Profile: true },
+        include: { profile: true },
       });
 
       if (!user) {
         throw new NotFoundException("User doesn't exist");
-      } else if (user.Profile) {
-        throw new NotFoundException(`User Profile with ID ${user.Profile.id} already exists`);
+      } else if (user.profile) {
+        throw new NotFoundException(`User Profile with ID ${user.profile.id} already exists`);
       }
 
       await this.prismaService.user.update({
@@ -121,7 +121,7 @@ export class UserService {
       return await this.prismaService.userProfile.create({
         data: {
           ...data,
-          User: {
+          user: {
             connect: {
               id: user.id,
             },
