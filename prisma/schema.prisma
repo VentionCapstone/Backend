@@ -56,11 +56,11 @@ model Accommodation {
   availableTo           DateTime
   description           String?
   previewImgUrl         String
-  Address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  Amenities             Amenity[]
-  Media                 Media[]
-  Reviews               Review[]
-  Booking               Booking[]
+  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities             Amenity[]
+  media                 Media[]
+  reviews               Review[]
+  booking               Booking[]
 }
 
 model Amenity {

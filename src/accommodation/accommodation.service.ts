@@ -140,7 +140,7 @@ export class AccommodationService {
     }
   }
 
-  async getUsersAccommodations(ownerId: string) {
+  async getUserAccommodations(ownerId: string) {
     let accommodation;
     try {
       accommodation = await this.prisma.accommodation.findMany({
@@ -162,7 +162,7 @@ export class AccommodationService {
           availability: true,
         },
         include: {
-          Address: true,
+          address: true,
         },
       };
 
@@ -191,10 +191,17 @@ export class AccommodationService {
         findManyOptions.skip = (options.page - 1) * options.limit;
         findManyOptions.take = options.limit;
       }
-
-      return await this.prisma.accommodation.findMany(findManyOptions);
+      const {
+        _min: { price: minPrice },
+        _max: { price: maxPrice },
+      } = await this.prisma.accommodation.aggregate({
+        _min: { price: true },
+        _max: { price: true },
+      });
+      const accommodations = await this.prisma.accommodation.findMany(findManyOptions);
+      return { priceRange: { minPrice, maxPrice }, accommodations };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
     }
   }
 }

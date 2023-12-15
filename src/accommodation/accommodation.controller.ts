@@ -26,39 +26,44 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  getSchemaPath,
   ApiBody,
   ApiConsumes,
+  getSchemaPath,
   ApiBearerAuth,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
+import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import { OrderAndFilter } from './dto/orderAndFilter.dto';
 
-@UseGuards(UserGuard)
-@ApiTags('ACCOMMODATION')
+@ApiTags('accommodation')
 @Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
-  @ApiOperation({ summary: 'CREATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Create accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Created accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
   })
-  @Post()
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Post('/')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
+      thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
       ownerId: req.user.id,
-      Address: {
+      address: {
         create: body.address,
       },
     };
@@ -68,18 +73,27 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'ADD IMAGE TO ACCOMMODATION' })
+  @ApiOperation({ summary: 'Add image to accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'File is required',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiParam({
     name: 'id',
@@ -100,6 +114,8 @@ export class AccommodationController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
   @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
@@ -126,18 +142,23 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'UPDATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Update accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Updated accommodation',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
-        },
-      },
-    },
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiParam({
     name: 'id',
@@ -145,6 +166,8 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
   @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
@@ -167,7 +190,7 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'DELETE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Delete accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Deleted accommodation',
@@ -180,12 +203,26 @@ export class AccommodationController {
       },
     },
   })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
   @ApiParam({
     name: 'id',
     type: String,
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
   @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
@@ -193,7 +230,6 @@ export class AccommodationController {
   }
 
   @ApiOperation({ summary: 'Get all accommodations' })
-  @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: 'All available accommodations list',
@@ -203,7 +239,7 @@ export class AccommodationController {
         data: {
           type: 'array',
           items: {
-            $ref: getSchemaPath(CreateAccommodationAndAddressDto),
+            $ref: getSchemaPath(AccommodationDto),
           },
         },
       },
@@ -215,22 +251,55 @@ export class AccommodationController {
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
-    const accommodationsList = await this.accommodationService.getAllAccommodations(orderAndFilter);
-    return { success: true, data: accommodationsList };
+    const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
+    return { success: true, priceRange: { ...data.priceRange }, data: data.accommodations };
   }
 
-  @ApiOperation({ summary: 'GET ACCOMMODATION' })
+  @ApiOperation({ summary: 'Get all your accommodations' })
   @ApiResponse({
     status: 200,
-    description: 'Accommodation with provided id',
+    description: 'Accommodations list',
     schema: {
       properties: {
         success: { type: 'boolean' },
         data: {
-          $ref: getSchemaPath(CreateAccommodationAndAddressDto),
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(AccommodationDto),
+          },
         },
       },
     },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('/getAll')
+  async findAll(@Req() res: any) {
+    const accommodations = await this.accommodationService.getUserAccommodations(res.user.id);
+    return { success: true, data: accommodations };
+  }
+
+  @ApiOperation({ summary: 'Get accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodation with provided id',
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @ApiParam({
     name: 'id',
