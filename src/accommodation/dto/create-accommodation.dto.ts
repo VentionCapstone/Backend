@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 
 export default class CreateAccommodationDto {
+  @IsOptional()
   @IsString()
   @IsUrl()
   thumbnailUrl: string;
