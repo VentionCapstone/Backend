@@ -22,8 +22,8 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('server', `http://localhost:${port}/api`),
-      async () => this.prismaHealth.pingCheck('database', this.prisma),
+      async () => await this.http.pingCheck('server', `http://localhost:${port}/api`),
+      async () => await this.prismaHealth.pingCheck('database', this.prisma),
     ]);
   }
 }
