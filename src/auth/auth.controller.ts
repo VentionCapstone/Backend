@@ -29,10 +29,20 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign up user' })
   @ApiResponse({
     status: 201,
-    description: `{
-    success: true,
-    message: 'User created successfully, please check your email to verify your account',
-  }`,
+    description: 'User created successfully, please check your email to verify your account',
+    schema: {
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: {
+          type: 'string',
+          example: 'User created successfully, please check your email to verify your account',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @Post('signup')
   register(@Body() registerDto: RegisterDto) {
@@ -42,11 +52,18 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign in user' })
   @ApiResponse({
     status: 200,
-    description: `{
-      { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
-        refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
-      }, id: "ce155ff3-5a38-412f-a7cb-328ef7cab68b"
-    }`,
+    description: 'User logged in',
+    schema: {
+      properties: {
+        access_token: { type: 'string', example: 'your_access_token_here' },
+        refresh_token: { type: 'string', example: 'your_refresh_token_here' },
+        id: { type: 'string', example: 'user_id_here' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
   })
   @HttpCode(200)
   @Post('signin')
@@ -71,12 +88,14 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: `{
-      { access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
-      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhODNhMWUzYi1jYWE1LTQxNDUtYjk0NS0wNDdiZjZhNWI3NjciLCJlbWFpbCI6InNoYWhyb3pndWxsaWV2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzAyNDcwOTI4LCJleHAiOjE3MDI0NzI3Mjh9.hLjM_RsmqJHH1QOfl9dCfg6CUzuD7lUwyvOoFHepxpM",
+    description: 'Tokens refreshed',
+    schema: {
+      properties: {
+        access_token: { type: 'string', example: 'your_access_token_here' },
+        refresh_token: { type: 'string', example: 'your_refresh_token_here' },
+        message: { type: 'string', example: 'Tokens have been refreshed successfully' },
+      },
     },
-    message: 'Tokens have been refreshed successfully',
-  }`,
   })
   @Get(':id/refresh')
   refreshToken(
@@ -96,7 +115,7 @@ export class AuthController {
     return this.verificationService.verify(body);
   }
 
-  @ApiOperation({ summary: 'Update email request' })
+  @ApiOperation({ summary: 'Update email' })
   @ApiBearerAuth()
   @ApiBadRequestResponse({ description: 'Email already verified' })
   @ApiConflictResponse({ description: 'Email already in use' })

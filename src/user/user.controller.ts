@@ -50,7 +50,7 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
-  @ApiOperation({ summary: 'CREATE USER PROFILE' })
+  @ApiOperation({ summary: 'Create user profile' })
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
     return this.userService.createUserProfile(createUserDto, user);
@@ -58,8 +58,8 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
-  @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
-  @ApiParam({ name: 'id', description: 'User profile ID' })
+  @ApiOperation({ summary: 'Update user profile id' })
+  @ApiParam({ name: 'id', description: 'User profile id' })
   @Patch('/:id')
   updateProfile(
     @Param('id') id: string,
