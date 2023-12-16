@@ -35,7 +35,7 @@ import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 
 @UseGuards(UserGuard)
-@ApiTags('accommodation')
+@ApiTags('accommodations')
 @Controller('accommodation')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
@@ -45,6 +45,15 @@ export class AccommodationController {
     description: 'Created accommodation',
     type: AccommodationResponseDto,
   })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiBearerAuth()
   @Post('')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
