@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender, UiTheme } from '@prisma/client';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsPhoneNumber, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John', description: 'First Name' })
@@ -11,8 +11,9 @@ export class CreateUserDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty({ example: '+359 888 888 888', description: 'Phone Number' })
+  @ApiProperty({ example: '359 888 888 888', description: 'Phone Number' })
   @IsString()
+  @IsPhoneNumber()
   phoneNumber: string;
 
   @ApiProperty({ example: 'https://example.com/photo.png', description: 'Photo URL' })
