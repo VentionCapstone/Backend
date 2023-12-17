@@ -252,7 +252,7 @@ export class AccommodationController {
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
     const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
-    return { success: true, priceRange: { ...data.priceRange }, data: data.accommodations };
+    return { success: true, ...data };
   }
 
   @ApiOperation({ summary: 'Get all your accommodations' })

@@ -212,8 +212,12 @@ export class AccommodationService {
         _min: { price: true },
         _max: { price: true },
       });
-      const accommodations = await this.prisma.accommodation.findMany(findManyOptions);
-      return { priceRange: { minPrice, maxPrice }, accommodations };
+
+      const [accommodations, totalCount] = await Promise.all([
+        this.prisma.accommodation.findMany(findManyOptions),
+        this.prisma.accommodation.count(),
+      ]);
+      return { priceRange: { minPrice, maxPrice }, totalCount, data: accommodations };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
     }
