@@ -171,13 +171,6 @@ export class AccommodationService {
             },
           },
         },
-
-        where: {
-          availability: true,
-        },
-        // include: {
-        //   address: true,
-        // },
       };
 
       if (options.orderBy) {
@@ -187,6 +180,7 @@ export class AccommodationService {
       }
 
       findManyOptions.where = {
+        availability: true,
         price: {
           gte: options.minPrice,
           lte: options.maxPrice ?? parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0', 10),
@@ -211,12 +205,16 @@ export class AccommodationService {
       } = await this.prisma.accommodation.aggregate({
         _min: { price: true },
         _max: { price: true },
+        where: findManyOptions.where,
       });
 
       const [accommodations, totalCount] = await Promise.all([
         this.prisma.accommodation.findMany(findManyOptions),
-        this.prisma.accommodation.count(),
+        this.prisma.accommodation.count({
+          where: findManyOptions.where,
+        }),
       ]);
+
       return { priceRange: { minPrice, maxPrice }, totalCount, data: accommodations };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
