@@ -112,6 +112,7 @@ export class AccommodationController {
       },
     },
   })
+  @ApiBearerAuth()
   @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
@@ -162,6 +163,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
@@ -215,6 +217,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
@@ -245,13 +248,14 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
+  @ApiBearerAuth()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
     const accommodation = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: accommodation };
   }
 
-  @ApiOperation({ summary: 'GET ALL YOUR ACCOMMODATIONS' })
+  @ApiOperation({ summary: 'Get all your accommodations' })
   @ApiResponse({
     status: 200,
     description: 'Accommodations list',

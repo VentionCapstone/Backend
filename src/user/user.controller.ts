@@ -34,7 +34,7 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'Get user by id' })
-  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiParam({ name: 'id', description: 'User id' })
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.userService.getUser(id);
@@ -42,7 +42,7 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'Get user profile by id' })
-  @ApiParam({ name: 'id', description: 'User profile ID' })
+  @ApiParam({ name: 'id', description: 'User profile id' })
   @Get('profile/:id')
   getUserProfile(@Param('id') id: string) {
     return this.userService.getUserProfile(id);
