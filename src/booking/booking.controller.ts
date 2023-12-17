@@ -13,13 +13,13 @@ import { DatesAvailableResDto, DatesNotAvailableResDto } from './dto';
 
 @Controller('booking')
 @UseGuards(UserGuard)
-@ApiTags('BOOKING')
+@ApiTags('booking')
 @ApiBearerAuth()
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Get('/availability/:id')
-  @ApiOperation({ summary: 'GET ACCOMODATION AVAILABILITY' })
+  @ApiOperation({ summary: 'Get accommodation availability' })
   @ApiExtraModels(DatesAvailableResDto, DatesNotAvailableResDto)
   @ApiOkResponse({
     description: 'Returns dates in YYYY-MM-DD format, if not available returns message',
@@ -27,8 +27,8 @@ export class BookingController {
       oneOf: refs(DatesAvailableResDto, DatesNotAvailableResDto),
     },
   })
-  async getAccomodationAvaibility(@Param('id') id: string) {
-    const data = await this.bookingService.getAccomodationAvaibility(id);
+  async getAccommodationAvaibility(@Param('id') id: string) {
+    const data = await this.bookingService.getAccommodationAvaibility(id);
     return {
       success: true,
       data,

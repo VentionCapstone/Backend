@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BookingService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getAccomodationAvaibility(accommodationId: string) {
+  async getAccommodationAvaibility(accommodationId: string) {
     try {
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
