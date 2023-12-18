@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 
 const prisma = new PrismaClient();
@@ -12,7 +13,11 @@ async function main() {
   // Create User
   for (const user of users) {
     await prisma.user.create({
-      data: user,
+      data: {
+        ...user,
+        email: user.email.toLowerCase(),
+        password: await bcrypt.hash(user.password, 12),
+      },
       include: {
         profile: true,
       },
