@@ -9,18 +9,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BookingService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getAccommodationAvaibility(accommodationId: string) {
+  async getAccommodationAvailableDates(accommodationId: string) {
     try {
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
         select: {
           availableFrom: true,
           availableTo: true,
-          availability: true,
           booking: {
             select: {
               startDate: true,
               endDate: true,
+            },
+            orderBy: {
+              startDate: 'asc',
             },
           },
         },
@@ -34,51 +36,50 @@ export class BookingService {
 
       const notAvailableRes = {
         id: accommodationId,
-        available: false,
-        message: 'Accommodation not available',
+        availableDates: null,
       };
 
-      if (accommodation.availability === false || nextAvailableDate.isAfter(availableTo))
-        return notAvailableRes;
+      if (nextAvailableDate.isAfter(availableTo)) return notAvailableRes;
 
       if (availableFrom < nextAvailableDate) availableFrom = nextAvailableDate;
-      const allDates = this.getAllDatesBetween(availableFrom, availableTo);
-
-      const bookedDates: string[] = [];
-
-      for (const booking of accommodation.booking) {
-        const startDate = dayjs(booking.startDate);
-        const endDate = dayjs(booking.endDate);
-
-        const dates = this.getAllDatesBetween(startDate, endDate);
-
-        bookedDates.push(...dates);
-      }
-
-      const availableDates = allDates.filter((date) => !bookedDates.includes(date));
+      const availableDates = this.getDateRanges(availableFrom, availableTo, accommodation.booking);
 
       if (availableDates.length === 0) return notAvailableRes;
 
       return {
         id: accommodationId,
-        available: true,
         availableDates,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new GlobalException(ErrorsTypes.BOOKIG_FAILED_TO_GET_AVAILABILITY, error.message);
+      throw new GlobalException(ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABILITY, error.message);
     }
   }
 
-  private getAllDatesBetween(startDate: Dayjs, endDate: Dayjs) {
-    const allDates: string[] = [];
-    let currentDate = startDate;
+  private getDateRanges(
+    startDate: Dayjs,
+    endDate: Dayjs,
+    bookedDates: { startDate: Date; endDate: Date }[]
+  ) {
+    const ranges = [];
+    let range = [];
+    let start = startDate;
+    let end = endDate;
 
-    while (currentDate <= endDate) {
-      allDates.push(currentDate.format('YYYY-MM-DD'));
-      currentDate = currentDate.add(1, 'day');
+    for (const date of bookedDates) {
+      if (start.isBefore(dayjs(date.startDate))) {
+        end = dayjs(date.startDate);
+        range = [start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')];
+        ranges.push(range);
+      }
+      start = dayjs(date.endDate);
     }
 
-    return allDates;
+    if (start.isBefore(endDate)) {
+      range = [start.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')];
+      ranges.push(range);
+    }
+
+    return ranges;
   }
 }

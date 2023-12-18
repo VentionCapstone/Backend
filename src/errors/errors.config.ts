@@ -103,7 +103,7 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete amenities.',
   },
-  [ErrorsTypes.BOOKIG_FAILED_TO_GET_AVAILABILITY]: {
+  [ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABILITY]: {
     statusCode: 500,
     message: 'Failed to get accommodation availability.',
   },

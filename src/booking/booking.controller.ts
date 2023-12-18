@@ -28,7 +28,7 @@ export class BookingController {
     },
   })
   async getAccommodationAvaibility(@Param('id') id: string) {
-    const data = await this.bookingService.getAccommodationAvaibility(id);
+    const data = await this.bookingService.getAccommodationAvailableDates(id);
     return {
       success: true,
       data,

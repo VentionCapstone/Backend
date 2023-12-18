@@ -50,7 +50,6 @@ model Accommodation {
   squareMeters  Int
   numberOfRooms Int
   price         Int
-  availability  Boolean
   availableFrom DateTime  @db.Date
   availableTo   DateTime  @db.Date
   description   String?
