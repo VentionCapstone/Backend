@@ -46,7 +46,7 @@ export class OrderAndFilter {
   @Min(0)
   @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PRICE))
   @IsOptional()
-  maxPrice?: number;
+  maxPrice?: number = parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0');
 
   @Transform(({ value }) => +value)
   @IsInt()
@@ -60,7 +60,7 @@ export class OrderAndFilter {
   @Min(0)
   @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_ROOMS))
   @IsOptional()
-  maxRooms?: number;
+  maxRooms?: number = parseInt(process.env.ACCOMMODATION_MAX_ROOMS || '0');
 
   @Transform(({ value }) => +value)
   @IsInt()
@@ -74,5 +74,5 @@ export class OrderAndFilter {
   @IsInt()
   @Min(0)
   @Max(parseNumberOrDefault(process.env.ACCOMMODATION_MAX_PEOPLE))
-  maxPeople?: number;
+  maxPeople?: number = parseInt(process.env.ACCOMMODATION_MAX_PEOPLE || '0');
 }

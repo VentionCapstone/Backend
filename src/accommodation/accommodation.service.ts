@@ -157,67 +157,73 @@ export class AccommodationService {
 
   async getAllAccommodations(options: OrderAndFilter) {
     try {
-      const findManyOptions: any = {
-        select: {
-          id: true,
-          thumbnailUrl: true,
-          squareMeters: true,
-          numberOfRooms: true,
-          allowedNumberOfPeople: true,
-          price: true,
-          address: {
-            select: {
-              country: true,
-            },
-          },
-        },
-      };
+      const findManyOptions = this.generateFindAllQueryObj(options);
 
-      if (options.orderBy) {
-        findManyOptions.orderBy = {
-          [options.orderBy]: options.sortOrder,
-        };
-      }
-
-      findManyOptions.where = {
-        availability: true,
-        price: {
-          gte: options.minPrice,
-          lte: options.maxPrice ?? parseInt(process.env.ACCOMMODATION_MAX_PRICE || '0', 10),
-        },
-        numberOfRooms: {
-          gte: options.minRooms,
-          lte: options.maxRooms ?? parseInt(process.env.ACCOMMODATION_MAX_ROOMS || '0', 10),
-        },
-        allowedNumberOfPeople: {
-          gte: options.minPeople,
-          lte: options.maxPeople ?? parseInt(process.env.ACCOMMODATION_MAX_PEOPLE || '0', 10),
-        },
-      };
-
-      if (options.page && options.limit) {
-        findManyOptions.skip = (options.page - 1) * options.limit;
-        findManyOptions.take = options.limit;
-      }
-      const {
-        _min: { price: minPrice },
-        _max: { price: maxPrice },
-      } = await this.prisma.accommodation.aggregate({
-        _min: { price: true },
-        _max: { price: true },
-        where: findManyOptions.where,
-      });
-
-      const [accommodations, totalCount] = await Promise.all([
+      const [accommodations, totalCount, priceStats] = await Promise.all([
         this.prisma.accommodation.findMany(findManyOptions),
         this.prisma.accommodation.count({
           where: findManyOptions.where,
         }),
+        this.prisma.accommodation.aggregate({
+          _min: { price: true },
+          _max: { price: true },
+          where: findManyOptions.where,
+        }),
       ]);
+
+      const {
+        _min: { price: minPrice },
+        _max: { price: maxPrice },
+      } = priceStats;
 
       return { priceRange: { minPrice, maxPrice }, totalCount, data: accommodations };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
     }
+  }
+
+  private generateFindAllQueryObj(options: OrderAndFilter) {
+    const findManyOptions: any = {
+      select: {
+        id: true,
+        thumbnailUrl: true,
+        squareMeters: true,
+        numberOfRooms: true,
+        allowedNumberOfPeople: true,
+        price: true,
+        address: {
+          select: {
+            country: true,
+          },
+        },
+      },
+
+      where: {
+        availability: true,
+        price: {
+          gte: options.minPrice,
+          lte: options.maxPrice,
+        },
+        numberOfRooms: {
+          gte: options.minRooms,
+          lte: options.maxRooms,
+        },
+        allowedNumberOfPeople: {
+          gte: options.minPeople,
+          lte: options.maxPeople,
+        },
+      },
+
+      skip: (options.page! - 1) * options.limit!,
+      take: options.limit,
+    };
+
+    if (options.orderBy) {
+      findManyOptions.orderBy = {
+        [options.orderBy]: options.sortOrder,
+      };
+    }
+
+    return findManyOptions;
   }
 }
