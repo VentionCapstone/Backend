@@ -1,15 +1,5 @@
 import { Transform } from 'class-transformer';
-import {
-  IsString,
-  IsInt,
-  IsBoolean,
-  IsDate,
-  IsOptional,
-  IsUrl,
-  IsNotEmpty,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsString, IsInt, IsDate, IsOptional, IsUrl, IsNotEmpty, Max, Min } from 'class-validator';
 
 export default class CreateAccommodationDto {
   @IsOptional()
@@ -43,11 +33,7 @@ export default class CreateAccommodationDto {
   @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
   price: number;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  availability: boolean;
-
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => new Date(value))
   @IsDate()
   availableFrom: Date;

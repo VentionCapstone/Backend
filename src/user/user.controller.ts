@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -6,6 +16,7 @@ import { AdminGuard } from '../common/guards/admin.guard';
 import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PhoneNumberTransformInterceptor } from './phone-validation/phoneNumberTransform.interceptor';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -38,6 +49,7 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
+  @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'CREATE USER PROFILE' })
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
@@ -45,6 +57,7 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
+  @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
   @Patch('profile/:id')

@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Accommodation" ALTER COLUMN "availableFrom" SET DATA TYPE DATE,
+ALTER COLUMN "availableTo" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "Booking" ALTER COLUMN "startDate" SET DATA TYPE DATE,
+ALTER COLUMN "endDate" SET DATA TYPE DATE;

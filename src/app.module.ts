@@ -1,11 +1,13 @@
-import { ConfigModule } from '@nestjs/config';
 import { Logger, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AccommodationModule } from './accommodation/accommodation.module';
+import { AmenitiesModule } from './amenities/amenities.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AccommodationModule } from './accommodation/accommodation.module';
 import { AuthModule } from './auth/auth.module';
+import { BookingModule } from './booking/booking.module';
 import { UserModule } from './user/user.module';
-import { AmenitiesModule } from './amenities/amenities.module';
+import { HealthModule } from './health-check/health.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AmenitiesModule } from './amenities/amenities.module';
     UserModule,
     AmenitiesModule,
     AccommodationModule,
+    BookingModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
