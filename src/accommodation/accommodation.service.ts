@@ -217,7 +217,6 @@ export class AccommodationService {
       },
 
       where: {
-        availability: true,
         price: {
           gte: options.minPrice,
           lte: options.maxPrice,
