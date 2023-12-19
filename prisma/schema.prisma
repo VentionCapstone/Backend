@@ -50,7 +50,7 @@ model Accommodation {
   squareMeters  Int
   numberOfRooms Int
   price         Int
-  availableFrom DateTime  @db.Date
+  availableFrom DateTime? @db.Date @default(dbgenerated("CURRENT_DATE"))
   availableTo   DateTime  @db.Date
   description   String?
   previewImgUrl String

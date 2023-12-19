@@ -1,1 +1,1 @@
-export * from './getAvailabilityRes.dto';
+export * from './getAvailableDatesRes.dto';

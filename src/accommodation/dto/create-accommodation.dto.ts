@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsInt, IsBoolean, IsDate, IsOptional, IsUrl, IsNotEmpty } from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export default class CreateAccommodationDto {
   @IsOptional()
@@ -23,11 +23,7 @@ export default class CreateAccommodationDto {
   @IsInt()
   price: number;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  availability: boolean;
-
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => new Date(value))
   @IsDate()
   availableFrom: Date;
