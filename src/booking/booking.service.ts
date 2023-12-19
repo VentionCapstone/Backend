@@ -52,7 +52,7 @@ export class BookingService {
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new GlobalException(ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABILITY, error.message);
+      throw new GlobalException(ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABLE_DATES, error.message);
     }
   }
 
