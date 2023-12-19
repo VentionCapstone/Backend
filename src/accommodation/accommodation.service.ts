@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
-import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AccommodationService {
@@ -60,30 +60,49 @@ export class AccommodationService {
   }
 
   async deleteAccommodation(id: string, ownerId: string) {
-    let deletedAccommodation;
+    let deletingAccommodation;
     try {
-      deletedAccommodation = await this.prisma.accommodation.delete({
+      deletingAccommodation = await this.prisma.accommodation.findUnique({
+        select: {
+          id: true,
+        },
         where: {
           id,
           ownerId,
         },
-        include: {
-          address: true,
+      });
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
+    }
+    if (!deletingAccommodation) throw new NotFoundException('Can not find deleting accommodation');
+
+    try {
+      const bookedDates = await this.prisma.booking.findMany({
+        select: {
+          startDate: true,
+          endDate: true,
+        },
+        where: { accommodationId: id },
+      });
+
+      const currentDate = dayjs();
+
+      for (const booking of bookedDates) {
+        const endDate = dayjs(booking.endDate);
+
+        if (!currentDate.isAfter(endDate)) {
+          throw new BadRequestException('There is an available booking');
+        }
+      }
+
+      await this.prisma.accommodation.update({
+        where: { id },
+        data: {
+          isDeleted: true,
         },
       });
     } catch (error) {
-      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException('Cannot find deleting accommodation');
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
-    }
-
-    try {
-      await this.prisma.address.delete({
-        where: { id: deletedAccommodation.addressId },
-      });
-    } catch (error) {
-      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException('Cannot find deleting accommodation address');
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE, error.message);
     }
     return;
