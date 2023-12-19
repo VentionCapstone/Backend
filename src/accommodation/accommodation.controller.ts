@@ -113,7 +113,7 @@ export class AccommodationController {
     },
   })
   @ApiBearerAuth()
-  @Post('/:id/file')
+  @Post('/:id/preview-upload')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
     @UploadedFile(
