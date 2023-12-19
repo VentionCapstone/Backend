@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log(`Start seeding ...`);
 
-  const users = JSON.parse(readFileSync('./prisma/seeds/users.json', 'utf-8'));
-  const accommodations = JSON.parse(readFileSync('./prisma/seeds/accommodations.json', 'utf-8'));
+  const users = JSON.parse(readFileSync('src/prisma/seeds/users.json', 'utf-8'));
+  const accommodations = JSON.parse(readFileSync('src/prisma/seeds/accommodations.json', 'utf-8'));
 
   // Create User
   for (const user of users) {

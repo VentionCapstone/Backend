@@ -22,7 +22,7 @@
     "prepare": "husky install"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node src/prisma/seed.ts"
   },
   "lint-staged": {
     "*.{js, jsx,ts,tsx}": [
