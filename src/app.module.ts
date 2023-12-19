@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './user/user.module';
+import { HealthModule } from './health-check/health.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from './user/user.module';
     AmenitiesModule,
     AccommodationModule,
     BookingModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
