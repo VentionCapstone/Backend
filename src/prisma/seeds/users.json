@@ -1,0 +1,232 @@
+[
+  {
+    "id": "1",
+    "firstName": "Germaine",
+    "lastName": "Mosciski",
+    "email": "Kennedi81@hotmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "1",
+        "phoneNumber": "393.749.1306 x913",
+        "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/486.jpg",
+        "gender": "FEMALE",
+        "country": "Cameroon",
+        "language": "French",
+        "uiTheme": "DARK",
+        "description": "Surgo neque solus. Delectatio tristis quis armarium paens pax villa deripio talis assumenda. Desolo aspernatur sunt atrox cupio auditor delectatio utpote."
+      }
+    }
+  },
+  {
+    "id": "2",
+    "firstName": "Kariane",
+    "lastName": "Gibson",
+    "email": "Saul.Rutherford24@gmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "2",
+        "phoneNumber": "1-283-262-2380 x38857",
+        "imageUrl": "https://avatars.githubusercontent.com/u/18864935",
+        "gender": "MALE",
+        "country": "Niue",
+        "language": "English",
+        "uiTheme": "LIGHT",
+        "description": "Tempora solio testimonium cum perferendis. Canis suffragium spoliatio utrimque caecus capitulus vomica vigor vulticulus quam. Decens una ademptio depono spargo dicta."
+      }
+    }
+  },
+  {
+    "id": "3",
+    "firstName": "Quinten",
+    "lastName": "Lockman",
+    "email": "Israel_Farrell@yahoo.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "3",
+        "phoneNumber": "(705) 858-6051 x528",
+        "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/568.jpg",
+        "gender": "FEMALE",
+        "country": "Palestine",
+        "language": "French",
+        "uiTheme": "DARK",
+        "description": "Doloribus condico succedo laudantium ventosus ter ulciscor paulatim amiculum audacia. Aperiam coepi depereo subito cunabula. Arcesso synagoga theatrum depromo approbo."
+      }
+    }
+  },
+  {
+    "id": "4",
+    "firstName": "Carmelo",
+    "lastName": "Rogahn",
+    "email": "Rafael.Cremin14@hotmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "4",
+        "phoneNumber": "1-597-897-4639 x281",
+        "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/630.jpg",
+        "gender": "MALE",
+        "country": "Lao People's Democratic Republic",
+        "language": "English",
+        "uiTheme": "LIGHT",
+        "description": "Adhuc alias caute tantillus carus teneo. Angelus complectus atque. Ager ustulo amplexus terreo ceno."
+      }
+    }
+  },
+  {
+    "id": "5",
+    "firstName": "Bart",
+    "lastName": "Boyle",
+    "email": "Jolie.Tillman93@yahoo.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "5",
+        "phoneNumber": "(254) 552-0902 x73050",
+        "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/556.jpg",
+        "gender": "FEMALE",
+        "country": "Serbia",
+        "language": "French",
+        "uiTheme": "DARK",
+        "description": "Tredecim delinquo totus callide coadunatio clementia spoliatio defessus color harum. Voluptatem vereor debitis approbo aspernatur testimonium ea necessitatibus. Subiungo ars minus."
+      }
+    }
+  },
+  {
+    "id": "6",
+    "firstName": "Nels",
+    "lastName": "Kohler",
+    "email": "Elise.Runte73@yahoo.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "6",
+        "phoneNumber": "659.640.4402",
+        "imageUrl": "https://avatars.githubusercontent.com/u/28593354",
+        "gender": "MALE",
+        "country": "Curacao",
+        "language": "English",
+        "uiTheme": "LIGHT",
+        "description": "Tandem vapulus vere carus suadeo cumque. Ad vorax peccatus vomica. Sollicito carus depopulo clementia vinco tergeo saepe."
+      }
+    }
+  },
+  {
+    "id": "7",
+    "firstName": "Itzel",
+    "lastName": "Hilpert",
+    "email": "Ted44@yahoo.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "7",
+        "phoneNumber": "(567) 747-4548 x998",
+        "imageUrl": "https://avatars.githubusercontent.com/u/98747872",
+        "gender": "FEMALE",
+        "country": "Afghanistan",
+        "language": "French",
+        "uiTheme": "DARK",
+        "description": "Tutis depono ante. Voluptas cursus terga aperte cunabula vos amoveo. Aer argumentum placeat advoco tendo."
+      }
+    }
+  },
+  {
+    "id": "8",
+    "firstName": "Josh",
+    "lastName": "Schmeler-Tillman",
+    "email": "Pink23@gmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "8",
+        "phoneNumber": "1-538-370-0103 x99257",
+        "imageUrl": "https://avatars.githubusercontent.com/u/97063706",
+        "gender": "MALE",
+        "country": "Germany",
+        "language": "English",
+        "uiTheme": "LIGHT",
+        "description": "Depraedor campana delectatio. Culpa nesciunt volva sed comitatus virga. Veritas amplitudo terebro aranea arbitro adduco pauci decretum."
+      }
+    }
+  },
+  {
+    "id": "9",
+    "firstName": "Jerrell",
+    "lastName": "Schultz",
+    "email": "Aubrey.Gleichner@hotmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "9",
+        "phoneNumber": "(370) 988-7096 x98453",
+        "imageUrl": "https://avatars.githubusercontent.com/u/37763074",
+        "gender": "FEMALE",
+        "country": "Chad",
+        "language": "French",
+        "uiTheme": "DARK",
+        "description": "Attonbitus pecco adipisci acer debeo chirographum supplanto caterva angustus theatrum. Theca distinctio universe. Administratio acidus repudiandae totidem theatrum civis sollicito demitto."
+      }
+    }
+  },
+  {
+    "id": "10",
+    "firstName": "Karlie",
+    "lastName": "Jaskolski",
+    "email": "Leonor_Stiedemann61@gmail.com",
+    "password": "Qwerty!2345",
+    "role": "USER",
+    "isEmailVerified": true,
+    "isVerified": true,
+    "isDeleted": false,
+    "profile": {
+      "create": {
+        "id": "10",
+        "phoneNumber": "1-880-872-6566",
+        "imageUrl": "https://avatars.githubusercontent.com/u/91608254",
+        "gender": "MALE",
+        "country": "Denmark",
+        "language": "English",
+        "uiTheme": "LIGHT",
+        "description": "Ducimus sursum adsidue solium ademptio tenax conculco. Vicissitudo derelinquo autem summisse trans carbo vitiosus. Nisi basium tametsi spes quam vix cum."
+      }
+    }
+  }
+]
