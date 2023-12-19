@@ -16,13 +16,17 @@ const parseNumberOrDefault = (value: string | undefined): number => {
 };
 
 export class OrderAndFilter {
-  @IsEnum(OrderBy)
+  @IsEnum(SortOrder)
   @IsOptional()
-  public orderBy?: OrderBy;
+  public orderByPrice?: SortOrder;
 
   @IsEnum(SortOrder)
   @IsOptional()
-  public sortOrder?: SortOrder = SortOrder.DESC;
+  public orderByRoom?: SortOrder;
+
+  @IsEnum(SortOrder)
+  @IsOptional()
+  public orderByPeople?: SortOrder;
 
   @Transform(({ value }) => +value)
   @IsOptional()

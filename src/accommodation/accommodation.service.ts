@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
-import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -159,24 +159,42 @@ export class AccommodationService {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
-      const [accommodations, totalCount, priceStats] = await Promise.all([
-        this.prisma.accommodation.findMany(findManyOptions),
-        this.prisma.accommodation.count({
-          where: findManyOptions.where,
-        }),
-        this.prisma.accommodation.aggregate({
-          _min: { price: true },
-          _max: { price: true },
-          where: findManyOptions.where,
-        }),
+      const findAccommodationsQuery = this.prisma.accommodation.findMany(findManyOptions);
+      const countAccommodationsQuery = this.prisma.accommodation.count({
+        where: findManyOptions.where,
+      });
+      const curPriceStatsQuery = this.prisma.accommodation.aggregate({
+        _min: { price: true },
+        _max: { price: true },
+        where: findManyOptions.where,
+      });
+      const totalPriceStatsQuery = this.prisma.accommodation.aggregate({
+        _min: { price: true },
+        _max: { price: true },
+      });
+
+      const [accommodations, totalCount, curPriceStats, totalPriceStats] = await Promise.all([
+        findAccommodationsQuery,
+        countAccommodationsQuery,
+        curPriceStatsQuery,
+        totalPriceStatsQuery,
       ]);
 
       const {
-        _min: { price: minPrice },
-        _max: { price: maxPrice },
-      } = priceStats;
+        _min: { price: curMinPrice },
+        _max: { price: curMaxPrice },
+      } = curPriceStats;
 
-      return { priceRange: { minPrice, maxPrice }, totalCount, data: accommodations };
+      const {
+        _min: { price: totalMinPrice },
+        _max: { price: totalMaxPrice },
+      } = totalPriceStats;
+
+      return {
+        priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
+        totalCount,
+        data: accommodations,
+      };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
     }
@@ -216,12 +234,26 @@ export class AccommodationService {
 
       skip: (options.page! - 1) * options.limit!,
       take: options.limit,
+
+      orderBy: [],
     };
 
-    if (options.orderBy) {
-      findManyOptions.orderBy = {
-        [options.orderBy]: options.sortOrder,
-      };
+    if (options.orderByPeople) {
+      findManyOptions.orderBy.push({
+        [OrderBy.NUMBER_OF_PEOPLE]: options.orderByPeople,
+      });
+    }
+
+    if (options.orderByPrice) {
+      findManyOptions.orderBy.push({
+        [OrderBy.PRICE]: options.orderByPrice,
+      });
+    }
+
+    if (options.orderByRoom) {
+      findManyOptions.orderBy.push({
+        [OrderBy.NUMBER_OF_ROOMS]: options.orderByRoom,
+      });
     }
 
     return findManyOptions;
