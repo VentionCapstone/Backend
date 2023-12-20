@@ -133,6 +133,10 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete amenities.',
   },
+  [ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABLE_DATES]: {
+    statusCode: 500,
+    message: 'Failed to get accommodation available dates.',
+  },
 };
 
 export default ERRORS;
