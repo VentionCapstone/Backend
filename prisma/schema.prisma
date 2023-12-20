@@ -55,6 +55,7 @@ model Accommodation {
   availableTo           DateTime  @db.Date
   description           String?
   previewImgUrl         String
+  isDeleted             Boolean   @default(false)
   address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
   amenities             Amenity[]
   media                 Media[]

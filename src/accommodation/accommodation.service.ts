@@ -70,6 +70,7 @@ export class AccommodationService {
         where: {
           id,
           ownerId,
+          isDeleted: false,
         },
       });
     } catch (error) {
@@ -119,26 +120,30 @@ export class AccommodationService {
         where: {
           id,
           ownerId,
+          isDeleted: true,
         },
       });
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING, error.message);
     }
+
     if (!restoringAccommodation)
       throw new NotFoundException('Can not find restoring accommodation');
 
     try {
-      await this.prisma.accommodation.update({
+      return await this.prisma.accommodation.update({
         where: { id },
         data: {
           isDeleted: false,
+        },
+        include: {
+          address: true,
         },
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE, error.message);
     }
-    return;
   }
 
   async getOneAccommodation(id: string) {
@@ -268,6 +273,7 @@ export class AccommodationService {
       },
 
       where: {
+        isDeleted: false,
         price: {
           gte: options.minPrice,
           lte: options.maxPrice,
