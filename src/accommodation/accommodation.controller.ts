@@ -224,6 +224,37 @@ export class AccommodationController {
     return { success: true, data: {} };
   }
 
+  @ApiOperation({ summary: 'Restore accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Restored accommodation',
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation id',
+    required: true,
+  })
+  @ApiBearerAuth()
+  @Delete('/:id/restore')
+  async restoreAccommodation(@Param('id') id: string, @Req() req: any) {
+    const accommodation = await this.accommodationService.restoreAccommodation(id, req.user.id);
+    return { success: true, data: { accommodation } };
+  }
+
   @ApiOperation({ summary: 'GET ACCOMMODATION' })
   @ApiResponse({
     status: 200,
