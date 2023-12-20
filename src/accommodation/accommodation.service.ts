@@ -1,12 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { GlobalException } from 'src/exceptions/global.exception';
+import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AccommodationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
 
   async createAccommodation(createAccommodationBody: any) {
     try {
@@ -43,7 +48,10 @@ export class AccommodationService {
       );
     }
 
-    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
+    if (!existingAccommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
+      );
 
     try {
       const updatedAccommodation = await this.prisma.accommodation.update({
@@ -73,7 +81,9 @@ export class AccommodationService {
       });
     } catch (error) {
       if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException('Cannot find deleting accommodation');
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_DELETING')
+        );
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
     }
 
@@ -83,7 +93,9 @@ export class AccommodationService {
       });
     } catch (error) {
       if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException('Cannot find deleting accommodation address');
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ADDRESS_FOR_DELETING')
+        );
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE, error.message);
     }
     return;
@@ -101,7 +113,10 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
-    if (!accommodation) throw new NotFoundException('Can not find accommodation');
+    if (!accommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
+      );
     return accommodation;
   }
 
@@ -118,7 +133,10 @@ export class AccommodationService {
       );
     }
 
-    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
+    if (!existingAccommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
+      );
 
     const base64Data = file.buffer.toString('base64');
 
