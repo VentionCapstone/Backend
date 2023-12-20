@@ -1,24 +1,47 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { StripeService } from '../stripe/stripe.service';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class PaymentService {
-  create() {
-    return 'This action adds a new payment';
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly stripeService: StripeService
+  ) {}
+
+  async processPayment(userId: string, totalAmount: number, paymentOption: string) {
+    const bookingDetails = await this.prismaService.booking.findMany({
+      where: { userId, status: 'PENDING' },
+    });
+
+    const paymentIntent = await this.stripeService.createPaymentIntent(
+      Math.round(totalAmount * 100)
+    );
+
+    await this.prismaService.payment.create({
+      data: {
+        type: paymentOption,
+        transactionId: paymentIntent.id,
+        totalAmount,
+        status: Status.PENDING,
+        booking: { connect: bookingDetails.map((booking) => ({ id: booking.id })) },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all payment`;
-  }
+  async processCashPayment(userId: string, totalAmount: number) {
+    const bookingDetails = await this.prismaService.booking.findMany({
+      where: { userId, status: 'PENDING' },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} payment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
+    await this.prismaService.payment.create({
+      data: {
+        type: 'cash',
+        totalAmount,
+        status: Status.COMPLETED,
+        booking: { connect: bookingDetails.map((booking) => ({ id: booking.id })) },
+      },
+    });
   }
 }

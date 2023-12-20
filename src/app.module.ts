@@ -9,6 +9,7 @@ import { BookingModule } from './booking/booking.module';
 import { UserModule } from './user/user.module';
 import { HealthModule } from './health-check/health.module';
 import { PaymentModule } from './payment/payment.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PaymentModule } from './payment/payment.module';
     BookingModule,
     HealthModule,
     PaymentModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
