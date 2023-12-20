@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsInt, IsBoolean, IsDate, IsOptional, IsUrl } from 'class-validator';
+import { IsDate, IsInt, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export default class UpdateAccommodationDto {
   @IsOptional()
@@ -18,10 +18,6 @@ export default class UpdateAccommodationDto {
   @IsOptional()
   @IsInt()
   price: number;
-
-  @IsOptional()
-  @IsBoolean()
-  availability: boolean;
 
   @IsOptional()
   @Transform(({ value }) => new Date(value))

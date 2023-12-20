@@ -34,8 +34,8 @@ model Booking {
   userId          String
   accommodationId String
   paymentId       String
-  startDate       DateTime
-  endDate         DateTime
+  startDate       DateTime      @db.Date
+  endDate         DateTime      @db.Date
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
@@ -50,9 +50,8 @@ model Accommodation {
   squareMeters  Int
   numberOfRooms Int
   price         Int
-  availability  Boolean
-  availableFrom DateTime
-  availableTo   DateTime
+  availableFrom DateTime? @db.Date @default(dbgenerated("CURRENT_DATE"))
+  availableTo   DateTime  @db.Date
   description   String?
   previewImgUrl String
   address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
