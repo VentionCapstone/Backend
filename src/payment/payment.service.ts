@@ -30,14 +30,14 @@ export class PaymentService {
     });
   }
 
-  async processCashPayment(userId: string, totalAmount: number) {
+  async processCashPayment(userId: string, totalAmount: number, paymentOption: string) {
     const bookingDetails = await this.prismaService.booking.findMany({
       where: { userId, status: 'PENDING' },
     });
 
     await this.prismaService.payment.create({
       data: {
-        type: 'cash',
+        type: paymentOption,
         totalAmount,
         status: Status.COMPLETED,
         booking: { connect: bookingDetails.map((booking) => ({ id: booking.id })) },

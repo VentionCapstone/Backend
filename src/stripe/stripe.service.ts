@@ -6,9 +6,10 @@ export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
+    const apiVersion = process.env.YOUR_STRIPE_API_VERSION || '2023-10-16';
     this.stripe = new Stripe(`${process.env.YOUR_STRIPE_SECRET_KEY}`, {
-      apiVersion: '2023-10-16',
-    });
+      apiVersion,
+    } as Stripe.StripeConfig);
   }
 
   async createPaymentIntent(amount: number): Promise<Stripe.PaymentIntent> {

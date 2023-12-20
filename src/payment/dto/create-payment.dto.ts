@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-enum PaymentOption {
+export enum PaymentOption {
   cash = 'cash',
   card = 'card',
 }
