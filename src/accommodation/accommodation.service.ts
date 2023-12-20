@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
 import * as dayjs from 'dayjs';
+import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -190,7 +191,7 @@ export class AccommodationService {
     }
   }
 
-  async getListOfAccommodations(ownerId: string) {
+  async getUserAccommodations(ownerId: string) {
     let accommodation;
     try {
       accommodation = await this.prisma.accommodation.findMany({
@@ -203,5 +204,108 @@ export class AccommodationService {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
     }
     return accommodation;
+  }
+
+  async getAllAccommodations(options: OrderAndFilter) {
+    try {
+      const findManyOptions = this.generateFindAllQueryObj(options);
+
+      const findAccommodationsQuery = this.prisma.accommodation.findMany(findManyOptions);
+      const countAccommodationsQuery = this.prisma.accommodation.count({
+        where: findManyOptions.where,
+      });
+      const curPriceStatsQuery = this.prisma.accommodation.aggregate({
+        _min: { price: true },
+        _max: { price: true },
+        where: findManyOptions.where,
+      });
+      const totalPriceStatsQuery = this.prisma.accommodation.aggregate({
+        _min: { price: true },
+        _max: { price: true },
+      });
+
+      const [accommodations, totalCount, curPriceStats, totalPriceStats] = await Promise.all([
+        findAccommodationsQuery,
+        countAccommodationsQuery,
+        curPriceStatsQuery,
+        totalPriceStatsQuery,
+      ]);
+
+      const {
+        _min: { price: curMinPrice },
+        _max: { price: curMaxPrice },
+      } = curPriceStats;
+
+      const {
+        _min: { price: totalMinPrice },
+        _max: { price: totalMaxPrice },
+      } = totalPriceStats;
+
+      return {
+        priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
+        totalCount,
+        data: accommodations,
+      };
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
+    }
+  }
+
+  private generateFindAllQueryObj(options: OrderAndFilter) {
+    const findManyOptions: any = {
+      select: {
+        id: true,
+        thumbnailUrl: true,
+        squareMeters: true,
+        numberOfRooms: true,
+        allowedNumberOfPeople: true,
+        price: true,
+        address: {
+          select: {
+            country: true,
+          },
+        },
+      },
+
+      where: {
+        price: {
+          gte: options.minPrice,
+          lte: options.maxPrice,
+        },
+        numberOfRooms: {
+          gte: options.minRooms,
+          lte: options.maxRooms,
+        },
+        allowedNumberOfPeople: {
+          gte: options.minPeople,
+          lte: options.maxPeople,
+        },
+      },
+
+      skip: (options.page! - 1) * options.limit!,
+      take: options.limit,
+
+      orderBy: [],
+    };
+
+    if (options.orderByPeople) {
+      findManyOptions.orderBy.push({
+        [OrderBy.NUMBER_OF_PEOPLE]: options.orderByPeople,
+      });
+    }
+
+    if (options.orderByPrice) {
+      findManyOptions.orderBy.push({
+        [OrderBy.PRICE]: options.orderByPrice,
+      });
+    }
+
+    if (options.orderByRoom) {
+      findManyOptions.orderBy.push({
+        [OrderBy.NUMBER_OF_ROOMS]: options.orderByRoom,
+      });
+    }
+
+    return findManyOptions;
   }
 }

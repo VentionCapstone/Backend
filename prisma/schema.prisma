@@ -34,8 +34,8 @@ model Booking {
   userId          String
   accommodationId String
   paymentId       String
-  startDate       DateTime
-  endDate         DateTime
+  startDate       DateTime      @db.Date
+  endDate         DateTime      @db.Date
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
@@ -43,24 +43,23 @@ model Booking {
 }
 
 model Accommodation {
-  id            String    @id @default(uuid())
-  addressId     String
-  thumbnailUrl  String
-  ownerId       String
-  squareMeters  Int
-  numberOfRooms Int
-  price         Int
-  availability  Boolean
-  availableFrom DateTime
-  availableTo   DateTime
-  description   String?
-  previewImgUrl String
-  isDeleted     Boolean   @default(false)
-  address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  amenities     Amenity[]
-  media         Media[]
-  reviews       Review[]
-  booking       Booking[]
+  id                    String    @id @default(uuid())
+  addressId             String
+  thumbnailUrl          String
+  ownerId               String
+  squareMeters          Int
+  numberOfRooms         Int
+  price                 Int
+  allowedNumberOfPeople Int
+  availableFrom         DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableTo           DateTime  @db.Date
+  description           String?
+  previewImgUrl         String
+  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities             Amenity[]
+  media                 Media[]
+  reviews               Review[]
+  booking               Booking[]
 }
 
 model Amenity {
