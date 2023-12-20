@@ -4,5 +4,6 @@ export const translateErrorMessage = async (
   i18n: I18nService,
   errorMessageKey: string
 ): Promise<string> => {
-  return i18n.translate(errorMessageKey, { lang: I18nContext.current()?.lang });
+  const langFromQuery = I18nContext.current()?.lang;
+  return i18n.translate(errorMessageKey, { lang: langFromQuery });
 };

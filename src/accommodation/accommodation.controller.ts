@@ -33,6 +33,7 @@ import {
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @UseGuards(UserGuard)
 @ApiTags('ACCOMMODATION')
@@ -54,6 +55,7 @@ export class AccommodationController {
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Post('/create')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
@@ -113,6 +115,7 @@ export class AccommodationController {
     },
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Post('/file/:id')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
@@ -164,6 +167,7 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Put('/update/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
@@ -218,6 +222,7 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Delete('/delete/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
@@ -249,6 +254,7 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Get('/get/:id')
   async findOne(@Param('id') id: string) {
     const accommodation = await this.accommodationService.getOneAccommodation(id);
@@ -276,6 +282,7 @@ export class AccommodationController {
     description: 'Internal Server Error',
   })
   @ApiBearerAuth()
+  @LangQuery()
   @Get('/getAll')
   async findAll(@Req() res: any) {
     const accommodations = await this.accommodationService.getListOfAccommodations(res.user.id);
