@@ -1,4 +1,3 @@
-// stripe.service.ts
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 
@@ -7,7 +6,7 @@ export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe('YOUR_STRIPE_SECRET_KEY', {
+    this.stripe = new Stripe(`${process.env.YOUR_STRIPE_SECRET_KEY}`, {
       apiVersion: '2023-10-16',
     });
   }
