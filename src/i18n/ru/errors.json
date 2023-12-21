@@ -1,0 +1,23 @@
+{
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE": "Этот электронный адрес уже используется! Пожалуйста, попробуйте еще раз",
+  "BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH": "Пароли не совпадают! Пожалуйста, попробуйте еще раз",
+  "NOT_FOUND_AUTH_USER": "Пользователь не найден",
+  "FORBIDDEN_AUTH": "Запрещено",
+  "NOT_AUTHORIZED_USER": "Вы не авторизованы для выполнения этого действия",
+  "NOT_FOUND_USER_PROFILE": "Профиль пользователя не найден",
+  "USER_PROFILE_ALREADY_EXIST": "Профиль пользователя уже существует",
+  "BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN": "Неверный токен обновления",
+  "BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN": "Срок действия токена обновления истек",
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED": "Вы уже подтвердили этот адрес электронной почты!",
+  "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "Электронная почта пользователя не подтверждена",
+  "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Недействительная ссылка",
+  "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Срок действия ссылки истек",
+  "NOT_FOUND_ACCOMODATION": "Жилье не найдено",
+  "NOT_FOUND_ACCOMODATION_FOR_UPDATING": "Жилье для обновления не найдено",
+  "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Жилье для удаления не найдено",
+  "NOT_FOUND_ADDRESS_FOR_DELETING": "Адрес для удаления не найден",
+  "NOT_FOUND_AMENITIES_LIST": "Список удобств не найден",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Для этого идентификатора жилья удобств не найдено",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Записи с указанными идентификатором жилья и идентификатором владельца не найдены.",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Записи удобств для этого объекта размещения уже существуют."
+}

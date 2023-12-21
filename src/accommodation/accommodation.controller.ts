@@ -35,6 +35,7 @@ import {
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -56,6 +57,7 @@ export class AccommodationController {
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @LangQuery()
   @Post('/')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
@@ -116,6 +118,7 @@ export class AccommodationController {
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @LangQuery()
   @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
@@ -168,6 +171,7 @@ export class AccommodationController {
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @LangQuery()
   @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
@@ -223,6 +227,7 @@ export class AccommodationController {
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @LangQuery()
   @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
@@ -307,6 +312,7 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
+  @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
     const accommodations = await this.accommodationService.getOneAccommodation(id);
