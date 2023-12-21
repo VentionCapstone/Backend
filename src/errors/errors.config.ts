@@ -35,11 +35,11 @@ const ERRORS: ErrorDefinition = {
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE]: {
     statusCode: 500,
-    message: 'Failed to delete accommodation .',
+    message: 'Failed to restore accommodation .',
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING]: {
     statusCode: 500,
-    message: 'Failed to get deleting accommodation .',
+    message: 'Failed to get restoring accommodation .',
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET]: {
     statusCode: 500,
