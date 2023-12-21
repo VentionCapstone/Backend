@@ -84,7 +84,12 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING, error.message);
     }
-    if (!deletingAccommodation) throw new NotFoundException('Can not find deleting accommodation');
+
+    if (!deletingAccommodation) {
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_DELETING')
+      );
+    }
 
     try {
       const bookedDates = await this.prisma.booking.findMany({
@@ -101,7 +106,9 @@ export class AccommodationService {
         const endDate = dayjs(booking.endDate);
 
         if (!currentDate.isAfter(endDate, 'day')) {
-          throw new BadRequestException('There is an available booking');
+          throw new BadRequestException(
+            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_ACCOMODATION_HAS_BOOKINGS')
+          );
         }
       }
 
@@ -135,9 +142,11 @@ export class AccommodationService {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING, error.message);
     }
 
-    if (!restoringAccommodation)
-      throw new NotFoundException('Can not find restoring accommodation');
-
+    if (!restoringAccommodation) {
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_RESTORING')
+      );
+    }
     try {
       return await this.prisma.accommodation.update({
         where: { id },
@@ -150,7 +159,6 @@ export class AccommodationService {
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
-
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE, error.message);
     }
   }
