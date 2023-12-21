@@ -12,6 +12,7 @@ import {
 } from '@nestjs/swagger';
 import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiTags('AMENITIES')
 @UseGuards(UserGuard)
@@ -20,6 +21,7 @@ export class AmenitiesController {
   constructor(private amenitiesService: AmenitiesService) {}
 
   @Get('/list')
+  @LangQuery()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES LIST' })
   @ApiUnauthorizedResponse({
@@ -44,6 +46,7 @@ export class AmenitiesController {
   }
 
   @Get('/:id')
+  @LangQuery()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'GET AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
@@ -68,6 +71,7 @@ export class AmenitiesController {
   }
 
   @Post('/:id')
+  @LangQuery()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'ADD AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
@@ -101,6 +105,7 @@ export class AmenitiesController {
   }
 
   @Put('/:id')
+  @LangQuery()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'UPDATE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({
@@ -130,6 +135,7 @@ export class AmenitiesController {
   }
 
   @Delete('/:id')
+  @LangQuery()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'DELETE AMENITIES BY ID' })
   @ApiUnauthorizedResponse({

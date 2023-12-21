@@ -1,13 +1,18 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { GlobalException } from 'src/exceptions/global.exception';
+import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import * as dayjs from 'dayjs';
 import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AccommodationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
 
   async createAccommodation(createAccommodationBody: any) {
     try {
@@ -44,7 +49,10 @@ export class AccommodationService {
       );
     }
 
-    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
+    if (!existingAccommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
+      );
 
     try {
       const updatedAccommodation = await this.prisma.accommodation.update({
@@ -142,6 +150,7 @@ export class AccommodationService {
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
+
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE, error.message);
     }
   }
@@ -158,7 +167,10 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
-    if (!accommodation) throw new NotFoundException('Can not find accommodation');
+    if (!accommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
+      );
     return accommodation;
   }
 
@@ -175,7 +187,10 @@ export class AccommodationService {
       );
     }
 
-    if (!existingAccommodation) throw new NotFoundException('Can not find updating accommodation');
+    if (!existingAccommodation)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
+      );
 
     const base64Data = file.buffer.toString('base64');
 
