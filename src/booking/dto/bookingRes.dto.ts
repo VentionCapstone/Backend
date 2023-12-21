@@ -10,6 +10,6 @@ export class BookingResDto {
   @ApiProperty()
   endDate: string;
 
-  @ApiProperty({ example: 'ACTIVE' })
+  @ApiProperty({ example: 'PENDING' })
   status: string;
 }
