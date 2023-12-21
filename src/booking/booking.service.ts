@@ -3,8 +3,10 @@ import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as utc from 'dayjs/plugin/utc';
+import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BookingReqDto } from './dto';
 
@@ -12,7 +14,10 @@ dayjs.extend(utc);
 
 @Injectable()
 export class BookingService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
 
   async getAccommodationAvailableDates(accommodationId: string) {
     try {
@@ -33,7 +38,10 @@ export class BookingService {
         },
       });
 
-      if (!accommodation) throw new NotFoundException('Accommodation not found');
+      if (!accommodation)
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
+        );
 
       let availableFrom = dayjs(accommodation.availableFrom);
       const availableTo = dayjs(accommodation.availableTo);

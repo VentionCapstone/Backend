@@ -1,15 +1,20 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UiTheme } from '@prisma/client';
+import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
 
   async validateUserAutherization(profileUserId: string, authUser: AuthUser) {
     if (authUser.role === 'ADMIN') {
@@ -17,7 +22,9 @@ export class UserService {
     }
 
     if (profileUserId !== authUser.id) {
-      throw new ForbiddenException('You are not authorized to perform this action');
+      throw new ForbiddenException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_AUTHORIZED_USER')
+      );
     }
 
     return true;
@@ -46,7 +53,9 @@ export class UserService {
       });
 
       if (!user) {
-        throw new NotFoundException(`User with ID ${id} not found`);
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
       }
 
       return {
@@ -75,7 +84,9 @@ export class UserService {
       });
 
       if (!userProfile) {
-        throw new NotFoundException(`User Profile with ID ${id} not found`);
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
+        );
       }
 
       return {
@@ -96,9 +107,13 @@ export class UserService {
       });
 
       if (!user) {
-        throw new NotFoundException("User doesn't exist");
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
       } else if (user.profile) {
-        throw new NotFoundException(`User Profile with ID ${user.profile.id} already exists`);
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.USER_PROFILE_ALREADY_EXIST')
+        );
       }
 
       await this.prismaService.user.update({
@@ -142,7 +157,9 @@ export class UserService {
       });
 
       if (!userProfile) {
-        throw new NotFoundException(`User Profile with ID ${id} not found`);
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
+        );
       }
 
       await this.validateUserAutherization(userProfile.userId, authUser);
@@ -182,7 +199,9 @@ export class UserService {
       });
 
       if (!userProfile) {
-        throw new NotFoundException(`User Profile with ID ${id} not found`);
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
+        );
       }
 
       await this.validateUserAutherization(userProfile.userId, authUser);

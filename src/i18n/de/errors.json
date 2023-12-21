@@ -1,0 +1,23 @@
+{
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE": "Diese E-Mail wird bereits verwendet! Bitte versuchen Sie es erneut",
+  "BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH": "Passwörter stimmen nicht überein! Bitte versuchen Sie es erneut",
+  "NOT_FOUND_AUTH_USER": "Benutzer nicht gefunden",
+  "NOT_FOUND_USER_PROFILE": "Benutzerprofil nicht gefunden",
+  "USER_PROFILE_ALREADY_EXIST": "Benutzerprofil existiert bereits",
+  "FORBIDDEN_AUTH": "Verboten",
+  "NOT_AUTHORIZED_USER": "Sie sind nicht berechtigt, diese Aktion auszuführen",
+  "BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN": "Ungültiges Aktualisierungstoken",
+  "BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN": "Aktualisierungstoken abgelaufen",
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED": "Sie haben diese E-Mail bereits verifiziert!",
+  "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "Benutzer-E-Mail nicht verifiziert",
+  "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Ungültiger Link",
+  "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Link abgelaufen",
+  "NOT_FOUND_ACCOMODATION": "Unterkunft nicht gefunden",
+  "NOT_FOUND_ACCOMODATION_FOR_UPDATING": "Aktualisierung der Unterkunft nicht gefunden",
+  "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Löschen der Unterkunft nicht gefunden",
+  "NOT_FOUND_ADDRESS_FOR_DELETING": "Adresse der Unterkunft zum Löschen nicht gefunden",
+  "NOT_FOUND_AMENITIES_LIST": "Keine Liste von Annehmlichkeiten gefunden",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Keine Annehmlichkeiten für diese Unterkunfts-ID gefunden",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Kein Datensatz mit der angegebenen Unterkunfts-ID und Besitzer-ID gefunden",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Annehmlichkeiten für diese Unterkunft existieren bereits"
+}

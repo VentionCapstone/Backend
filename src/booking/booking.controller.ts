@@ -10,6 +10,7 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { BookingService } from './booking.service';
 import { AvailableDatesResDto, BookingReqDto, BookingResDto } from './dto';
 
@@ -21,6 +22,7 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Get('/available-dates/:id')
+  @LangQuery()
   @ApiOperation({ summary: 'Get accommodation availability' })
   @ApiOkResponse({
     description: 'Returns dates in YYYY-MM-DD format, if not available returns message',

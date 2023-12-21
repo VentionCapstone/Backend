@@ -11,6 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthUser } from 'src/common/types/AuthUser.type';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
@@ -28,6 +29,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'SIGN UP USER' })
   @ApiResponse({ status: 201, description: 'link sent' })
+  @LangQuery()
   @Post('signup')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -35,6 +37,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'SIGN IN USER' })
   @ApiResponse({ status: 200, description: 'tokens' })
+  @LangQuery()
   @Post('signin')
   login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(loginDto, res);
@@ -44,6 +47,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Message: User Logged Out Succesfully' })
   @UseGuards(UserGuard)
+  @LangQuery()
   @Post('signout')
   signOut(
     @CookieGetter('refresh_token') refreshToken: string,
@@ -55,6 +59,7 @@ export class AuthController {
   @ApiOperation({ summary: 'REFRESH TOKEN' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Refresh Tokens' })
+  @LangQuery()
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,
@@ -68,6 +73,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Invalid link' })
   @ApiGoneResponse({ description: 'Link expired' })
   @ApiOkResponse({ description: 'Verified Succesfully' })
+  @LangQuery()
   @Post('verify')
   verifyEmail(@Body() body: EmailVerificationDto) {
     return this.verificationService.verify(body);
@@ -79,6 +85,7 @@ export class AuthController {
   @ApiConflictResponse({ description: 'Email already in use' })
   @ApiOkResponse({ description: 'Link sent' })
   @UseGuards(UserGuard)
+  @LangQuery()
   @Put('email')
   updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: AuthUser) {
     return this.authService.updateEmailRequest(body, user);

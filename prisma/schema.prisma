@@ -43,22 +43,23 @@ model Booking {
 }
 
 model Accommodation {
-  id            String    @id @default(uuid())
-  addressId     String
-  thumbnailUrl  String
-  ownerId       String
-  squareMeters  Int
-  numberOfRooms Int
-  price         Int
-  availableFrom DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
-  availableTo   DateTime  @db.Date
-  description   String?
-  previewImgUrl String
-  address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  amenities     Amenity[]
-  media         Media[]
-  reviews       Review[]
-  booking       Booking[]
+  id                    String    @id @default(uuid())
+  addressId             String
+  thumbnailUrl          String
+  ownerId               String
+  squareMeters          Int
+  numberOfRooms         Int
+  price                 Int
+  allowedNumberOfPeople Int
+  availableFrom         DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableTo           DateTime  @db.Date
+  description           String?
+  previewImgUrl         String
+  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities             Amenity[]
+  media                 Media[]
+  reviews               Review[]
+  booking               Booking[]
 }
 
 model Amenity {
