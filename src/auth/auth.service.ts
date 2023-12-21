@@ -13,7 +13,7 @@ import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 
-import { CurrentUserType } from 'src/common/types/CurrentUser.type';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { VerificationSerivce } from './verification.service';
 
@@ -147,7 +147,7 @@ export class AuthService {
     }
   }
 
-  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: CurrentUserType) {
+  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: AuthUser) {
     try {
       const { email: newEmail } = emailUpdateDto;
 

@@ -10,7 +10,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { CurrentUserType } from 'src/common/types/CurrentUser.type';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
@@ -80,7 +80,7 @@ export class AuthController {
   @ApiOkResponse({ description: 'Link sent' })
   @UseGuards(UserGuard)
   @Put('email')
-  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: CurrentUserType) {
+  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: AuthUser) {
     return this.authService.updateEmailRequest(body, user);
   }
 }

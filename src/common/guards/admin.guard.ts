@@ -4,7 +4,7 @@ import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { User } from '../../auth/entities/auth.entity';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CurrentUserType } from '../types/CurrentUser.type';
+import { AuthUser } from '../types/AuthUser.type';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -40,7 +40,7 @@ export class AdminGuard implements CanActivate {
         email: findUser.email,
         role: findUser.role,
         isEmailVerified: findUser.isEmailVerified,
-      } as CurrentUserType;
+      } as AuthUser;
 
       return true;
     } catch (error) {
