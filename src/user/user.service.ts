@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { UiTheme, User } from '@prisma/client';
+import { UiTheme } from '@prisma/client';
+import { CurrentUserType } from 'src/common/types/CurrentUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,7 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async validateUserAutherization(profileUserId: string, authUser: User) {
+  async validateUserAutherization(profileUserId: string, authUser: CurrentUserType) {
     if (authUser.role === 'ADMIN') {
       return true;
     }
@@ -87,7 +88,7 @@ export class UserService {
     }
   }
 
-  async createUserProfile(createUserDto: CreateUserDto, userData: User) {
+  async createUserProfile(createUserDto: CreateUserDto, userData: CurrentUserType) {
     try {
       const user = await this.prismaService.user.findUnique({
         where: { id: userData.id },
@@ -134,7 +135,7 @@ export class UserService {
     }
   }
 
-  async updateUserProfile(id: string, updateUserDto: UpdateUserDto, authUser: User) {
+  async updateUserProfile(id: string, updateUserDto: UpdateUserDto, authUser: CurrentUserType) {
     try {
       const userProfile = await this.prismaService.userProfile.findFirst({
         where: { id },
@@ -174,7 +175,7 @@ export class UserService {
     }
   }
 
-  async removeUserProfile(id: string, authUser: User) {
+  async removeUserProfile(id: string, authUser: CurrentUserType) {
     try {
       const userProfile = await this.prismaService.userProfile.findFirst({
         where: { id },

@@ -1,7 +1,4 @@
 import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
-import { Response } from 'express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -12,11 +9,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { CurrentUserType } from 'src/common/types/CurrentUser.type';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
+import { AuthService } from './auth.service';
+import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
 import { VerificationSerivce } from './verification.service';
-import { User } from '@prisma/client';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -80,7 +80,7 @@ export class AuthController {
   @ApiOkResponse({ description: 'Link sent' })
   @UseGuards(UserGuard)
   @Put('email')
-  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: User) {
+  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: CurrentUserType) {
     return this.authService.updateEmailRequest(body, user);
   }
 }

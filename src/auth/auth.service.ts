@@ -7,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 
+import { CurrentUserType } from 'src/common/types/CurrentUser.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { VerificationSerivce } from './verification.service';
 
@@ -147,7 +147,7 @@ export class AuthService {
     }
   }
 
-  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: User) {
+  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: CurrentUserType) {
     try {
       const { email: newEmail } = emailUpdateDto;
 
