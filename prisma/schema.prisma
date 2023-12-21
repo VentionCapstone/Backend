@@ -124,9 +124,9 @@ model Review {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  title           String
   feedback        String
   rating          Int
+  createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
 }
