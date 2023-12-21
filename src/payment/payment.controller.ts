@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, BadRequestException } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto, PaymentOption } from './dto/create-payment.dto';
 import { UserGuard } from '../common/guards/user.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 type PaymentHandler = (
   userId: string,
@@ -38,12 +39,15 @@ export class PaymentController {
   @ApiResponse({ status: 200, description: 'Payment processed successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @Post('')
-  async handlePayment(@Body() createPaymentDto: CreatePaymentDto, @Req() req: any) {
+  async handlePayment(
+    @Body() createPaymentDto: CreatePaymentDto,
+    @CurrentUser('id') userId: string
+  ) {
     const { totalAmount, paymentOption } = createPaymentDto;
 
     if (!this.paymentHandlers[paymentOption]) {
       throw new BadRequestException('Invalid payment option');
     }
-    await this.paymentHandlers[paymentOption](req.user.id, totalAmount, paymentOption);
+    await this.paymentHandlers[paymentOption](userId, totalAmount, paymentOption);
   }
 }

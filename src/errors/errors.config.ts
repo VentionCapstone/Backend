@@ -137,6 +137,10 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to get accommodation available dates.',
   },
+  [ErrorsTypes.PAYMENT_FAILED_TO_PROCESS]: {
+    statusCode: 500,
+    message: 'Failed to process payment',
+  },
 };
 
 export default ERRORS;
