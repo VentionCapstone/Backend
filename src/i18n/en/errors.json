@@ -1,0 +1,23 @@
+{
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE": "This email is already in use! Please try again",
+  "BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH": "Passwords do not match! Please try again",
+  "NOT_FOUND_AUTH_USER": "User not found",
+  "NOT_FOUND_USER_PROFILE": "User profile not found",
+  "USER_PROFILE_ALREADY_EXIST": "User Profile already exists",
+  "FORBIDDEN_AUTH": "Forbidden",
+  "NOT_AUTHORIZED_USER": "You are not authorized to perform this action",
+  "BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN": "Invalid refresh token",
+  "BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN": "Refresh token expired",
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED": "You already verified this email!",
+  "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "User Email not Verified",
+  "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Invalid link",
+  "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Link expired",
+  "NOT_FOUND_ACCOMODATION": "Can not find accommodation",
+  "NOT_FOUND_ACCOMODATION_FOR_UPDATING": "Can not find updating accommodation",
+  "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Cannot find deleting accommodation",
+  "NOT_FOUND_ADDRESS_FOR_DELETING": "Cannot find deleting accommodation address",
+  "NOT_FOUND_AMENITIES_LIST": "No amenities list found",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID": "No amenities found for this accomodation id",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "No record with given accommodation id and owner id is found",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Amenities for this accomodation already exist"
+}

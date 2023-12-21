@@ -9,12 +9,28 @@ import { BookingModule } from './booking/booking.module';
 import { UserModule } from './user/user.module';
 import { HealthModule } from './health-check/health.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import * as path from 'path';
+import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        {
+          use: QueryResolver,
+          options: ['lang'],
+        },
+        AcceptLanguageResolver,
+      ],
     }),
     AuthModule,
     UserModule,

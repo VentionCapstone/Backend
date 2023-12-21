@@ -1,14 +1,19 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AmenitiesDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { GlobalException } from 'src/exceptions/global.exception';
+import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AmenitiesDto } from './dto';
 
 @Injectable()
 export class AmenitiesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
 
   async getAmenitiesList() {
     try {
@@ -20,7 +25,9 @@ export class AmenitiesService {
         .map((column) => column.column_name);
 
       if (!columns) {
-        throw new NotFoundException('No amenities list found');
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_LIST')
+        );
       }
 
       return { message: 'Success getting amenities list', data: list };
@@ -37,7 +44,9 @@ export class AmenitiesService {
         },
       });
       if (!amenities) {
-        throw new NotFoundException('No amenities found for this accomodation id');
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID')
+        );
       }
       return { message: 'Success getting amenities', data: amenities };
     } catch (error) {
@@ -55,14 +64,18 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
-          throw new ConflictException('Amenities for this accomodation already exist');
+          throw new ConflictException(
+            await translateErrorMessage(this.i18n, 'errors.CONFLICT_AMENITIES_ALREADY_EXIST')
+          );
         }
         if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED) {
-          throw new NotFoundException('No amenities found for this accomodation id');
+          throw new NotFoundException(
+            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID')
+          );
         }
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
           throw new NotFoundException(
-            'No record with given accommodation id and owner id is found'
+            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
           );
         }
       }
@@ -86,7 +99,7 @@ export class AmenitiesService {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
           throw new NotFoundException(
-            'No record with given accommodation id and owner id is found'
+            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
           );
         }
       }
@@ -109,7 +122,7 @@ export class AmenitiesService {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
           throw new NotFoundException(
-            'No record with given accommodation id and owner id is found'
+            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
           );
         }
       }
