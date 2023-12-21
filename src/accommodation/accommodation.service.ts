@@ -257,4 +257,68 @@ export class AccommodationService {
 
     return findManyOptions;
   }
+
+  async getAccommodationReviews(accommodationId: string) {
+    try {
+      const findAllReviewsQuery = this.prisma.review.findMany({
+        where: { accommodationId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profile: {
+                select: {
+                  country: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const reviewsCountQuery = this.prisma.review.groupBy({
+        by: ['rating'],
+        where: { accommodationId },
+        _count: true,
+      });
+
+      const averageRateQuery = this.prisma.review.aggregate({
+        where: { accommodationId },
+        _avg: {
+          rating: true,
+        },
+      });
+
+      const [reviews, ratingCounts, averageRating] = await Promise.all([
+        findAllReviewsQuery,
+        reviewsCountQuery,
+        averageRateQuery,
+      ]);
+
+      const {
+        _avg: { rating: averageRate },
+      } = averageRating;
+
+      const countByRating = this.getCountByRating(ratingCounts);
+
+      return { data: reviews, countByRating, averageRate };
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
+    }
+  }
+
+  private getCountByRating(ratingCounts: { rating: number; _count: number }[]) {
+    const countByRating: Record<number, number> = {};
+
+    for (const ratingCount of ratingCounts) {
+      const rating = ratingCount.rating;
+      const count = ratingCount._count;
+
+      countByRating[rating] = count;
+    }
+
+    return countByRating;
+  }
 }

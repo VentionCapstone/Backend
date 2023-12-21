@@ -35,6 +35,7 @@ import {
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -281,6 +282,45 @@ export class AccommodationController {
   async findAll(@Req() res: any) {
     const accommodations = await this.accommodationService.getUserAccommodations(res.user.id);
     return { success: true, data: accommodations };
+  }
+
+  @ApiOperation({ summary: 'Get all reviews to this accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviews of this accommodation',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(ReviewDto),
+          },
+        },
+        countByRating: {
+          type: 'object',
+          additionalProperties: {
+            type: 'integer',
+          },
+        },
+        averageRate: {
+          type: 'number',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @Get('/:accommodationId/reviews')
+  async getAllReviews(@Param('accommodationId') accommodationId: string) {
+    const review = await this.accommodationService.getAccommodationReviews(accommodationId);
+    return { success: true, ...review };
   }
 
   @ApiOperation({ summary: 'Get accommodation' })
