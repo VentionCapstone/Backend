@@ -12,6 +12,7 @@
   "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "Электронная почта пользователя не подтверждена",
   "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Недействительная ссылка",
   "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Срок действия ссылки истек",
+  "BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END": "Вы можете добавить отзыв только после окончания бронирования",
   "NOT_FOUND_ACCOMODATION": "Жилье не найдено",
   "NOT_FOUND_ACCOMODATION_FOR_UPDATING": "Жилье для обновления не найдено",
   "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Жилье для удаления не найдено",
@@ -19,5 +20,9 @@
   "NOT_FOUND_AMENITIES_LIST": "Список удобств не найден",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Для этого идентификатора жилья удобств не найдено",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Записи с указанными идентификатором жилья и идентификатором владельца не найдены.",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Записи удобств для этого объекта размещения уже существуют."
+  "NOT_FOUND_BOOKING": "Бронирование не найдено",
+  "NOT_FOUND_REVIEW_FOR_UPDATING": "Не удается найти обновляемый отзыв",
+  "NOT_FOUND_REVIEW": "Отзыв не найден",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Удобства для данного размещения уже существуют",
+  "CONFLICT_REVIEW_ALREADY_EXIST": "У вас уже есть отзыв о данном бронировании размещения"
 }

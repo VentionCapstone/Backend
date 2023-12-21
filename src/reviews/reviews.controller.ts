@@ -12,6 +12,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import CreateReviewDto from './dto/create-review.dto';
 import UpdateReviewDto from './dto/update-user.dto';
 import { ReviewResponseDto } from './dto/review-response.dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiTags('reviews')
 @UseGuards(UserGuard)
@@ -35,6 +36,7 @@ export class ReviewsController {
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @LangQuery()
   @Post('/:accommodationId')
   async createReview(
     @Body() body: CreateReviewDto,

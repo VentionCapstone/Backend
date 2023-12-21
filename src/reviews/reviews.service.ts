@@ -12,10 +12,15 @@ import * as dayjs from 'dayjs';
 import UpdateReviewDto from './dto/update-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly i18n: I18nService
+  ) {}
   getReviewQuery = {
     include: {
       user: {
@@ -49,14 +54,21 @@ export class ReviewsService {
       });
 
       if (!bookking) {
-        throw new NotFoundException('Bookking not found');
+        throw new NotFoundException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_BOOKING')
+        );
       }
 
       const currentDate = dayjs();
       const bookingEndDate = dayjs(bookking?.endDate);
 
       if (!currentDate.isAfter(bookingEndDate, 'day')) {
-        throw new BadRequestException('You can add review only after the end of booking');
+        throw new BadRequestException(
+          await translateErrorMessage(
+            this.i18n,
+            'errors.BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END'
+          )
+        );
       }
 
       const newReview = await this.prisma.review.create({
@@ -68,10 +80,12 @@ export class ReviewsService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
-        throw new ConflictException('You already have a review on this booking of accommodation');
+        throw new ConflictException(
+          await translateErrorMessage(this.i18n, 'errors.CONFLICT_REVIEW_ALREADY_EXIST')
+        );
       }
 
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE, error.message);
+      throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_CREATE, error.message);
     }
   }
 
@@ -82,13 +96,13 @@ export class ReviewsService {
         where: { id: reviewId, userId },
       });
     } catch (error) {
-      throw new GlobalException(
-        ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING,
-        error.message
-      );
+      throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_GET_FOR_UPDATING, error.message);
     }
 
-    if (!existingReview) throw new NotFoundException('Can not find updating review');
+    if (!existingReview)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW_FOR_UPDATING')
+      );
 
     try {
       const newAccommodation = await this.prisma.review.update({
@@ -100,7 +114,7 @@ export class ReviewsService {
       return newAccommodation;
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_CREATE, error.message);
+      throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_UPDATE, error.message);
     }
   }
 
@@ -112,9 +126,12 @@ export class ReviewsService {
         ...this.getReviewQuery,
       });
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
+      throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_GET, error.message);
     }
-    if (!review) throw new NotFoundException('Can not find review');
+    if (!review)
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW')
+      );
     return review;
   }
 
@@ -127,10 +144,12 @@ export class ReviewsService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException('Can not find review');
+          throw new NotFoundException(
+            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW')
+          );
         }
       }
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE, error.message);
+      throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_DELETE, error.message);
     }
   }
 }
