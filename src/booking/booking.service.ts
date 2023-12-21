@@ -1,4 +1,5 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as utc from 'dayjs/plugin/utc';
@@ -82,7 +83,7 @@ export class BookingService {
             },
             where: {
               status: {
-                in: ['ACTIVE', 'PENDING'],
+                in: [Status.ACTIVE, Status.PENDING],
               },
               OR: [
                 {
@@ -142,7 +143,7 @@ export class BookingService {
         data: {
           startDate: bookingStart.toISOString(),
           endDate: bookingEnd.toISOString(),
-          status: 'PENDING',
+          status: Status.PENDING,
           accommodation: {
             connect: {
               id: accommodationId,
