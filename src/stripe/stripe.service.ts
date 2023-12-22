@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
+import { GlobalException } from '../exceptions/global.exception';
+import ErrorsTypes from '../errors/errors.enum';
 
 @Injectable()
 export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
-    const apiVersion = process.env.YOUR_STRIPE_API_VERSION || '2023-10-16';
-    this.stripe = new Stripe(`${process.env.YOUR_STRIPE_SECRET_KEY}`, {
-      apiVersion,
-    } as Stripe.StripeConfig);
+    try {
+      const apiVersion = process.env.YOUR_STRIPE_API_VERSION;
+      const stripeKey = process.env.YOUR_STRIPE_SECRET_KEY;
+      this.stripe = new Stripe(String(stripeKey), {
+        apiVersion,
+      } as Stripe.StripeConfig);
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.STRIPE_FAILED_TO_PROCESS, error.message);
+    }
   }
 
   async createPaymentIntent(amount: number): Promise<Stripe.PaymentIntent> {

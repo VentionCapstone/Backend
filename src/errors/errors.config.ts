@@ -141,6 +141,10 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to process payment',
   },
+  [ErrorsTypes.STRIPE_FAILED_TO_PROCESS]: {
+    statusCode: 500,
+    message: 'Failed to set stripe configuration',
+  },
 };
 
 export default ERRORS;
