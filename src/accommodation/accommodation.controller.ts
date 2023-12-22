@@ -8,10 +8,10 @@ import {
   NotFoundException,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
   Put,
   Query,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -35,6 +35,7 @@ import {
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
@@ -60,12 +61,15 @@ export class AccommodationController {
   @UseGuards(UserGuard)
   @LangQuery()
   @Post('/')
-  async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
+  async createAccommodation(
+    @Body() body: CreateAccommodationAndAddressDto,
+    @CurrentUser('id') userId: string
+  ) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
       thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
-      ownerId: req.user.id,
+      ownerId: userId,
       address: {
         create: body.address,
       },
@@ -133,14 +137,14 @@ export class AccommodationController {
     )
     file: Express.Multer.File,
     @Param('id') id: string,
-    @Req() req: any
+    @CurrentUser('id') userId: string
   ) {
     if (!file) throw new NotFoundException('File for updation not provided');
 
     const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
       id,
       file,
-      req.user.id
+      userId
     );
 
     return { success: true, data: updatedAccommodation };
@@ -177,7 +181,7 @@ export class AccommodationController {
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
     @Param('id') id: string,
-    @Req() req: any
+    @CurrentUser('id') userId: string
   ) {
     const updateAccommodationAndAdress = {
       ...body.accommodation,
@@ -189,10 +193,43 @@ export class AccommodationController {
     const updatedAccommodation = await this.accommodationService.updateAccommodation(
       id,
       updateAccommodationAndAdress,
-      req.user.id
+      userId
     );
 
     return { success: true, data: updatedAccommodation };
+  }
+
+  @ApiOperation({ summary: 'Restore accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Restored accommodation',
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation id',
+    required: true,
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Patch('/:id/restore')
+  async restoreAccommodation(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    const accommodation = await this.accommodationService.restoreAccommodation(id, userId);
+
+    return { success: true, data: accommodation };
   }
 
   @ApiOperation({ summary: 'Delete accommodation' })
@@ -230,8 +267,8 @@ export class AccommodationController {
   @UseGuards(UserGuard)
   @LangQuery()
   @Delete('/:id')
-  async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
-    await this.accommodationService.deleteAccommodation(id, req.user.id);
+  async deleteAccommodation(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    await this.accommodationService.deleteAccommodation(id, userId);
     return { success: true, data: {} };
   }
 
@@ -250,10 +287,6 @@ export class AccommodationController {
         },
       },
     },
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
@@ -284,8 +317,8 @@ export class AccommodationController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('/getAll')
-  async findAll(@Req() res: any) {
-    const accommodations = await this.accommodationService.getUserAccommodations(res.user.id);
+  async findAll(@CurrentUser('id') userId: string) {
+    const accommodations = await this.accommodationService.getUserAccommodations(userId);
     return { success: true, data: accommodations };
   }
 

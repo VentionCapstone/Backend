@@ -29,9 +29,17 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete accommodation .',
   },
-  [ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE]: {
+  [ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING]: {
     statusCode: 500,
-    message: 'Failed to delete accommodation address.',
+    message: 'Failed to get deleting accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE]: {
+    statusCode: 500,
+    message: 'Failed to restore accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING]: {
+    statusCode: 500,
+    message: 'Failed to get restoring accommodation .',
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET]: {
     statusCode: 500,

@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
-import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
+import * as dayjs from 'dayjs';
 import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
@@ -69,37 +69,98 @@ export class AccommodationService {
   }
 
   async deleteAccommodation(id: string, ownerId: string) {
-    let deletedAccommodation;
+    let deletingAccommodation;
     try {
-      deletedAccommodation = await this.prisma.accommodation.delete({
+      deletingAccommodation = await this.prisma.accommodation.findUnique({
+        select: {
+          id: true,
+        },
         where: {
           id,
           ownerId,
+          isDeleted: false,
+        },
+      });
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING, error.message);
+    }
+
+    if (!deletingAccommodation) {
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_DELETING')
+      );
+    }
+
+    try {
+      const bookedDates = await this.prisma.booking.findMany({
+        select: {
+          startDate: true,
+          endDate: true,
+        },
+        where: { accommodationId: id },
+      });
+
+      const currentDate = dayjs();
+
+      for (const booking of bookedDates) {
+        const endDate = dayjs(booking.endDate);
+
+        if (!currentDate.isAfter(endDate, 'day')) {
+          throw new BadRequestException(
+            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_ACCOMODATION_HAS_BOOKINGS')
+          );
+        }
+      }
+
+      await this.prisma.accommodation.update({
+        where: { id },
+        data: {
+          isDeleted: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
+    }
+    return;
+  }
+
+  async restoreAccommodation(id: string, ownerId: string) {
+    let restoringAccommodation;
+    try {
+      restoringAccommodation = await this.prisma.accommodation.findUnique({
+        select: {
+          id: true,
+        },
+        where: {
+          id,
+          ownerId,
+          isDeleted: true,
+        },
+      });
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING, error.message);
+    }
+
+    if (!restoringAccommodation) {
+      throw new NotFoundException(
+        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_RESTORING')
+      );
+    }
+    try {
+      return await this.prisma.accommodation.update({
+        where: { id },
+        data: {
+          isDeleted: false,
         },
         include: {
           address: true,
         },
       });
     } catch (error) {
-      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_DELETING')
-        );
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_DELETE, error.message);
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE, error.message);
     }
-
-    try {
-      await this.prisma.address.delete({
-        where: { id: deletedAccommodation.addressId },
-      });
-    } catch (error) {
-      if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ADDRESS_FOR_DELETING')
-        );
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE, error.message);
-    }
-    return;
   }
 
   async getOneAccommodation(id: string) {
@@ -235,6 +296,7 @@ export class AccommodationService {
       },
 
       where: {
+        isDeleted: false,
         price: {
           gte: options.minPrice,
           lte: options.maxPrice,
