@@ -228,7 +228,7 @@ export class AccommodationController {
   async restoreAccommodation(@Param('id') id: string, @CurrentUser('id') userId: string) {
     const accommodation = await this.accommodationService.restoreAccommodation(id, userId);
 
-    return { success: true, data: { ...accommodation } };
+    return { success: true, data: accommodation };
   }
 
   @ApiOperation({ summary: 'Delete accommodation' })
