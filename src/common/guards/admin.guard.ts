@@ -4,6 +4,7 @@ import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { User } from '../../auth/entities/auth.entity';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthUser } from '../types/AuthUser.type';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -34,7 +35,12 @@ export class AdminGuard implements CanActivate {
 
       if (findUser.role !== 'ADMIN') throw new UnauthorizedException('User Unauthorized');
 
-      req.user = findUser;
+      req.user = {
+        id: findUser.id,
+        email: findUser.email,
+        role: findUser.role,
+        isEmailVerified: findUser.isEmailVerified,
+      } as AuthUser;
 
       return true;
     } catch (error) {

@@ -18,8 +18,15 @@
   "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Жоюға арналған тұрғын үй табылмады",
   "NOT_FOUND_ACCOMODATION_FOR_RESTORING": "Дұрыс баспана табу мүмкін емес",
   "NOT_FOUND_ADDRESS_FOR_DELETING": "Жоюға арналған адрес табылмады",
+  "BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END": "Брондау аяқталған соң тек қаралып отырмалық қосуға болады",
   "NOT_FOUND_AMENITIES_LIST": "Ыңғайлылық тізімі табылмады",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Бұл тұрғын үй идентификаторы үшін ыңғайлылық табылмады",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Тұрғын үй идентификаторы мен иесінің идентификаторы берілген жазба табылмады",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Бұл тұрғын үйге арналған ыңғайлылықтар қазірдің өзінде бар"
+  "NOT_FOUND_BOOKING": "Брондау табылмады",
+  "NOT_FOUND_REVIEW_FOR_UPDATING": "Жаңартуға арналған пікір табылмады",
+  "NOT_FOUND_REVIEW": "Пікір табылмады",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Мүмкіндіктер бұл тұрғын үшін әлі бар",
+  "CONFLICT_REVIEW_ALREADY_EXIST": "Сіз бұл тұрғын үшін әлі пікір бергенсіз",
+  "BOOKING_INVALID_DATES": "Брондау күндері жарамсыз",
+  "BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген"
 }

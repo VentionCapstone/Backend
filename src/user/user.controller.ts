@@ -10,8 +10,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -57,7 +57,7 @@ export class UserController {
   @ApiOperation({ summary: 'CREATE USER PROFILE' })
   @LangQuery()
   @Post('profile')
-  createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+  createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: AuthUser) {
     return this.userService.createUserProfile(createUserDto, user);
   }
 
@@ -70,7 +70,7 @@ export class UserController {
   updateProfile(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: AuthUser
   ) {
     return this.userService.updateUserProfile(id, updateUserDto, user);
   }
@@ -79,7 +79,7 @@ export class UserController {
   @ApiOperation({ summary: 'DELETE USER PROFILE BY ID' })
   @LangQuery()
   @Delete('profile/:id')
-  removeProfile(@Param('id') id: string, @CurrentUser() user: User) {
+  removeProfile(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.userService.removeUserProfile(id, user);
   }
 }
