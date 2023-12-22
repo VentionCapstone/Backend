@@ -29,9 +29,17 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete accommodation .',
   },
-  [ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE]: {
+  [ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING]: {
     statusCode: 500,
-    message: 'Failed to delete accommodation address.',
+    message: 'Failed to get deleting accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE]: {
+    statusCode: 500,
+    message: 'Failed to restore accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING]: {
+    statusCode: 500,
+    message: 'Failed to get restoring accommodation .',
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET]: {
     statusCode: 500,
@@ -136,6 +144,26 @@ const ERRORS: ErrorDefinition = {
   [ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABLE_DATES]: {
     statusCode: 500,
     message: 'Failed to get accommodation available dates.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_CREATE]: {
+    statusCode: 500,
+    message: 'Failed to create review for this accommodation.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET_FOR_UPDATING]: {
+    statusCode: 500,
+    message: 'Failed to get updating review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_UPDATE]: {
+    statusCode: 500,
+    message: 'Failed to update review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_DELETE]: {
+    statusCode: 500,
+    message: 'Failed to delete review.',
   },
   [ErrorsTypes.PAYMENT_FAILED_TO_PROCESS]: {
     statusCode: 500,

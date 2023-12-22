@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { HealthModule } from './health-check/health.module';
 import { PaymentModule } from './payment/payment.module';
 import { StripeModule } from './stripe/stripe.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import * as path from 'path';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 
@@ -41,6 +42,7 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
     HealthModule,
     PaymentModule,
     StripeModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

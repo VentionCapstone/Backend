@@ -1,14 +1,24 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
-import { BookingService } from './booking.service';
-import { AvailableDatesResDto } from './dto';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import { BookingService } from './booking.service';
+import { AvailableDatesResDto, BookingReqDto, BookingResDto } from './dto';
 
 @Controller('booking')
 @UseGuards(UserGuard)
 @ApiTags('booking')
 @ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'User not authorized' })
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
@@ -21,6 +31,21 @@ export class BookingController {
   })
   async getAccommodationAvailableDates(@Param('id') id: string) {
     const data = await this.bookingService.getAccommodationAvailableDates(id);
+    return {
+      success: true,
+      data,
+    };
+  }
+
+  @Post('/book')
+  @LangQuery()
+  @ApiOperation({ summary: 'Book accommodation' })
+  @ApiOkResponse({ description: 'Returns booking object', type: BookingResDto })
+  @ApiNotFoundResponse({ description: 'Accommodation not found' })
+  @ApiBadRequestResponse({ description: 'Accommodation not available for this dates' })
+  @ApiBadRequestResponse({ description: 'Already booked on some of these dates' })
+  async bookAccommodation(@Body() body: BookingReqDto, @CurrentUser('id') userId: string) {
+    const data = await this.bookingService.bookAccommodation(userId, body);
     return {
       success: true,
       data,

@@ -33,13 +33,14 @@ model Booking {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  paymentId       String
+  paymentId       String?
   startDate       DateTime      @db.Date
   endDate         DateTime      @db.Date
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  payment         Payment       @relation(fields: [paymentId], references: [id])
+  payment         Payment?      @relation(fields: [paymentId], references: [id])
+  review          Review?
 }
 
 model Accommodation {
@@ -55,6 +56,7 @@ model Accommodation {
   availableTo           DateTime  @db.Date
   description           String?
   previewImgUrl         String
+  isDeleted             Boolean   @default(false)
   address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
   amenities             Amenity[]
   media                 Media[]
@@ -124,11 +126,13 @@ model Review {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  title           String
   feedback        String
+  bookingId       String        @unique
   rating          Int
+  createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  booking         Booking       @relation(fields: [bookingId], references: [id])
 }
 
 enum Role {
