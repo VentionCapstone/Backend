@@ -38,6 +38,7 @@ export class BookingController {
   }
 
   @Post('/book')
+  @LangQuery()
   @ApiOperation({ summary: 'Book accommodation' })
   @ApiOkResponse({ description: 'Returns booking object', type: BookingResDto })
   @ApiNotFoundResponse({ description: 'Accommodation not found' })

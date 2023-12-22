@@ -18,6 +18,8 @@
   "NOT_FOUND_ADDRESS_FOR_DELETING": "Адрес для удаления не найден",
   "NOT_FOUND_AMENITIES_LIST": "Список удобств не найден",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Для этого идентификатора жилья удобств не найдено",
-  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Записи с указанными идентификатором жилья и идентификатором владельца не найдены.",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Записи удобств для этого объекта размещения уже существуют."
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Записи с указанными идентификатором жилья и идентификатором владельца не найдены",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Записи удобств для этого объекта размещения уже существуют",
+  "BOOKING_INVALID_DATES": "Неверные даты бронирования",
+  "BOOKING_ALREADY_BOOKED": "К сожалению, на некоторые из этих дат жилье уже забронировано"
 }
