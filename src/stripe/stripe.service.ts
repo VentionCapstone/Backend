@@ -14,17 +14,7 @@ export class StripeService {
     if (!apiVersion && !stripeKey) {
       throw new GlobalException(
         ErrorsTypes.STRIPE_FAILED_TO_PROCESS,
-        'Stripe API version and secret key are not set. Please set the environment variables.'
-      );
-    } else if (!apiVersion) {
-      throw new GlobalException(
-        ErrorsTypes.STRIPE_FAILED_TO_PROCESS,
-        'Stripe API version is not set. Please set the YOUR_STRIPE_API_VERSION environment variable.'
-      );
-    } else if (!stripeKey) {
-      throw new GlobalException(
-        ErrorsTypes.STRIPE_FAILED_TO_PROCESS,
-        'Stripe secret key is not set. Please set the YOUR_STRIPE_SECRET_KEY environment variable.'
+        'Stripe API version or secret key are not set. Please set the environment variables.'
       );
     }
 
