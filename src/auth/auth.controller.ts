@@ -12,7 +12,7 @@ import {
 import { Response } from 'express';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
-import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
+import { CookieOrHeaderGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
 import { AuthService } from './auth.service';
@@ -50,7 +50,7 @@ export class AuthController {
   @LangQuery()
   @Post('signout')
   signOut(
-    @CookieGetter('refresh_token') refreshToken: string,
+    @CookieOrHeaderGetter('refresh_token') refreshToken: string,
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.logout(refreshToken, res);
@@ -63,7 +63,7 @@ export class AuthController {
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,
-    @CookieGetter('refresh_token') refreshToken: string,
+    @CookieOrHeaderGetter('refresh_token') refreshToken: string,
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.refreshToken(id, refreshToken, res);

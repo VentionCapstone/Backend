@@ -401,4 +401,21 @@ export class AccommodationService {
 
     return countByRating;
   }
+
+  async getAccommodationMedia(accommodationId: string, limit: number | undefined) {
+    try {
+      const queryObj: any = {
+        where: { accommodationId },
+      };
+
+      if (limit) {
+        queryObj.take = +limit;
+      }
+
+      const media = await this.prisma.media.findMany(queryObj);
+      return media;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.MEDIA_LIST_FAILED_TO_GET, error.message);
+    }
+  }
 }

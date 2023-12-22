@@ -165,6 +165,10 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete review.',
   },
+  [ErrorsTypes.MEDIA_LIST_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get media for this accommodation.',
+  },
 };
 
 export default ERRORS;

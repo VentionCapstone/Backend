@@ -31,6 +31,7 @@ import {
   getSchemaPath,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
@@ -351,14 +352,44 @@ export class AccommodationController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
   @Get('/:accommodationId/reviews')
   async getAllReviews(@Param('accommodationId') accommodationId: string) {
     const review = await this.accommodationService.getAccommodationReviews(accommodationId);
     return { success: true, ...review };
+  }
+
+  @ApiOperation({ summary: 'Get accommodation media' })
+  @ApiResponse({
+    status: 200,
+    description: 'Media of accommodation',
+    type: AccommodationResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+    description: 'Accommodation ID',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description:
+      'Optional query, if passed it returns the provided number of media for this accommodation, If not, returns all media.',
+  })
+  @LangQuery()
+  @Get('/:id/media')
+  async getAccommodationMedia(@Param('id') id: string, @Query('limit') limit: number) {
+    const media = await this.accommodationService.getAccommodationMedia(id, limit);
+    return { success: true, data: media, count: media?.length };
   }
 
   @ApiOperation({ summary: 'Get accommodation' })
