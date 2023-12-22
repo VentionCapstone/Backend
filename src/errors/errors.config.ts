@@ -143,7 +143,7 @@ const ERRORS: ErrorDefinition = {
   },
   [ErrorsTypes.STRIPE_FAILED_TO_PROCESS]: {
     statusCode: 500,
-    message: 'Failed to set stripe configuration',
+    message: 'Failed to set stripe environment variables',
   },
 };
 
