@@ -21,9 +21,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky install"
   },
-  "prisma": {
-    "seed": "ts-node src/prisma/seed.ts"
-  },
   "lint-staged": {
     "*.{js, jsx,ts,tsx}": [
       "eslint --quiet --fix"

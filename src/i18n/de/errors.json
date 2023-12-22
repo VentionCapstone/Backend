@@ -12,6 +12,7 @@
   "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "Benutzer-E-Mail nicht verifiziert",
   "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Ungültiger Link",
   "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Link abgelaufen",
+  "BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END": "Sie können eine Bewertung erst nach dem Ende der Buchung hinzufügen",
   "NOT_FOUND_ACCOMODATION": "Unterkunft nicht gefunden",
   "NOT_FOUND_ACCOMODATION_FOR_UPDATING": "Aktualisierung der Unterkunft nicht gefunden",
   "NOT_FOUND_ACCOMODATION_FOR_DELETING": "Löschen der Unterkunft nicht gefunden",
@@ -19,7 +20,11 @@
   "NOT_FOUND_AMENITIES_LIST": "Keine Liste von Annehmlichkeiten gefunden",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Keine Annehmlichkeiten für diese Unterkunfts-ID gefunden",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Kein Datensatz mit der angegebenen Unterkunfts-ID und Besitzer-ID gefunden",
+  "NOT_FOUND_BOOKING": "Buchung nicht gefunden",
+  "NOT_FOUND_REVIEW_FOR_UPDATING": "Aktualisierung der Bewertung nicht gefunden",
+  "NOT_FOUND_REVIEW": "Bewertung nicht gefunden",
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Annehmlichkeiten für diese Unterkunft existieren bereits",
+  "CONFLICT_REVIEW_ALREADY_EXIST": "Sie haben bereits eine Bewertung für diese Buchung der Unterkunft",
   "BOOKING_INVALID_DATES": "Buchungsdaten sind ungültig",
   "BOOKING_ALREADY_BOOKED": "Leider ist die Unterkunft für einige dieser Termine bereits gebucht"
 }

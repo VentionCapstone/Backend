@@ -40,6 +40,7 @@ model Booking {
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   payment         Payment?      @relation(fields: [paymentId], references: [id])
+  review          Review?
 }
 
 model Accommodation {
@@ -124,11 +125,13 @@ model Review {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  title           String
   feedback        String
+  bookingId       String        @unique
   rating          Int
+  createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  booking         Booking       @relation(fields: [bookingId], references: [id])
 }
 
 enum Role {

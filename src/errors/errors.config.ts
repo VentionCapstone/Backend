@@ -137,6 +137,26 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to get accommodation available dates.',
   },
+  [ErrorsTypes.REVIEW_FAILED_TO_CREATE]: {
+    statusCode: 500,
+    message: 'Failed to create review for this accommodation.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET_FOR_UPDATING]: {
+    statusCode: 500,
+    message: 'Failed to get updating review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_UPDATE]: {
+    statusCode: 500,
+    message: 'Failed to update review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_DELETE]: {
+    statusCode: 500,
+    message: 'Failed to delete review.',
+  },
 };
 
 export default ERRORS;
