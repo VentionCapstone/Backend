@@ -24,5 +24,7 @@
   "NOT_FOUND_REVIEW_FOR_UPDATING": "Не удается найти обновляемый отзыв",
   "NOT_FOUND_REVIEW": "Отзыв не найден",
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Удобства для данного размещения уже существуют",
-  "CONFLICT_REVIEW_ALREADY_EXIST": "У вас уже есть отзыв о данном бронировании размещения"
+  "CONFLICT_REVIEW_ALREADY_EXIST": "У вас уже есть отзыв о данном бронировании размещения",
+  "BOOKING_INVALID_DATES": "Неверные даты бронирования",
+  "BOOKING_ALREADY_BOOKED": "К сожалению, на некоторые из этих дат жилье уже забронировано"
 }

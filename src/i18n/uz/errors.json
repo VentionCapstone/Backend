@@ -24,5 +24,7 @@
   "NOT_FOUND_REVIEW_FOR_UPDATING": "Yangilash uchun tahrir qilinadigan sharh topilmadi",
   "NOT_FOUND_REVIEW": "Sharh topilmadi",
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Ushbu tashrif joyi uchun imtiyozlar allaqachon mavjud",
-  "CONFLICT_REVIEW_ALREADY_EXIST": "Siz ushbu tashrif joyi bronlashtirishiga qo'shimcha sharh qo'yganmiz"
+  "CONFLICT_REVIEW_ALREADY_EXIST": "Siz ushbu tashrif joyi bronlashtirishiga qo'shimcha sharh qo'yganmiz",
+  "BOOKING_INVALID_DATES": "Bron qilish sanalari noto'g'ri",
+  "BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan"
 }
