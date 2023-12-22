@@ -45,22 +45,22 @@ export class BookingService {
 
       let availableFrom = dayjs(accommodation.availableFrom);
       const availableTo = dayjs(accommodation.availableTo);
-      const nextAvailableDate = dayjs().utcOffset(0).add(1, 'day').startOf('day');
+      const tomorrow = dayjs().utcOffset(0).add(1, 'day').startOf('day');
 
       const notAvailableRes = {
         id: accommodationId,
         availableDates: null,
       };
 
-      if (nextAvailableDate.isAfter(availableTo)) return notAvailableRes;
+      if (tomorrow.isAfter(availableTo)) return notAvailableRes;
 
-      if (availableFrom < nextAvailableDate) availableFrom = nextAvailableDate;
+      if (availableFrom < tomorrow) availableFrom = tomorrow;
       const availableDates = this.getDateRanges(availableFrom, availableTo, accommodation.booking);
 
       if (availableDates.length === 0) return notAvailableRes;
 
       return {
-        id: accommodationId,
+        accommodationId,
         availableDates,
       };
     } catch (error) {
@@ -76,8 +76,13 @@ export class BookingService {
       const bookingStart = dayjs(startDate);
       const bookingEnd = dayjs(endDate);
 
-      if (!bookingStart.isBefore(bookingEnd, 'day') || !bookingStart.isAfter(dayjs().endOf('day')))
+      if (
+        !bookingStart.isBefore(bookingEnd, 'day') ||
+        !bookingStart.isAfter(dayjs().utcOffset(0).endOf('day'))
+      )
         throw new BadRequestException('Invalid booking dates');
+
+      const tomorrow = dayjs().utcOffset(0).add(1, 'day').startOf('day');
 
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
@@ -93,40 +98,9 @@ export class BookingService {
               status: {
                 in: [Status.ACTIVE, Status.PENDING],
               },
-              OR: [
-                {
-                  startDate: {
-                    lt: startDate,
-                  },
-                  endDate: {
-                    gt: startDate,
-                  },
-                },
-                {
-                  startDate: {
-                    lt: endDate,
-                  },
-                  endDate: {
-                    gt: endDate,
-                  },
-                },
-                {
-                  startDate: {
-                    gt: startDate,
-                  },
-                  endDate: {
-                    lt: endDate,
-                  },
-                },
-                {
-                  startDate: {
-                    lt: startDate,
-                  },
-                  endDate: {
-                    gt: endDate,
-                  },
-                },
-              ],
+              endDate: {
+                gt: tomorrow.toISOString(),
+              },
             },
           },
         },
@@ -137,15 +111,20 @@ export class BookingService {
       let availableFrom = dayjs(accommodation.availableFrom);
       const availableTo = dayjs(accommodation.availableTo);
 
-      const nextAvailableDate = dayjs().utcOffset(0).add(1, 'day').startOf('day');
-      if (availableFrom < nextAvailableDate) availableFrom = nextAvailableDate;
+      if (availableFrom < tomorrow) availableFrom = tomorrow;
 
-      if (
-        bookingStart.isBefore(availableFrom) ||
-        bookingEnd.isAfter(availableTo) ||
-        accommodation.booking.length > 0
-      )
+      if (bookingStart.isBefore(availableFrom) || bookingEnd.isAfter(availableTo))
         throw new BadRequestException('Booking is not available for this dates');
+
+      const alreadyBooked = accommodation.booking.some(
+        ({ startDate, endDate }) =>
+          dayjs(startDate).isBefore(bookingEnd) && dayjs(endDate).isAfter(bookingStart)
+      );
+
+      if (alreadyBooked)
+        throw new BadRequestException(
+          'Sorry, accommodation is already booked on some of these dates'
+        );
 
       const booking = await this.prismaService.booking.create({
         data: {
