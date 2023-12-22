@@ -19,5 +19,7 @@
   "NOT_FOUND_AMENITIES_LIST": "Ыңғайлылық тізімі табылмады",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Бұл тұрғын үй идентификаторы үшін ыңғайлылық табылмады",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Тұрғын үй идентификаторы мен иесінің идентификаторы берілген жазба табылмады",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Бұл тұрғын үйге арналған ыңғайлылықтар қазірдің өзінде бар"
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Бұл тұрғын үйге арналған ыңғайлылықтар қазірдің өзінде бар",
+  "BOOKING_INVALID_DATES": "Брондау күндері жарамсыз",
+  "BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген"
 }

@@ -19,5 +19,7 @@
   "NOT_FOUND_AMENITIES_LIST": "No amenities list found",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "No amenities found for this accomodation id",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "No record with given accommodation id and owner id is found",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Amenities for this accomodation already exist"
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Amenities for this accomodation already exist",
+  "BOOKING_INVALID_DATES": "Booking dates are invalid",
+  "BOOKING_ALREADY_BOOKED": "Sorry, accommodation is already booked on some of these dates"
 }

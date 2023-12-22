@@ -1,7 +1,4 @@
 import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
-import { Response } from 'express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -12,12 +9,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthUser } from 'src/common/types/AuthUser.type';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
+import { AuthService } from './auth.service';
+import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
 import { VerificationSerivce } from './verification.service';
-import { User } from '@prisma/client';
-import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -87,7 +87,7 @@ export class AuthController {
   @UseGuards(UserGuard)
   @LangQuery()
   @Put('email')
-  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: User) {
+  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: AuthUser) {
     return this.authService.updateEmailRequest(body, user);
   }
 }

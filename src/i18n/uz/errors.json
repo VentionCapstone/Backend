@@ -19,5 +19,7 @@
   "NOT_FOUND_AMENITIES_LIST": "Qulayliklar roʻyxati topilmadi",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Bu turar joy identifikatori uchun qulayliklar topilmadi",
   "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Berilgan turar joy identifikatori va egasining identifikatori bilan yozuv topilmadi",
-  "CONFLICT_AMENITIES_ALREADY_EXIST": "Bu turar joy uchun qulayliklar ro`yxati allaqachon mavjud"
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Bu turar joy uchun qulayliklar ro`yxati allaqachon mavjud",
+  "BOOKING_INVALID_DATES": "Bron qilish sanalari noto'g'ri",
+  "BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan"
 }

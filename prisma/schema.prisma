@@ -33,13 +33,13 @@ model Booking {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  paymentId       String
+  paymentId       String?
   startDate       DateTime      @db.Date
   endDate         DateTime      @db.Date
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  payment         Payment       @relation(fields: [paymentId], references: [id])
+  payment         Payment?      @relation(fields: [paymentId], references: [id])
 }
 
 model Accommodation {
