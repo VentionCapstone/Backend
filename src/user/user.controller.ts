@@ -18,6 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PhoneNumberTransformInterceptor } from './phone-validation/phoneNumberTransform.interceptor';
 import { UserService } from './user.service';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiBearerAuth()
 @ApiTags('USER')
@@ -27,6 +28,7 @@ export class UserController {
 
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'GET ALL USERS' })
+  @LangQuery()
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -35,6 +37,7 @@ export class UserController {
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'GET USER BY ID' })
   @ApiParam({ name: 'id', description: 'User ID' })
+  @LangQuery()
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.userService.getUser(id);
@@ -43,6 +46,7 @@ export class UserController {
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'GET USER PROFILE BY ID' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
+  @LangQuery()
   @Get('profile/:id')
   getUserProfile(@Param('id') id: string) {
     return this.userService.getUserProfile(id);
@@ -51,6 +55,7 @@ export class UserController {
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'CREATE USER PROFILE' })
+  @LangQuery()
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
     return this.userService.createUserProfile(createUserDto, user);
@@ -60,6 +65,7 @@ export class UserController {
   @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
   @ApiParam({ name: 'id', description: 'User profile ID' })
+  @LangQuery()
   @Patch('profile/:id')
   updateProfile(
     @Param('id') id: string,
@@ -71,6 +77,7 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'DELETE USER PROFILE BY ID' })
+  @LangQuery()
   @Delete('profile/:id')
   removeProfile(@Param('id') id: string, @CurrentUser() user: User) {
     return this.userService.removeUserProfile(id, user);

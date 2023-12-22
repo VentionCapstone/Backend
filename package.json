@@ -55,6 +55,7 @@
     "express": "^4.18.2",
     "lint-staged": "^15.1.0",
     "nest-winston": "^1.9.4",
+    "nestjs-i18n": "^10.4.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "stripe": "^14.9.0",

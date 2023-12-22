@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -33,13 +34,14 @@ import {
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
+import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
-@UseGuards(UserGuard)
-@ApiTags('ACCOMMODATION')
-@Controller('accommodation')
+@ApiTags('accommodation')
+@Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
-  @ApiOperation({ summary: 'CREATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Create accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Created accommodation',
@@ -54,7 +56,9 @@ export class AccommodationController {
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
-  @Post('/create')
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Post('/')
   async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
@@ -71,7 +75,7 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'ADD IMAGE TO ACCOMMODATION' })
+  @ApiOperation({ summary: 'Add image to accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
@@ -113,7 +117,9 @@ export class AccommodationController {
     },
   })
   @ApiBearerAuth()
-  @Post('/file/:id')
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
     @UploadedFile(
@@ -139,7 +145,7 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'UPDATE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Update accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Updated accommodation',
@@ -164,7 +170,9 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
-  @Put('/update/:id')
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
     @Param('id') id: string,
@@ -186,7 +194,7 @@ export class AccommodationController {
     return { success: true, data: updatedAccommodation };
   }
 
-  @ApiOperation({ summary: 'DELETE ACCOMMODATION' })
+  @ApiOperation({ summary: 'Delete accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Deleted accommodation',
@@ -218,13 +226,69 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
-  @Delete('/delete/:id')
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Delete('/:id')
   async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
     await this.accommodationService.deleteAccommodation(id, req.user.id);
     return { success: true, data: {} };
   }
 
-  @ApiOperation({ summary: 'GET ACCOMMODATION' })
+  @ApiOperation({ summary: 'Get all accommodations' })
+  @ApiResponse({
+    status: 200,
+    description: 'All available accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(AccommodationDto),
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @Get('/')
+  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
+    const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
+    return { success: true, ...data };
+  }
+
+  @ApiOperation({ summary: 'Get all your accommodations' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(AccommodationDto),
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('/getAll')
+  async findAll(@Req() res: any) {
+    const accommodations = await this.accommodationService.getUserAccommodations(res.user.id);
+    return { success: true, data: accommodations };
+  }
+
+  @ApiOperation({ summary: 'Get accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Accommodation with provided id',
@@ -248,37 +312,10 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @ApiBearerAuth()
-  @Get('/get/:id')
+  @LangQuery()
+  @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodation = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodation };
-  }
-
-  @ApiOperation({ summary: 'GET ALL YOUR ACCOMMODATIONS' })
-  @ApiResponse({
-    status: 200,
-    description: 'Accommodations list',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          type: 'array',
-          items: {
-            $ref: getSchemaPath(AccommodationDto),
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  @ApiBearerAuth()
-  @Get('/getAll')
-  async findAll(@Req() res: any) {
-    const accommodations = await this.accommodationService.getListOfAccommodations(res.user.id);
+    const accommodations = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: accommodations };
   }
 }

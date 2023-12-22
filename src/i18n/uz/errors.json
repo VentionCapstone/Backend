@@ -1,0 +1,23 @@
+{
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE": "Bu elektron pochta allaqachon ishlatilmoqda! Iltimos, yana bir bor urinib ko'ring",
+  "BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH": "Parollar mos kelmadi! Iltimos, yana bir bor urinib ko'ring",
+  "NOT_FOUND_AUTH_USER": "Foydalanuvchi topilmadi",
+  "FORBIDDEN_AUTH": "Taqiqlangan",
+  "NOT_AUTHORIZED_USER": "Bu amalni bajarishga ruxsatingiz yo‘q",
+  "NOT_FOUND_USER_PROFILE": "Foydalanuvchi profili topilmadi",
+  "USER_PROFILE_ALREADY_EXIST": "Foydalanuvchi profili allaqachon mavjud",
+  "BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN": "Yaroqsiz yangilash tokeni",
+  "BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN": "Yangilash tokenining muddati tugagan",
+  "BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED": "Siz bu elektron pochtani allaqachon tasdiqlagansiz!",
+  "BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED": "Foydalanuvchi elektron pochtasi tasdiqlanmagan",
+  "BAD_REQUEST_AUTH_EMAIL_INVALID_LINK": "Havola noto‘g‘ri",
+  "BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK": "Havolaning muddati tugagan",
+  "NOT_FOUND_ACCOMODATION": "Turar joy topilmadi",
+  "NOT_FOUND_ACCOMODATION_UPDATING": "Yangilash uchun turar joy topilmadi",
+  "NOT_FOUND_ACCOMODATION_DELETING": "Oʻchirish uchun turar joy topilmadi",
+  "NOT_FOUND_ADDRESS_DELETING": "Oʻchirish uchun adres topilmadi",
+  "NOT_FOUND_AMENITIES_LIST": "Qulayliklar roʻyxati topilmadi",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID": "Bu turar joy identifikatori uchun qulayliklar topilmadi",
+  "NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID": "Berilgan turar joy identifikatori va egasining identifikatori bilan yozuv topilmadi",
+  "CONFLICT_AMENITIES_ALREADY_EXIST": "Bu turar joy uchun qulayliklar ro`yxati allaqachon mavjud"
+}

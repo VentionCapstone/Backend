@@ -11,6 +11,8 @@ export class AccommodationDto {
   @ApiProperty()
   numberOfRooms: number;
   @ApiProperty()
+  allowedNumberOfPeople: number;
+  @ApiProperty()
   price: number;
   @ApiProperty()
   availability: boolean;

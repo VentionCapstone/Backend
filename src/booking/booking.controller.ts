@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { UserGuard } from 'src/common/guards/user.guard';
 import { BookingService } from './booking.service';
 import { AvailableDatesResDto } from './dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @Controller('booking')
 @UseGuards(UserGuard)
@@ -12,6 +13,7 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Get('/available-dates/:id')
+  @LangQuery()
   @ApiOperation({ summary: 'Get accommodation availability' })
   @ApiOkResponse({
     description: 'Returns dates in YYYY-MM-DD format, if not available returns message',
