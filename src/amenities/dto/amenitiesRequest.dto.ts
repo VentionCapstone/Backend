@@ -1,7 +1,7 @@
 import { IsBoolean, IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AmenitiesDto {
+export class AmenitiesRequestDto {
   @ApiProperty()
   @IsBoolean()
   @IsNotEmpty()

@@ -1,7 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Param, UseGuards } from '@nestjs/common';
-import { AmenitiesService } from './amenities.service';
-import { AmenitiesDto } from './dto';
-import { UserGuard } from 'src/common/guards/user.guard';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -10,9 +7,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ResponseDto, getListResponseDto } from './dto/amenititesResponse.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import { AmenitiesService } from './amenities.service';
+import { AmenitiesRequestDto, AmenitiesResponseDto, AmenitiesListResponseDto } from './dto';
 
 @ApiTags('AMENITIES')
 @UseGuards(UserGuard)
@@ -31,7 +30,7 @@ export class AmenitiesController {
   @ApiResponse({
     status: 200,
     description: 'Success getting amenities list',
-    type: getListResponseDto,
+    type: AmenitiesListResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -41,8 +40,9 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  getAmenitiesList() {
-    return this.amenitiesService.getAmenitiesList();
+  async getAmenitiesList() {
+    const amenitiesList = await this.amenitiesService.getAmenitiesList();
+    return { success: true, data: amenitiesList };
   }
 
   @Get('/:id')
@@ -56,7 +56,7 @@ export class AmenitiesController {
   @ApiResponse({
     status: 200,
     description: 'Success getting amenities',
-    type: ResponseDto,
+    type: AmenitiesResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -66,8 +66,9 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  getAmenities(@Param('id') id: string) {
-    return this.amenitiesService.getAmenities(id);
+  async getAmenities(@Param('id') id: string) {
+    const amenitiesById = await this.amenitiesService.getAmenities(id);
+    return { success: true, data: amenitiesById };
   }
 
   @Post('/:id')
@@ -81,7 +82,7 @@ export class AmenitiesController {
   @ApiResponse({
     status: 201,
     description: 'Success adding amenities',
-    type: ResponseDto,
+    type: AmenitiesResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -95,13 +96,14 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiBody({ type: AmenitiesDto })
-  addAmenities(
+  @ApiBody({ type: AmenitiesRequestDto })
+  async addAmenities(
     @Param('id') id: string,
-    @Body() dto: AmenitiesDto,
+    @Body() dto: AmenitiesRequestDto,
     @CurrentUser('id') userId: string
   ) {
-    return this.amenitiesService.addAmenities(id, dto, userId);
+    const addedAmenities = await this.amenitiesService.addAmenities(id, dto, userId);
+    return { success: true, data: addedAmenities };
   }
 
   @Put('/:id')
@@ -115,7 +117,7 @@ export class AmenitiesController {
   @ApiResponse({
     status: 200,
     description: 'Success updating amenities',
-    type: ResponseDto,
+    type: AmenitiesResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -125,13 +127,14 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiBody({ type: AmenitiesDto })
-  updateAmenities(
+  @ApiBody({ type: AmenitiesRequestDto })
+  async updateAmenities(
     @Param('id') id: string,
-    @Body() dto: AmenitiesDto,
+    @Body() dto: AmenitiesRequestDto,
     @CurrentUser('id') userId: string
   ) {
-    return this.amenitiesService.updateAmenities(id, dto, userId);
+    const updatedAmenities = await this.amenitiesService.updateAmenities(id, dto, userId);
+    return { success: true, data: updatedAmenities };
   }
 
   @Delete('/:id')
@@ -145,7 +148,7 @@ export class AmenitiesController {
   @ApiResponse({
     status: 200,
     description: 'Success deleting amenities',
-    type: ResponseDto,
+    type: AmenitiesResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -155,7 +158,8 @@ export class AmenitiesController {
     status: 500,
     description: 'Internal Server Error',
   })
-  deleteAmenities(@Param('id') id: string, @CurrentUser('id') userId: string) {
-    return this.amenitiesService.deleteAmenities(id, userId);
+  async deleteAmenities(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    await this.amenitiesService.deleteAmenities(id, userId);
+    return { success: true, data: {} };
   }
 }

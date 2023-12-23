@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AmenitiesDto } from './amenities.dto';
+import { AmenitiesRequestDto } from './amenitiesRequest.dto';
 
-export class AmenitiesResponseDto extends AmenitiesDto {
+export class AmenitiesResponseDataDto extends AmenitiesRequestDto {
   @ApiProperty()
   id: string;
 
@@ -9,17 +9,17 @@ export class AmenitiesResponseDto extends AmenitiesDto {
   accomodationId: string;
 }
 
-export class ResponseDto {
+export class AmenitiesResponseDto {
   @ApiProperty()
-  message: string;
+  success: boolean;
 
   @ApiProperty()
-  data: AmenitiesResponseDto;
+  data: AmenitiesResponseDataDto;
 }
 
-export class getListResponseDto {
+export class AmenitiesListResponseDto {
   @ApiProperty()
-  message: string;
+  success: boolean;
 
   @ApiProperty()
   data: Array<string>;

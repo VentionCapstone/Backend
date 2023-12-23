@@ -6,7 +6,7 @@ import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AmenitiesDto } from './dto';
+import { AmenitiesRequestDto } from './dto';
 
 @Injectable()
 export class AmenitiesService {
@@ -20,7 +20,7 @@ export class AmenitiesService {
       const columns: Array<{ column_name: string }> = await this.prisma
         .$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'Amenity';`;
       const excludedColumns = ['accommodationId', 'id'];
-      const list = columns
+      const amenitiesList = columns
         .filter((column) => !excludedColumns.includes(column.column_name))
         .map((column) => column.column_name);
 
@@ -30,7 +30,7 @@ export class AmenitiesService {
         );
       }
 
-      return { message: 'Success getting amenities list', data: list };
+      return amenitiesList;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET, error.message);
     }
@@ -48,19 +48,19 @@ export class AmenitiesService {
           await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID')
         );
       }
-      return { message: 'Success getting amenities', data: amenities };
+      return amenities;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET, error.message);
     }
   }
 
-  async addAmenities(id: string, dto: AmenitiesDto, userId: string) {
+  async addAmenities(id: string, dto: AmenitiesRequestDto, userId: string) {
     try {
-      const newAmenities = await this.prisma.amenity.create({
+      const addedAmenities = await this.prisma.amenity.create({
         data: { ...dto, accommodation: { connect: { id, ownerId: userId } } },
       });
-      return { message: 'Success adding amenities', data: newAmenities };
+      return addedAmenities;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
@@ -83,7 +83,7 @@ export class AmenitiesService {
     }
   }
 
-  async updateAmenities(id: string, dto: AmenitiesDto, userId: string) {
+  async updateAmenities(id: string, dto: AmenitiesRequestDto, userId: string) {
     try {
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
@@ -94,7 +94,7 @@ export class AmenitiesService {
         },
         data: { ...dto },
       });
-      return { message: 'Success updating amenities', data: updatedAmenities };
+      return updatedAmenities;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
@@ -109,7 +109,7 @@ export class AmenitiesService {
 
   async deleteAmenities(id: string, userId: string) {
     try {
-      const deletedAmenities = await this.prisma.amenity.delete({
+      await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
           accommodation: {
@@ -117,7 +117,7 @@ export class AmenitiesService {
           },
         },
       });
-      return { message: 'Success deleting amenities', data: deletedAmenities };
+      return;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
