@@ -1,5 +1,6 @@
-import { Transform } from 'class-transformer';
-import { IsString, IsInt, IsDate, IsOptional, IsUrl, Max } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsString, IsInt, IsDate, IsOptional, IsUrl, Max, ValidateNested } from 'class-validator';
+import UpdateAddressDto from './update-address.dto';
 
 export default class UpdateAccommodationDto {
   @IsOptional()
@@ -39,4 +40,8 @@ export default class UpdateAccommodationDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ValidateNested()
+  @Type(() => UpdateAddressDto)
+  address: UpdateAddressDto;
 }

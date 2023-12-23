@@ -1,5 +1,16 @@
-import { Transform } from 'class-transformer';
-import { IsString, IsInt, IsDate, IsOptional, IsUrl, IsNotEmpty, Max, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsString,
+  IsInt,
+  IsDate,
+  IsOptional,
+  IsUrl,
+  IsNotEmpty,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import CreateAddressDto from './create-address.dto';
 
 export default class CreateAccommodationDto {
   @IsOptional()
@@ -46,4 +57,8 @@ export default class CreateAccommodationDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ValidateNested()
+  @Type(() => CreateAddressDto)
+  address: CreateAddressDto;
 }

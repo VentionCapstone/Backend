@@ -19,8 +19,6 @@ import {
 import { AccommodationService } from './accommodation.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import CreateAccommodationAndAddressDto from './dto/create-accommodation-address.dto';
-import UpdateAccommodationAndAddressDto from './dto/update-accommodation-address.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -38,6 +36,8 @@ import { OrderAndFilter } from './dto/orderAndFilter.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import CreateAccommodationDto from './dto/create-accommodation.dto';
+import UpdateAccommodationDto from './dto/update-accommodation.dto';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -62,13 +62,13 @@ export class AccommodationController {
   @LangQuery()
   @Post('/')
   async createAccommodation(
-    @Body() body: CreateAccommodationAndAddressDto,
+    @Body() body: CreateAccommodationDto,
     @CurrentUser('id') userId: string
   ) {
     const createAccommodationAndAdress = {
-      ...body.accommodation,
-      previewImgUrl: body.accommodation.previewImgUrl || 'none',
-      thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
+      ...body,
+      previewImgUrl: body.previewImgUrl || 'none',
+      thumbnailUrl: body.thumbnailUrl || 'none',
       ownerId: userId,
       address: {
         create: body.address,
@@ -179,12 +179,12 @@ export class AccommodationController {
   @LangQuery()
   @Put('/:id')
   async updateAccommodation(
-    @Body() body: UpdateAccommodationAndAddressDto,
+    @Body() body: UpdateAccommodationDto,
     @Param('id') id: string,
     @CurrentUser('id') userId: string
   ) {
     const updateAccommodationAndAdress = {
-      ...body.accommodation,
+      ...body,
       address: {
         update: body.address,
       },
