@@ -132,7 +132,7 @@ export class AuthService {
 
       const tokenMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
 
-      if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_AUTH);
+      if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);

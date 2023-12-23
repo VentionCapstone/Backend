@@ -23,7 +23,7 @@ export class UserService {
     }
 
     if (profileUserId !== authUser.id)
-      throw new ForbiddenException(ErrorsTypes.NOT_AUTHORIZED_USER);
+      throw new ForbiddenException(ErrorsTypes.FORBIDDEN_NOT_AUTHORIZED_USER);
 
     return true;
   }
@@ -39,7 +39,7 @@ export class UserService {
         data: users,
       };
     } catch {
-      throw new GlobalException(ErrorsTypes.USERS_LIST_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET_LIST);
     }
   }
 

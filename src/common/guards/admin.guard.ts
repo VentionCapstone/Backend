@@ -17,12 +17,11 @@ export class AdminGuard implements CanActivate {
 
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) throw new UnauthorizedException(ErrorsTypes.AUTH_USER_UNAUTHORIZED);
+    if (!authHeader) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-    if (bearer != 'Bearer' || !token)
-      throw new UnauthorizedException(ErrorsTypes.AUTH_USER_UNAUTHORIZED);
+    if (bearer != 'Bearer' || !token) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
     try {
       const user: Partial<User> = await this.jwtService.verify(token, {
         secret: process.env.ACCESS_TOKEN_KEY,
@@ -33,7 +32,8 @@ export class AdminGuard implements CanActivate {
       });
       if (!findUser) throw new UnauthorizedException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
-      if (findUser.role !== 'ADMIN') throw new UnauthorizedException(ErrorsTypes.FORBIDDEN_AUTH);
+      if (findUser.role !== 'ADMIN')
+        throw new UnauthorizedException(ErrorsTypes.FORBIDDEN_NOT_AUTHORIZED_USER);
 
       req.user = {
         id: findUser.id,

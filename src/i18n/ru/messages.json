@@ -1,12 +1,12 @@
 {
-  "AUTH_REGISTER_SUCCESS": "",
-  "AUTH_LOGOUT_SUCCESS": "",
-  "AUTH_EMAIL_VERIFIED_SUCCESS": "",
-  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "",
+  "AUTH_REGISTER_SUCCESS": "Пользователь успешно создан, проверьте свою электронную почту, чтобы подтвердить свою учетную запись",
+  "AUTH_LOGOUT_SUCCESS": "Пользователь успешно вышел из системы",
+  "AUTH_EMAIL_VERIFIED_SUCCESS": "Электронная почта успешно подтверждена",
+  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Запрос на обновление электронной почты отправлен, проверьте свою электронную почту",
 
-  "AMENITY_ADD_SUCCESS": "",
-  "AMENITY_UPDATE_SUCCESS": "",
-  "AMENITY_DELETE_SUCCESS": "",
+  "AMENITY_ADD_SUCCESS": "Успешно добавлены удобства",
+  "AMENITY_UPDATE_SUCCESS": "Успешное обновление удобств",
+  "AMENITY_DELETE_SUCCESS": "Успешное удаление удобств",
 
-  "USER_PROFILE_DELETE_SUCCESS": ""
+  "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален"
 }

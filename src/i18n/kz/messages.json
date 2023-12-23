@@ -1,12 +1,12 @@
 {
-  "AUTH_REGISTER_SUCCESS": "",
-  "AUTH_LOGOUT_SUCCESS": "",
-  "AUTH_EMAIL_VERIFIED_SUCCESS": "",
-  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "",
+  "AUTH_REGISTER_SUCCESS": "Пайдаланушы сәтті жасалды, тіркелгіңізді растау үшін электрондық поштаңызды тексеріңіз",
+  "AUTH_LOGOUT_SUCCESS": "Пайдаланушы жүйеден сәтті шықты",
+  "AUTH_EMAIL_VERIFIED_SUCCESS": "Электрондық пошта сәтті расталды",
+  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Электрондық поштаны жаңарту сұрауы жіберілді, электрондық поштаңызды тексеріңіз",
 
-  "AMENITY_ADD_SUCCESS": "",
-  "AMENITY_UPDATE_SUCCESS": "",
-  "AMENITY_DELETE_SUCCESS": "",
+  "AMENITY_ADD_SUCCESS": "Қолайлылықтарды қосу сәтті болды",
+  "AMENITY_UPDATE_SUCCESS": "Қолайлылықтарды жаңарту сәтті",
+  "AMENITY_DELETE_SUCCESS": "Ыңғайлылықтарды жою сәтті аяқталды",
 
-  "USER_PROFILE_DELETE_SUCCESS": ""
+  "USER_PROFILE_DELETE_SUCCESS": "Профиль сәтті жойылды"
 }

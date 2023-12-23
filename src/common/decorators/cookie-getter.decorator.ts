@@ -6,7 +6,7 @@ export const CookieGetter = createParamDecorator(
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies[data];
 
-    if (!refreshToken) throw new UnauthorizedException(ErrorsTypes.AUTH_TOKEN_NOT_FOUND);
+    if (!refreshToken) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_TOKEN_NOT_FOUND);
 
     return refreshToken;
   }

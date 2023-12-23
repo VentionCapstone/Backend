@@ -17,12 +17,11 @@ export class UserGuard implements CanActivate {
 
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) throw new UnauthorizedException(ErrorsTypes.AUTH_USER_UNAUTHORIZED);
+    if (!authHeader) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-    if (bearer != 'Bearer' || !token)
-      throw new UnauthorizedException(ErrorsTypes.AUTH_USER_UNAUTHORIZED);
+    if (bearer != 'Bearer' || !token) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
 
     try {
       const user: Partial<User> = await this.jwtService.verify(token, {

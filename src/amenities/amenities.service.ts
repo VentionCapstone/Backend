@@ -32,7 +32,7 @@ export class AmenitiesService {
         data: list,
       };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET, error.message);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET_LIST, error.message);
     }
   }
 

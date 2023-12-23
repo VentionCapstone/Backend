@@ -33,7 +33,7 @@ export class BookingService {
         },
       });
 
-      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMODATION);
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
       let availableFrom = dayjs(accommodation.availableFrom);
       const availableTo = dayjs(accommodation.availableTo);
@@ -72,7 +72,7 @@ export class BookingService {
         !bookingStart.isBefore(bookingEnd, 'day') ||
         !bookingStart.isAfter(dayjs().utcOffset(0).endOf('day'))
       )
-        throw new BadRequestException(ErrorsTypes.BOOKING_INVALID_DATES);
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
 
       const tomorrow = dayjs().utcOffset(0).add(1, 'day').startOf('day');
 
@@ -98,7 +98,7 @@ export class BookingService {
         },
       });
 
-      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMODATION);
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
       let availableFrom = dayjs(accommodation.availableFrom);
       const availableTo = dayjs(accommodation.availableTo);
@@ -106,14 +106,15 @@ export class BookingService {
       if (availableFrom < tomorrow) availableFrom = tomorrow;
 
       if (bookingStart.isBefore(availableFrom) || bookingEnd.isAfter(availableTo))
-        throw new BadRequestException(ErrorsTypes.BOOKING_INVALID_DATES);
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
 
       const alreadyBooked = accommodation.booking.some(
         ({ startDate, endDate }) =>
           dayjs(startDate).isBefore(bookingEnd) && dayjs(endDate).isAfter(bookingStart)
       );
 
-      if (alreadyBooked) throw new BadRequestException(ErrorsTypes.BOOKING_ALREADY_BOOKED);
+      if (alreadyBooked)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_ALREADY_BOOKED);
 
       const booking = await this.prismaService.booking.create({
         data: {
