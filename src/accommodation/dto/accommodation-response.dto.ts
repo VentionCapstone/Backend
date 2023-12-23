@@ -1,5 +1,7 @@
-import CreateAddressDto from './create-address.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { AmenitiesDto } from 'src/amenities/dto';
+import MediaResponseDto from 'src/media/dto/mediaResponse.dto';
+import CreateAddressDto from './create-address.dto';
 
 export class AccommodationDto {
   @ApiProperty()
@@ -24,6 +26,10 @@ export class AccommodationDto {
   description: string;
   @ApiProperty()
   address: CreateAddressDto;
+  @ApiProperty()
+  amenities: AmenitiesDto;
+  @ApiProperty()
+  media: MediaResponseDto[];
 }
 
 export default class AccommodationResponseDto {
