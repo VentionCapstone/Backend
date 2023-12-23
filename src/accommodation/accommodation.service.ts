@@ -219,19 +219,23 @@ export class AccommodationService {
     }
   }
 
-  async getUserAccommodations(ownerId: string) {
-    let accommodation;
+  async getUserAccommodations(ownerId: string, { page, limit }: { page: string; limit: string }) {
     try {
-      accommodation = await this.prisma.accommodation.findMany({
+      const findAccommodationsQueryObj: any = {
         where: { ownerId },
         include: {
           address: true,
         },
-      });
+      };
+
+      if (page && limit) {
+        findAccommodationsQueryObj.skip = (+page - 1) * +limit;
+        findAccommodationsQueryObj.take = +limit;
+      }
+      return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
     }
-    return accommodation;
   }
 
   async getAllAccommodations(options: OrderAndFilter) {
