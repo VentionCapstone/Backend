@@ -29,6 +29,7 @@ import {
   getSchemaPath,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
@@ -355,9 +356,29 @@ export class AccommodationController {
     status: 401,
     description: 'Unauthorized',
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description:
+      'Optional query, bring equal or less number of reviews, need to be passed it pair with page.',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description:
+      'Optional query, skips <page * limit> number of reviews, need to be passed it pair with limit.',
+  })
   @Get('/:accommodationId/reviews')
-  async getAllReviews(@Param('accommodationId') accommodationId: string) {
-    const review = await this.accommodationService.getAccommodationReviews(accommodationId);
+  async getAllReviews(
+    @Param('accommodationId') accommodationId: string,
+    @Query() limitAndPage: { page: string; limit: string }
+  ) {
+    const review = await this.accommodationService.getAccommodationReviews(
+      accommodationId,
+      limitAndPage
+    );
     return { success: true, ...review };
   }
 

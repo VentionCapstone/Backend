@@ -338,9 +338,12 @@ export class AccommodationService {
     return findManyOptions;
   }
 
-  async getAccommodationReviews(accommodationId: string) {
+  async getAccommodationReviews(
+    accommodationId: string,
+    { page, limit }: { page: string; limit: string }
+  ) {
     try {
-      const findAllReviewsQuery = this.prisma.review.findMany({
+      const findAllReviewsQueryObj: any = {
         where: { accommodationId },
         include: {
           user: {
@@ -356,7 +359,14 @@ export class AccommodationService {
             },
           },
         },
-      });
+      };
+
+      if (page && limit) {
+        findAllReviewsQueryObj.skip = (+page - 1) * +limit;
+        findAllReviewsQueryObj.take = +limit;
+      }
+
+      const findAllReviewsQuery = this.prisma.review.findMany(findAllReviewsQueryObj);
 
       const reviewsCountQuery = this.prisma.review.groupBy({
         by: ['rating'],
