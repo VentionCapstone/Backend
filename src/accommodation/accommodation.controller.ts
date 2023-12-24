@@ -320,7 +320,7 @@ export class AccommodationController {
     required: false,
     type: Number,
     description:
-      'Optional query, bring equal or less number of reviews, need to be passed it pair with page.',
+      'Optional query, brings equal or less number of reviews, need to be passed it pair with page.',
   })
   @ApiQuery({
     name: 'page',
@@ -341,7 +341,7 @@ export class AccommodationController {
     return { success: true, data: accommodations };
   }
 
-  @ApiOperation({ summary: 'Get all reviews to this accommodation' })
+  @ApiOperation({ summary: 'Get reviews to this accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Reviews of this accommodation',
@@ -379,7 +379,7 @@ export class AccommodationController {
     required: false,
     type: Number,
     description:
-      'Optional query, bring equal or less number of reviews, need to be passed it pair with page.',
+      'Optional query, brings equal or less number of reviews, need to be passed it pair with page.',
   })
   @ApiQuery({
     name: 'page',
