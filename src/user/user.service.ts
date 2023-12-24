@@ -1,4 +1,10 @@
-import { ForbiddenException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UiTheme } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
@@ -99,7 +105,7 @@ export class UserService {
       if (!user) {
         throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
       } else if (user.profile) {
-        throw new NotFoundException(ErrorsTypes.USER_PROFILE_ALREADY_EXIST);
+        throw new ConflictException(ErrorsTypes.CONFLICT_USER_PROFILE_ALREADY_EXIST);
       }
 
       await this.prismaService.user.update({
