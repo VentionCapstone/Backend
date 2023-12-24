@@ -31,6 +31,11 @@ export class PaymentService {
           booking: { connect: bookingDetails.map((booking) => ({ id: booking.id })) },
         },
       });
+
+      await this.prismaService.booking.updateMany({
+        where: { userId, status: 'PENDING' },
+        data: { status: Status.COMPLETED },
+      });
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
@@ -49,6 +54,11 @@ export class PaymentService {
           status: Status.COMPLETED,
           booking: { connect: bookingDetails.map((booking) => ({ id: booking.id })) },
         },
+      });
+
+      await this.prismaService.booking.updateMany({
+        where: { userId, status: 'PENDING' },
+        data: { status: Status.COMPLETED },
       });
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
