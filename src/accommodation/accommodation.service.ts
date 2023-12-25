@@ -6,6 +6,7 @@ import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { OrderAndFilterReview, reviewOrderBy } from './dto/get-review.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -342,11 +343,10 @@ export class AccommodationService {
     return findManyOptions;
   }
 
-  async getAccommodationReviews(
-    accommodationId: string,
-    { page, limit }: { page: string; limit: string }
-  ) {
+  async getAccommodationReviews(accommodationId: string, options: OrderAndFilterReview) {
     try {
+      const { orderByDate, orderByRate, page, limit } = options;
+
       const findAllReviewsQueryObj: any = {
         where: { accommodationId },
         include: {
@@ -358,16 +358,30 @@ export class AccommodationService {
               profile: {
                 select: {
                   country: true,
+                  imageUrl: true,
                 },
               },
             },
           },
         },
+        orderBy: [],
       };
 
       if (page && limit) {
         findAllReviewsQueryObj.skip = (+page - 1) * +limit;
         findAllReviewsQueryObj.take = +limit;
+      }
+
+      if (orderByDate) {
+        findAllReviewsQueryObj.orderBy.push({
+          [reviewOrderBy.CREATEDAT_DATE]: orderByDate,
+        });
+      }
+
+      if (orderByRate) {
+        findAllReviewsQueryObj.orderBy.push({
+          [reviewOrderBy.RATE]: orderByRate,
+        });
       }
 
       const findAllReviewsQuery = this.prisma.review.findMany(findAllReviewsQueryObj);

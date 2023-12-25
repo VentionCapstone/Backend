@@ -39,6 +39,7 @@ import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
+import { OrderAndFilterReview } from './dto/get-review.dto';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -374,24 +375,10 @@ export class AccommodationController {
     status: 401,
     description: 'Unauthorized',
   })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description:
-      'Optional query, brings equal or less number of reviews, need to be passed it pair with page.',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description:
-      'Optional query, skips <page * limit> number of reviews, need to be passed it pair with limit.',
-  })
   @Get('/:accommodationId/reviews')
   async getAllReviews(
     @Param('accommodationId') accommodationId: string,
-    @Query() limitAndPage: { page: string; limit: string }
+    @Query() limitAndPage: OrderAndFilterReview
   ) {
     const review = await this.accommodationService.getAccommodationReviews(
       accommodationId,
