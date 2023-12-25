@@ -28,5 +28,7 @@
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Мүмкіндіктер бұл тұрғын үшін әлі бар",
   "CONFLICT_REVIEW_ALREADY_EXIST": "Сіз бұл тұрғын үшін әлі пікір бергенсіз",
   "BOOKING_INVALID_DATES": "Брондау күндері жарамсыз",
-  "BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген"
+  "BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген",
+  "BOOKING_NOT_FOUND_FOR_PAYMENT": "Брондау табылмады",
+  "INVALID_PAYMENT_OPTION": "Жарамсыз төлем өсімі"
 }

@@ -28,5 +28,7 @@
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Ushbu tashrif joyi uchun imtiyozlar allaqachon mavjud",
   "CONFLICT_REVIEW_ALREADY_EXIST": "Siz ushbu tashrif joyi bronlashtirishiga qo'shimcha sharh qo'yganmiz",
   "BOOKING_INVALID_DATES": "Bron qilish sanalari noto'g'ri",
-  "BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan"
+  "BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan",
+  "BOOKING_NOT_FOUND_FOR_PAYMENT": "Bron topilmadi",
+  "INVALID_PAYMENT_OPTION": "Noto'g'ri to'lov usuli"
 }

@@ -28,5 +28,7 @@
   "CONFLICT_AMENITIES_ALREADY_EXIST": "Amenities for this accomodation already exist",
   "CONFLICT_REVIEW_ALREADY_EXIST": "You already have a review on this booking of accommodation",
   "BOOKING_INVALID_DATES": "Booking dates are invalid",
-  "BOOKING_ALREADY_BOOKED": "Sorry, accommodation is already booked on some of these dates"
+  "BOOKING_ALREADY_BOOKED": "Sorry, accommodation is already booked on some of these dates",
+  "BOOKING_NOT_FOUND_FOR_PAYMENT": "Booking not found",
+  "INVALID_PAYMENT_OPTION": "Invalid payment option"
 }
