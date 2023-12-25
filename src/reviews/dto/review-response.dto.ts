@@ -3,6 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 class ProfileDto {
   @ApiProperty()
   country: string;
+
+  @ApiProperty()
+  imageUrl: string;
 }
 class UserDto {
   @ApiProperty()
