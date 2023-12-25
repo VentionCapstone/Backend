@@ -30,5 +30,6 @@
   "BOOKING_INVALID_DATES": "Buchungsdaten sind ungültig",
   "BOOKING_ALREADY_BOOKED": "Leider ist die Unterkunft für einige dieser Termine bereits gebucht",
   "BOOKING_NOT_FOUND_FOR_PAYMENT": "Buchung nicht gefunden",
-  "INVALID_PAYMENT_OPTION": "Ungültige Zahlungsoption"
+  "INVALID_PAYMENT_OPTION": "Ungültige Zahlungsoption",
+  "PAYMENT_FAILED": "Zahlung fehlgeschlagen"
 }

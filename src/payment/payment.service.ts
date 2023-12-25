@@ -46,7 +46,7 @@ export class PaymentService {
 
         return { success: true, message: 'Payment processed successfully' };
       } else {
-        throw new BadRequestException('Payment failed');
+        throw new BadRequestException(this.i18n, 'errors.PAYMENT_FAILED');
       }
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);

@@ -30,5 +30,6 @@
   "BOOKING_INVALID_DATES": "Неверные даты бронирования",
   "BOOKING_ALREADY_BOOKED": "К сожалению, на некоторые из этих дат жилье уже забронировано",
   "BOOKING_NOT_FOUND_FOR_PAYMENT": "Бронирование не найдено",
-  "INVALID_PAYMENT_OPTION": "Неверный вариант оплаты"
+  "INVALID_PAYMENT_OPTION": "Неверный вариант оплаты",
+  "PAYMENT_FAILED": "Ошибка оплаты"
 }

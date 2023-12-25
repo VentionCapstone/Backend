@@ -30,5 +30,6 @@
   "BOOKING_INVALID_DATES": "Брондау күндері жарамсыз",
   "BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген",
   "BOOKING_NOT_FOUND_FOR_PAYMENT": "Брондау табылмады",
-  "INVALID_PAYMENT_OPTION": "Жарамсыз төлем өсімі"
+  "INVALID_PAYMENT_OPTION": "Жарамсыз төлем өсімі",
+  "PAYMENT_FAILED": "Төлем сәтсіздік көрсетті"
 }

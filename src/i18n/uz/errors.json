@@ -30,5 +30,6 @@
   "BOOKING_INVALID_DATES": "Bron qilish sanalari noto'g'ri",
   "BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan",
   "BOOKING_NOT_FOUND_FOR_PAYMENT": "Bron topilmadi",
-  "INVALID_PAYMENT_OPTION": "Noto'g'ri to'lov usuli"
+  "INVALID_PAYMENT_OPTION": "Noto'g'ri to'lov usuli",
+  "PAYMENT_FAILED": "To'lov muvaffaqiyatsiz"
 }

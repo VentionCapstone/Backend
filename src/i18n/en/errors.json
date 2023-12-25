@@ -30,5 +30,6 @@
   "BOOKING_INVALID_DATES": "Booking dates are invalid",
   "BOOKING_ALREADY_BOOKED": "Sorry, accommodation is already booked on some of these dates",
   "BOOKING_NOT_FOUND_FOR_PAYMENT": "Booking not found",
-  "INVALID_PAYMENT_OPTION": "Invalid payment option"
+  "INVALID_PAYMENT_OPTION": "Invalid payment option",
+  "PAYMENT_FAILED": "Payment failed"
 }
