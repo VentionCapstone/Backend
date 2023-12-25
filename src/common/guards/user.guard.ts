@@ -1,9 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '../../auth/entities/auth.entity';
-import { GlobalException } from 'src/exceptions/global.exception';
 import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
+import { User } from '../../auth/entities/auth.entity';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthUser } from '../types/AuthUser.type';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -32,7 +33,12 @@ export class UserGuard implements CanActivate {
       });
       if (!findUser) throw new UnauthorizedException('Invalid token provided');
 
-      req.user = findUser;
+      req.user = {
+        id: findUser.id,
+        email: findUser.email,
+        role: findUser.role,
+        isEmailVerified: findUser.isEmailVerified,
+      } as AuthUser;
 
       return true;
     } catch (error) {

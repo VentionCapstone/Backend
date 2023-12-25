@@ -8,9 +8,10 @@ import {
   NotFoundException,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
   Put,
-  Req,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -33,10 +34,13 @@ import {
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
+import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { ReviewDto } from 'src/reviews/dto/review-response.dto';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
-@UseGuards(UserGuard)
-@ApiTags('accommodations')
-@Controller('accommodation')
+@ApiTags('accommodation')
+@Controller('accommodations')
 export class AccommodationController {
   constructor(private readonly accommodationService: AccommodationService) {}
   @ApiOperation({ summary: 'Create accommodation' })
@@ -54,13 +58,18 @@ export class AccommodationController {
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
-  @Post('')
-  async createAccommodation(@Body() body: CreateAccommodationAndAddressDto, @Req() req: any) {
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Post('/')
+  async createAccommodation(
+    @Body() body: CreateAccommodationAndAddressDto,
+    @CurrentUser('id') userId: string
+  ) {
     const createAccommodationAndAdress = {
       ...body.accommodation,
       previewImgUrl: body.accommodation.previewImgUrl || 'none',
       thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
-      ownerId: req.user.id,
+      ownerId: userId,
       address: {
         create: body.address,
       },
@@ -71,7 +80,7 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'Add image to accomodation' })
+  @ApiOperation({ summary: 'Add image to accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
@@ -113,7 +122,9 @@ export class AccommodationController {
     },
   })
   @ApiBearerAuth()
-  @Post('/:id/preview-upload')
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Post('/:id/file')
   @UseInterceptors(FileInterceptor('file'))
   async updateAccommodationAddFile(
     @UploadedFile(
@@ -126,14 +137,14 @@ export class AccommodationController {
     )
     file: Express.Multer.File,
     @Param('id') id: string,
-    @Req() req: any
+    @CurrentUser('id') userId: string
   ) {
     if (!file) throw new NotFoundException('File for updation not provided');
 
     const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
       id,
       file,
-      req.user.id
+      userId
     );
 
     return { success: true, data: updatedAccommodation };
@@ -164,11 +175,13 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @LangQuery()
   @Put('/:id')
   async updateAccommodation(
     @Body() body: UpdateAccommodationAndAddressDto,
     @Param('id') id: string,
-    @Req() req: any
+    @CurrentUser('id') userId: string
   ) {
     const updateAccommodationAndAdress = {
       ...body.accommodation,
@@ -180,10 +193,43 @@ export class AccommodationController {
     const updatedAccommodation = await this.accommodationService.updateAccommodation(
       id,
       updateAccommodationAndAdress,
-      req.user.id
+      userId
     );
 
     return { success: true, data: updatedAccommodation };
+  }
+
+  @ApiOperation({ summary: 'Restore accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Restored accommodation',
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation id',
+    required: true,
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Patch('/:id/restore')
+  async restoreAccommodation(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    const accommodation = await this.accommodationService.restoreAccommodation(id, userId);
+
+    return { success: true, data: accommodation };
   }
 
   @ApiOperation({ summary: 'Delete accommodation' })
@@ -218,10 +264,101 @@ export class AccommodationController {
     required: true,
   })
   @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @LangQuery()
   @Delete('/:id')
-  async deleteAccommodation(@Param('id') id: string, @Req() req: any) {
-    await this.accommodationService.deleteAccommodation(id, req.user.id);
+  async deleteAccommodation(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    await this.accommodationService.deleteAccommodation(id, userId);
     return { success: true, data: {} };
+  }
+
+  @ApiOperation({ summary: 'Get all accommodations' })
+  @ApiResponse({
+    status: 200,
+    description: 'All available accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(AccommodationDto),
+          },
+        },
+      },
+    },
+  })
+  @Get('/')
+  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
+    const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
+    return { success: true, ...data };
+  }
+
+  @ApiOperation({ summary: 'Get all your accommodations' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodations list',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(AccommodationDto),
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('/getAll')
+  async findAll(@CurrentUser('id') userId: string) {
+    const accommodations = await this.accommodationService.getUserAccommodations(userId);
+    return { success: true, data: accommodations };
+  }
+
+  @ApiOperation({ summary: 'Get all reviews to this accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviews of this accommodation',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(ReviewDto),
+          },
+        },
+        countByRating: {
+          type: 'object',
+          additionalProperties: {
+            type: 'integer',
+          },
+        },
+        averageRate: {
+          type: 'number',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @Get('/:accommodationId/reviews')
+  async getAllReviews(@Param('accommodationId') accommodationId: string) {
+    const review = await this.accommodationService.getAccommodationReviews(accommodationId);
+    return { success: true, ...review };
   }
 
   @ApiOperation({ summary: 'Get accommodation' })
@@ -248,37 +385,10 @@ export class AccommodationController {
     description: 'Accommodation ID',
     required: true,
   })
-  @ApiBearerAuth()
+  @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodation = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodation };
-  }
-
-  @ApiOperation({ summary: 'Get all your accommodations' })
-  @ApiResponse({
-    status: 200,
-    description: 'Accommodations list',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          type: 'array',
-          items: {
-            $ref: getSchemaPath(AccommodationDto),
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  @ApiBearerAuth()
-  @Get('/getAll')
-  async findAll(@Req() res: any) {
-    const accommodations = await this.accommodationService.getListOfAccommodations(res.user.id);
+    const accommodations = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: accommodations };
   }
 }

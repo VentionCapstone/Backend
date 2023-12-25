@@ -33,33 +33,35 @@ model Booking {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  paymentId       String
-  startDate       DateTime
-  endDate         DateTime
+  paymentId       String?
+  startDate       DateTime      @db.Date
+  endDate         DateTime      @db.Date
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
-  payment         Payment       @relation(fields: [paymentId], references: [id])
+  payment         Payment?      @relation(fields: [paymentId], references: [id])
+  review          Review?
 }
 
 model Accommodation {
-  id            String    @id @default(uuid())
-  addressId     String
-  thumbnailUrl  String
-  ownerId       String
-  squareMeters  Int
-  numberOfRooms Int
-  price         Int
-  availability  Boolean
-  availableFrom DateTime
-  availableTo   DateTime
-  description   String?
-  previewImgUrl String
-  address       Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  amenities     Amenity[]
-  media         Media[]
-  reviews       Review[]
-  booking       Booking[]
+  id                    String    @id @default(uuid())
+  addressId             String
+  thumbnailUrl          String
+  ownerId               String
+  squareMeters          Int
+  numberOfRooms         Int
+  price                 Int
+  allowedNumberOfPeople Int
+  availableFrom         DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableTo           DateTime  @db.Date
+  description           String?
+  previewImgUrl         String
+  isDeleted             Boolean   @default(false)
+  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities             Amenity[]
+  media                 Media[]
+  reviews               Review[]
+  booking               Booking[]
 }
 
 model Amenity {
@@ -124,11 +126,13 @@ model Review {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
-  title           String
   feedback        String
+  bookingId       String        @unique
   rating          Int
+  createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  booking         Booking       @relation(fields: [bookingId], references: [id])
 }
 
 enum Role {

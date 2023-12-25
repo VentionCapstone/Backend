@@ -10,14 +10,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PhoneNumberTransformInterceptor } from './phone-validation/phoneNumberTransform.interceptor';
 import { UserService } from './user.service';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -27,6 +28,7 @@ export class UserController {
 
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Get all users' })
+  @LangQuery()
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -35,6 +37,7 @@ export class UserController {
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'Get user by id' })
   @ApiParam({ name: 'id', description: 'User id' })
+  @LangQuery()
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.userService.getUser(id);
@@ -43,6 +46,7 @@ export class UserController {
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'Get user profile by id' })
   @ApiParam({ name: 'id', description: 'User profile id' })
+  @LangQuery()
   @Get('profile/:id')
   getUserProfile(@Param('id') id: string) {
     return this.userService.getUserProfile(id);
@@ -51,8 +55,9 @@ export class UserController {
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'Create user profile' })
+  @LangQuery()
   @Post('profile')
-  createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+  createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: AuthUser) {
     return this.userService.createUserProfile(createUserDto, user);
   }
 
@@ -61,10 +66,11 @@ export class UserController {
   @ApiOperation({ summary: 'Update user profile id' })
   @ApiParam({ name: 'id', description: 'User profile id' })
   @Patch('/:id')
+  @LangQuery()
   updateProfile(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() user: User
+    @CurrentUser() user: AuthUser
   ) {
     return this.userService.updateUserProfile(id, updateUserDto, user);
   }
@@ -72,7 +78,8 @@ export class UserController {
   @UseGuards(UserGuard)
   @ApiOperation({ summary: 'Delete user profile by id' })
   @Delete('/:id')
-  removeProfile(@Param('id') id: string, @CurrentUser() user: User) {
+  @LangQuery()
+  removeProfile(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.userService.removeUserProfile(id, user);
   }
 }

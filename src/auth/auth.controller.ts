@@ -1,7 +1,4 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
-import { Response } from 'express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -12,11 +9,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthUser } from 'src/common/types/AuthUser.type';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { CookieGetter } from '../common/decorators/cookie-getter.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
+import { AuthService } from './auth.service';
+import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
 import { VerificationSerivce } from './verification.service';
-import { User } from '@prisma/client';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -44,6 +45,7 @@ export class AuthController {
     status: 500,
     description: 'Internal Server Error',
   })
+  @LangQuery()
   @Post('signup')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -66,6 +68,7 @@ export class AuthController {
     description: 'Internal Server Error',
   })
   @HttpCode(200)
+  @LangQuery()
   @Post('signin')
   login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(loginDto, res);
@@ -76,6 +79,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User logged out succesfully' })
   @UseGuards(UserGuard)
   @HttpCode(200)
+  @LangQuery()
   @Post('signout')
   signOut(
     @CookieGetter('refresh_token') refreshToken: string,
@@ -97,6 +101,7 @@ export class AuthController {
       },
     },
   })
+  @LangQuery()
   @Get(':id/refresh')
   refreshToken(
     @Param('id') id: string,
@@ -110,6 +115,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Invalid link' })
   @ApiGoneResponse({ description: 'Link expired' })
   @ApiOkResponse({ description: 'Verified Succesfully' })
+  @LangQuery()
   @Post('verify')
   verifyEmail(@Body() body: EmailVerificationDto) {
     return this.verificationService.verify(body);
@@ -121,8 +127,9 @@ export class AuthController {
   @ApiConflictResponse({ description: 'Email already in use' })
   @ApiOkResponse({ description: 'Link sent' })
   @UseGuards(UserGuard)
+  @LangQuery()
   @Put('email')
-  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: User) {
+  updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: AuthUser) {
     return this.authService.updateEmailRequest(body, user);
   }
 }

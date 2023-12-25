@@ -29,17 +29,25 @@ const ERRORS: ErrorDefinition = {
     statusCode: 500,
     message: 'Failed to delete accommodation .',
   },
-  [ErrorsTypes.ACCOMMODATION_ADDRESS_FAILED_TO_DELETE]: {
+  [ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING]: {
     statusCode: 500,
-    message: 'Failed to delete accommodation address.',
+    message: 'Failed to get deleting accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_RESTORE]: {
+    statusCode: 500,
+    message: 'Failed to restore accommodation .',
+  },
+  [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_RESTORING]: {
+    statusCode: 500,
+    message: 'Failed to get restoring accommodation .',
   },
   [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET]: {
     statusCode: 500,
     message: 'Failed to get existsting accommodation.',
   },
-  [ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST]: {
+  [ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET]: {
     statusCode: 500,
-    message: 'Failed to get list of accommodations.',
+    message: 'Failed to get lists of accommodations.',
   },
 
   [ErrorsTypes.AUTH_FAILED_TO_REGISTER]: {
@@ -83,6 +91,36 @@ const ERRORS: ErrorDefinition = {
     message: 'Failed to verify user token.',
   },
 
+  [ErrorsTypes.USERS_LIST_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get users list.',
+  },
+
+  [ErrorsTypes.USER_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get user.',
+  },
+
+  [ErrorsTypes.USER_PROFILE_FAILED_TO_ADD]: {
+    statusCode: 500,
+    message: 'Failed to add user profile.',
+  },
+
+  [ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE]: {
+    statusCode: 500,
+    message: 'Failed to update user profile.',
+  },
+
+  [ErrorsTypes.USER_PROFILE_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get user profile.',
+  },
+
+  [ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE]: {
+    statusCode: 500,
+    message: 'Failed to delete user profile.',
+  },
+
   [ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET]: {
     statusCode: 500,
     message: 'Failed to get amenities list.',
@@ -102,6 +140,30 @@ const ERRORS: ErrorDefinition = {
   [ErrorsTypes.AMENITIES_FAILED_TO_DELETE]: {
     statusCode: 500,
     message: 'Failed to delete amenities.',
+  },
+  [ErrorsTypes.BOOKING_FAILED_TO_GET_AVAILABLE_DATES]: {
+    statusCode: 500,
+    message: 'Failed to get accommodation available dates.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_CREATE]: {
+    statusCode: 500,
+    message: 'Failed to create review for this accommodation.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET_FOR_UPDATING]: {
+    statusCode: 500,
+    message: 'Failed to get updating review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_UPDATE]: {
+    statusCode: 500,
+    message: 'Failed to update review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_GET]: {
+    statusCode: 500,
+    message: 'Failed to get review.',
+  },
+  [ErrorsTypes.REVIEW_FAILED_TO_DELETE]: {
+    statusCode: 500,
+    message: 'Failed to delete review.',
   },
 };
 

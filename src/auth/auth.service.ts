@@ -7,15 +7,17 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { VerificationSerivce } from './verification.service';
+import { I18nService } from 'nestjs-i18n';
+import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +25,8 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly verificationService: VerificationSerivce,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly i18n: I18nService
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -31,10 +34,15 @@ export class AuthService {
       const { email, password, confirm_password } = registerDto;
       const findUser = await this.prismaService.user.findUnique({ where: { email } });
 
-      if (findUser) throw new BadRequestException('This email is already in use! Please try again');
+      if (findUser)
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE')
+        );
 
       if (password !== confirm_password)
-        throw new BadRequestException('Passwords do not match! Please try again');
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH')
+        );
 
       const hashed_password: string = await bcrypt.hash(password, 12);
 
@@ -64,7 +72,10 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.validateUser(email);
       const isMatchPass = await bcrypt.compare(password, user.password);
-      if (!isMatchPass) throw new BadRequestException('User not found');
+      if (!isMatchPass)
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
@@ -89,7 +100,10 @@ export class AuthService {
         secret: process.env.REFRESH_TOKEN_KEY,
       });
 
-      if (!adminData) throw new ForbiddenException('User not found');
+      if (!adminData)
+        throw new ForbiddenException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken: null },
@@ -113,18 +127,30 @@ export class AuthService {
         secret: process.env.REFRESH_TOKEN_KEY,
       });
 
-      if (!decodedToken) throw new BadRequestException('Invalid refresh token');
+      if (!decodedToken)
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN')
+        );
 
-      if (userId != decodedToken['sub']) throw new BadRequestException('User not found');
+      if (userId != decodedToken['sub'])
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
 
       const user = await this.prismaService.user.findFirst({
         where: { id: userId },
       });
-      if (!user || !user.hashedRefreshToken) throw new BadRequestException('User not found');
+      if (!user || !user.hashedRefreshToken)
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
 
       const tokenMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
 
-      if (!tokenMatch) throw new ForbiddenException('Forbidden');
+      if (!tokenMatch)
+        throw new ForbiddenException(
+          await translateErrorMessage(this.i18n, 'errors.FORBIDDEN_AUTH')
+        );
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
@@ -140,22 +166,30 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof TokenExpiredError)
-        throw new UnauthorizedException('Refresh token expired');
+        throw new UnauthorizedException(
+          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN')
+        );
 
       if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS, error.message);
     }
   }
 
-  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: User) {
+  async updateEmailRequest(emailUpdateDto: EmailUpdateDto, user: AuthUser) {
     try {
       const { email: newEmail } = emailUpdateDto;
 
       if (user.email === newEmail) {
-        if (user.isEmailVerified) throw new BadRequestException('You already verified this email!');
+        if (user.isEmailVerified)
+          throw new BadRequestException(
+            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED')
+          );
       } else {
         const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
-        if (findUser) throw new ConflictException('This email is already in use! Please try again');
+        if (findUser)
+          throw new ConflictException(
+            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE')
+          );
       }
 
       const activationLink = await this.verificationService.send(newEmail);
@@ -186,8 +220,14 @@ export class AuthService {
   async validateUser(email: string) {
     try {
       const user = await this.prismaService.user.findUnique({ where: { email } });
-      if (!user) throw new UnauthorizedException('User not found');
-      if (!user.isEmailVerified) throw new BadRequestException('User Email not Verified');
+      if (!user)
+        throw new UnauthorizedException(
+          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
+        );
+      if (!user.isEmailVerified)
+        throw new BadRequestException(
+          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED')
+        );
       return user;
     } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof BadRequestException)
