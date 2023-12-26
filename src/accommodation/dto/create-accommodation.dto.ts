@@ -23,6 +23,10 @@ export default class CreateAccommodationDto {
   previewImgUrl: string;
 
   @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsNotEmpty()
   @IsInt()
   squareMeters: number;
 

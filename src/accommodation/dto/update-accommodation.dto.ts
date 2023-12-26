@@ -18,6 +18,10 @@ export default class UpdateAccommodationDto {
   thumbnailUrl: string;
 
   @IsOptional()
+  @IsString()
+  title: string;
+
+  @IsOptional()
   @IsInt()
   squareMeters: number;
 
