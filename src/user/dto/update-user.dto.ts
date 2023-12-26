@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Gender, UiTheme } from '@prisma/client';
-import { IsEnum, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
@@ -18,6 +18,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   phoneNumber: string;
 
   @ApiProperty({ example: 'https://example.com/photo.png', description: 'Photo URL' })
+  @IsOptional()
   @IsString()
   imageUrl: string;
 
@@ -38,6 +39,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   uiTheme: UiTheme;
 
   @ApiProperty({ example: 'I am a software engineer', description: 'Description' })
+  @IsOptional()
   @IsString()
   description: string;
 }
