@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsInt, IsDate, IsOptional, IsUrl, IsNotEmpty, Max, Min } from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Max, Min } from 'class-validator';
 
 export default class CreateAccommodationDto {
   @IsOptional()
@@ -42,6 +42,13 @@ export default class CreateAccommodationDto {
   @Transform(({ value }) => new Date(value))
   @IsDate()
   availableTo: Date;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(-720)
+  @Max(720)
+  @Transform(({ value }) => value - (value % 15))
+  timezoneOffset: number;
 
   @IsOptional()
   @IsString()

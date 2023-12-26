@@ -19,12 +19,21 @@ export class BookingService {
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
         select: {
+          timezoneOffset: true,
           availableFrom: true,
           availableTo: true,
           booking: {
             select: {
               startDate: true,
               endDate: true,
+            },
+            where: {
+              status: {
+                in: [Status.ACTIVE, Status.PENDING],
+              },
+              endDate: {
+                gt: dayjs().toISOString(),
+              },
             },
             orderBy: {
               startDate: 'asc',
@@ -35,9 +44,18 @@ export class BookingService {
 
       if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
-      let availableFrom = dayjs(accommodation.availableFrom);
-      const availableTo = dayjs(accommodation.availableTo);
-      const tomorrow = dayjs().utcOffset(0).add(1, 'day').startOf('day');
+      let availableFrom = this.getTimeInZone(
+        accommodation.availableFrom,
+        accommodation.timezoneOffset
+      );
+      const availableTo = this.getTimeInZone(
+        accommodation.availableTo,
+        accommodation.timezoneOffset
+      );
+      const tomorrow = dayjs()
+        .utcOffset(-accommodation.timezoneOffset)
+        .add(1, 'day')
+        .startOf('day');
 
       const notAvailableRes = {
         id: accommodationId,
@@ -47,7 +65,12 @@ export class BookingService {
       if (tomorrow.isAfter(availableTo)) return notAvailableRes;
 
       if (availableFrom < tomorrow) availableFrom = tomorrow;
-      const availableDates = this.getDateRanges(availableFrom, availableTo, accommodation.booking);
+      const availableDates = this.getDateRanges(
+        availableFrom,
+        availableTo,
+        accommodation.timezoneOffset,
+        accommodation.booking
+      );
 
       if (availableDates.length === 0) return notAvailableRes;
 
@@ -65,20 +88,10 @@ export class BookingService {
     const { accommodationId, startDate, endDate } = body;
 
     try {
-      const bookingStart = dayjs(startDate);
-      const bookingEnd = dayjs(endDate);
-
-      if (
-        !bookingStart.isBefore(bookingEnd, 'day') ||
-        !bookingStart.isAfter(dayjs().utcOffset(0).endOf('day'))
-      )
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
-
-      const tomorrow = dayjs().utcOffset(0).add(1, 'day').startOf('day');
-
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
         select: {
+          timezoneOffset: true,
           availableFrom: true,
           availableTo: true,
           booking: {
@@ -91,7 +104,7 @@ export class BookingService {
                 in: [Status.ACTIVE, Status.PENDING],
               },
               endDate: {
-                gt: tomorrow.toISOString(),
+                gt: dayjs().toISOString(),
               },
             },
           },
@@ -100,8 +113,26 @@ export class BookingService {
 
       if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
-      let availableFrom = dayjs(accommodation.availableFrom);
-      const availableTo = dayjs(accommodation.availableTo);
+      const bookingStart = this.getTimeInZone(startDate, accommodation.timezoneOffset);
+      const bookingEnd = this.getTimeInZone(endDate, accommodation.timezoneOffset);
+      if (
+        !bookingStart.isBefore(bookingEnd, 'day') ||
+        !bookingStart.isAfter(dayjs().utcOffset(-accommodation.timezoneOffset).endOf('day'))
+      )
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
+
+      let availableFrom = this.getTimeInZone(
+        accommodation.availableFrom,
+        accommodation.timezoneOffset
+      );
+      const availableTo = this.getTimeInZone(
+        accommodation.availableTo,
+        accommodation.timezoneOffset
+      );
+      const tomorrow = dayjs()
+        .utcOffset(-accommodation.timezoneOffset)
+        .add(1, 'day')
+        .startOf('day');
 
       if (availableFrom < tomorrow) availableFrom = tomorrow;
 
@@ -110,7 +141,8 @@ export class BookingService {
 
       const alreadyBooked = accommodation.booking.some(
         ({ startDate, endDate }) =>
-          dayjs(startDate).isBefore(bookingEnd) && dayjs(endDate).isAfter(bookingStart)
+          this.getTimeInZone(startDate, accommodation.timezoneOffset).isBefore(bookingEnd) &&
+          this.getTimeInZone(endDate, accommodation.timezoneOffset).isAfter(bookingStart)
       );
 
       if (alreadyBooked)
@@ -118,8 +150,8 @@ export class BookingService {
 
       const booking = await this.prismaService.booking.create({
         data: {
-          startDate: bookingStart.toISOString(),
-          endDate: bookingEnd.toISOString(),
+          startDate: startDate,
+          endDate: endDate,
           status: Status.PENDING,
           accommodation: {
             connect: {
@@ -147,29 +179,36 @@ export class BookingService {
   }
 
   private getDateRanges(
-    startDate: Dayjs,
-    endDate: Dayjs,
+    availableFrom: Dayjs,
+    availableTo: Dayjs,
+    offset: number,
     bookedDates: { startDate: Date; endDate: Date }[]
   ) {
     const ranges = [];
     let range = [];
-    let start = startDate;
-    let end = endDate;
+    let rangeStart = availableFrom;
 
-    for (const date of bookedDates) {
-      if (start.isBefore(dayjs(date.startDate))) {
-        end = dayjs(date.startDate);
-        range = [start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')];
+    for (const booking of bookedDates) {
+      const bookingStart = this.getTimeInZone(booking.startDate, offset);
+      const bookingEnd = this.getTimeInZone(booking.endDate, offset);
+
+      if (rangeStart.isBefore(bookingStart)) {
+        const rangeEnd = bookingStart < availableTo ? bookingStart : availableTo;
+        range = [rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD')];
         ranges.push(range);
       }
-      start = dayjs(date.endDate);
+      rangeStart = bookingEnd;
     }
 
-    if (start.isBefore(endDate)) {
-      range = [start.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')];
+    if (rangeStart.isBefore(availableTo)) {
+      range = [rangeStart.format('YYYY-MM-DD'), availableTo.format('YYYY-MM-DD')];
       ranges.push(range);
     }
 
     return ranges;
+  }
+
+  private getTimeInZone(date: Date, offset: number) {
+    return dayjs(date).utcOffset(-offset).add(offset, 'minutes');
   }
 }
