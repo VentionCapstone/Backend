@@ -17,12 +17,11 @@ export class AdminGuard implements CanActivate {
 
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) throw new UnauthorizedException('User Unauthorized');
+    if (!authHeader) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-    if (bearer != 'Bearer' || !token) throw new UnauthorizedException('User Unauthorized');
-
+    if (bearer != 'Bearer' || !token) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED);
     try {
       const user: Partial<User> = await this.jwtService.verify(token, {
         secret: process.env.ACCESS_TOKEN_KEY,
@@ -31,9 +30,10 @@ export class AdminGuard implements CanActivate {
       const findUser = await this.prismaService.user.findUnique({
         where: { email: user.email },
       });
-      if (!findUser) throw new UnauthorizedException('Invalid token provided');
+      if (!findUser) throw new UnauthorizedException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
-      if (findUser.role !== 'ADMIN') throw new UnauthorizedException('User Unauthorized');
+      if (findUser.role !== 'ADMIN')
+        throw new UnauthorizedException(ErrorsTypes.FORBIDDEN_NOT_AUTHORIZED_USER);
 
       req.user = {
         id: findUser.id,
@@ -45,7 +45,7 @@ export class AdminGuard implements CanActivate {
       return true;
     } catch (error) {
       if (error instanceof TokenExpiredError)
-        throw new UnauthorizedException('Access token expired');
+        throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN);
       if (error instanceof UnauthorizedException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
     }

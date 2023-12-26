@@ -1,5 +1,5 @@
-import CreateAddressDto from './create-address.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import CreateAddressDto from './create-address.dto';
 
 export class AccommodationDto {
   @ApiProperty()

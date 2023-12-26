@@ -1,18 +1,13 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { I18nService } from 'nestjs-i18n';
-import ErrorsTypes from 'src/errors/errors.enum';
 import * as dayjs from 'dayjs';
-import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
+import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly i18n: I18nService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createAccommodation(createAccommodationBody: any) {
     try {
@@ -50,9 +45,7 @@ export class AccommodationService {
     }
 
     if (!existingAccommodation)
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
-      );
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_UPDATING);
 
     try {
       const updatedAccommodation = await this.prisma.accommodation.update({
@@ -82,14 +75,11 @@ export class AccommodationService {
         },
       });
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_GET_DELITING, error.message);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_GET_DELETING, error.message);
     }
 
-    if (!deletingAccommodation) {
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_DELETING')
-      );
-    }
+    if (!deletingAccommodation)
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_DELETING);
 
     try {
       const bookedDates = await this.prisma.booking.findMany({
@@ -105,11 +95,8 @@ export class AccommodationService {
       for (const booking of bookedDates) {
         const endDate = dayjs(booking.endDate);
 
-        if (!currentDate.isAfter(endDate, 'day')) {
-          throw new BadRequestException(
-            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_ACCOMODATION_HAS_BOOKINGS')
-          );
-        }
+        if (!currentDate.isAfter(endDate, 'day'))
+          throw new BadRequestException(ErrorsTypes.BAD_REQUEST_ACCOMMODATION_HAS_BOOKINGS);
       }
 
       await this.prisma.accommodation.update({
@@ -143,9 +130,7 @@ export class AccommodationService {
     }
 
     if (!restoringAccommodation) {
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_RESTORING')
-      );
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_RESTORING);
     }
     try {
       return await this.prisma.accommodation.update({
@@ -175,10 +160,7 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
-    if (!accommodation)
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
-      );
+    if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
     return accommodation;
   }
 
@@ -196,9 +178,7 @@ export class AccommodationService {
     }
 
     if (!existingAccommodation)
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION_FOR_UPDATING')
-      );
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_UPDATING);
 
     const base64Data = file.buffer.toString('base64');
 
@@ -275,7 +255,7 @@ export class AccommodationService {
         data: accommodations,
       };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATIONS_LIST_FAILED_TO_GET, error.message);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
   }
 
