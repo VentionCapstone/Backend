@@ -8,5 +8,7 @@
   "AMENITY_UPDATE_SUCCESS": "Успешное обновление удобств",
   "AMENITY_DELETE_SUCCESS": "Успешное удаление удобств",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален"
+  "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален",
+
+  "BOOKING_PAYMENT_SUCCESS": "Платеж успешно обработан"
 }

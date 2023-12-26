@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
-import { GlobalException } from '../exceptions/global.exception';
 import ErrorsTypes from '../errors/errors.enum';
+import { GlobalException } from '../exceptions/global.exception';
 
 @Injectable()
 export class StripeService {
@@ -13,7 +13,7 @@ export class StripeService {
 
     if (!apiVersion && !stripeKey) {
       throw new GlobalException(
-        ErrorsTypes.STRIPE_FAILED_TO_PROCESS,
+        ErrorsTypes.PAYMENT_FAILED_TO_PROCESS,
         'Stripe API version or secret key are not set. Please set the environment variables.'
       );
     }
@@ -23,7 +23,7 @@ export class StripeService {
         apiVersion,
       } as Stripe.StripeConfig);
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.STRIPE_FAILED_TO_PROCESS, error.message);
+      throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
   }
 

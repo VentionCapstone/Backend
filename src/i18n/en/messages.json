@@ -8,5 +8,7 @@
   "AMENITY_UPDATE_SUCCESS": "Success updating amenities",
   "AMENITY_DELETE_SUCCESS": "Success deleting amenities",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Profile successfully deleted"
+  "USER_PROFILE_DELETE_SUCCESS": "Profile successfully deleted",
+
+  "BOOKING_PAYMENT_SUCCESS": "Payment processed successfully"
 }

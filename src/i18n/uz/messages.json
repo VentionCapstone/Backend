@@ -8,5 +8,7 @@
   "AMENITY_UPDATE_SUCCESS": "Qulayliklar muvaffaqiyatli yangilandi",
   "AMENITY_DELETE_SUCCESS": "Qulayliklar muvaffaqiyatli o'chirildi",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Foydalanuvchi muvaffaqiyatli o'chirildi"
+  "USER_PROFILE_DELETE_SUCCESS": "Foydalanuvchi muvaffaqiyatli o'chirildi",
+
+  "BOOKING_PAYMENT_SUCCESS": "To'lov muvaffaqiyatli amalga oshirildi"
 }

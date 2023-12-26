@@ -8,5 +8,7 @@
   "AMENITY_UPDATE_SUCCESS": "Erfolgreiche Aktualisierung der Annehmlichkeiten",
   "AMENITY_DELETE_SUCCESS": "Erfolgreiche Löschung der Annehmlichkeiten",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Profil erfolgreich gelöscht"
+  "USER_PROFILE_DELETE_SUCCESS": "Profil erfolgreich gelöscht",
+
+  "BOOKING_PAYMENT_SUCCESS": "Zahlung erfolgreich verarbeitet"
 }

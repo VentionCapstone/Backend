@@ -8,5 +8,7 @@
   "AMENITY_UPDATE_SUCCESS": "Қолайлылықтарды жаңарту сәтті",
   "AMENITY_DELETE_SUCCESS": "Ыңғайлылықтарды жою сәтті аяқталды",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Профиль сәтті жойылды"
+  "USER_PROFILE_DELETE_SUCCESS": "Профиль сәтті жойылды",
+
+  "BOOKING_PAYMENT_SUCCESS": "Төлем сәтті өңделді"
 }

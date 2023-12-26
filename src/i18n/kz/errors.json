@@ -71,5 +71,6 @@
   "REVIEW_FAILED_TO_GET": "Тексеру мүмкін болмады",
   "REVIEW_FAILED_TO_DELETE": "Пікірді жою мүмкін болмады",
   "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Жарамсыз төлем өсімі",
-  "BAD_REQUEST_PAYMENT_FAILED": "Төлем сәтсіздік көрсетті"
+  "BAD_REQUEST_PAYMENT_FAILED": "Төлем сәтсіздік көрсетті",
+  "PAYMENT_FAILED_TO_PROCESS": "Төлем өңделмеді"
 }

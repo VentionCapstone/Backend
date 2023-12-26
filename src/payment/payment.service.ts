@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Status } from '@prisma/client';
+import { I18nService } from 'nestjs-i18n';
+import { translateMessage } from 'src/helpers/translateMessage.helper';
+import MessagesTypes from 'src/messages/messages.enum';
 import ErrorsTypes from '../errors/errors.enum';
 import { GlobalException } from '../exceptions/global.exception';
 import { PrismaService } from '../prisma/prisma.service';
@@ -9,7 +12,8 @@ import { StripeService } from '../stripe/stripe.service';
 export class PaymentService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly stripeService: StripeService
+    private readonly stripeService: StripeService,
+    private readonly i18n: I18nService
   ) {}
 
   async processPayment(userId: string, totalAmount: number, paymentOption: string) {
@@ -42,7 +46,10 @@ export class PaymentService {
           data: { status: Status.COMPLETED },
         });
 
-        return { success: true, message: 'Payment processed successfully' };
+        return {
+          success: true,
+          message: translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS),
+        };
       } else {
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_PAYMENT_FAILED);
       }
@@ -73,7 +80,10 @@ export class PaymentService {
         data: { status: Status.COMPLETED },
       });
 
-      return { success: true, message: 'Payment processed successfully' };
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS),
+      };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
