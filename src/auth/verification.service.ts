@@ -1,12 +1,19 @@
-import { BadRequestException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  GoneException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import base64url from 'base64url';
 import * as crypto from 'crypto';
 import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { translateMessage } from 'src/helpers/translateMessage.helper';
 import { MailerService } from 'src/mailer/mailer.service';
+import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailVerificationDto } from './dto';
 
@@ -44,31 +51,19 @@ export class VerificationSerivce {
     try {
       const [email, expires, hash] = base64url.decode(body.token).split('$$');
       if (!email || !expires || !hash)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_INVALID_LINK')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_INVALID_LINK);
 
       const user = await this.prismaService.user.findUnique({
         where: { email: email.toLowerCase() },
       });
-      if (!user)
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
       if (user.isEmailVerified)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED);
       if (user.activationLink !== body.token)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_INVALID_LINK')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_INVALID_LINK);
 
       const isExpired = +expires < Date.now();
-      if (isExpired)
-        throw new GoneException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK')
-        );
+      if (isExpired) throw new GoneException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_EXPIRED_LINK);
 
       await this.prismaService.user.update({
         where: { id: user.id },
@@ -77,15 +72,10 @@ export class VerificationSerivce {
 
       return {
         success: true,
-        message: 'Email verified succesfully',
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_EMAIL_VERIFIED_SUCCESS),
       };
     } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof NotFoundException ||
-        error instanceof GoneException
-      )
-        throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_VERIFY_EMAIL, error.message);
     }
   }

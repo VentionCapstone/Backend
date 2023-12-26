@@ -1,12 +1,11 @@
-import { Controller, Post, Body, UseGuards, BadRequestException } from '@nestjs/common';
-import { PaymentService } from './payment.service';
-import { CreatePaymentDto, PaymentOption } from './dto/create-payment.dto';
-import { UserGuard } from '../common/guards/user.guard';
+import { BadRequestException, Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { GlobalException } from '../exceptions/global.exception';
+import { UserGuard } from '../common/guards/user.guard';
 import ErrorsTypes from '../errors/errors.enum';
-import { I18nService } from 'nestjs-i18n';
+import { GlobalException } from '../exceptions/global.exception';
+import { CreatePaymentDto, PaymentOption } from './dto/create-payment.dto';
+import { PaymentService } from './payment.service';
 
 type PaymentHandler = (
   userId: string,
@@ -20,7 +19,6 @@ type PaymentHandler = (
 @ApiBearerAuth()
 export class PaymentController {
   private paymentHandlers: Record<string, PaymentHandler>;
-  private readonly i18n: I18nService;
 
   constructor(private readonly paymentService: PaymentService) {
     this.paymentHandlers = {
@@ -50,7 +48,7 @@ export class PaymentController {
     const { totalAmount, paymentOption } = createPaymentDto;
 
     if (!this.paymentHandlers[paymentOption]) {
-      throw new BadRequestException(this.i18n, 'errors.INVALID_PAYMENT_OPTION');
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_PAYMENT_OPTION);
     }
 
     try {

@@ -2,11 +2,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
+import { WinstonModule } from 'nest-winston';
+import { I18nService } from 'nestjs-i18n';
+import { format, transports } from 'winston';
+import 'winston-daily-rotate-file';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './filters/global.filter';
-import 'winston-daily-rotate-file';
-import { WinstonModule } from 'nest-winston';
-import { format, transports } from 'winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -70,7 +71,7 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
   }
 
-  app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
+  app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger), app.get(I18nService)));
 
   await app.listen(port, () => {
     console.log('listening on port ' + port);

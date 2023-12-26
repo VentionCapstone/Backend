@@ -1,17 +1,15 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Status } from '@prisma/client';
+import ErrorsTypes from '../errors/errors.enum';
+import { GlobalException } from '../exceptions/global.exception';
 import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from '../stripe/stripe.service';
-import { Status } from '@prisma/client';
-import { GlobalException } from '../exceptions/global.exception';
-import ErrorsTypes from '../errors/errors.enum';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly stripeService: StripeService,
-    private readonly i18n: I18nService
+    private readonly stripeService: StripeService
   ) {}
 
   async processPayment(userId: string, totalAmount: number, paymentOption: string) {
@@ -21,7 +19,7 @@ export class PaymentService {
       });
 
       if (bookingDetails.length === 0) {
-        throw new NotFoundException(this.i18n, 'errors.BOOKING_NOT_FOUND_FOR_PAYMENT');
+        throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
       }
 
       const paymentIntent = await this.stripeService.createPaymentIntent(
@@ -46,7 +44,7 @@ export class PaymentService {
 
         return { success: true, message: 'Payment processed successfully' };
       } else {
-        throw new BadRequestException(this.i18n, 'errors.PAYMENT_FAILED');
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_PAYMENT_FAILED);
       }
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
@@ -59,7 +57,7 @@ export class PaymentService {
         where: { userId, status: Status.PENDING },
       });
       if (bookingDetails.length) {
-        throw new NotFoundException(this.i18n, 'errors.BOOKING_NOT_FOUND_FOR_PAYMENT');
+        throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
       }
       await this.prismaService.payment.create({
         data: {
