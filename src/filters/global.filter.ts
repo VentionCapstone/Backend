@@ -1,4 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -15,20 +22,28 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: GlobalException | any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const defaultStatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     const defaultErrorMessage = translateErrorMessage(this.i18n, ErrorsTypes.DEFAULT);
     const defaultResponse = {
       success: false,
-      error: { statusCode: 500, message: defaultErrorMessage },
+      error: { statusCode: defaultStatusCode, message: defaultErrorMessage },
     };
 
     try {
-      const knownException = exception instanceof HttpException;
       const request = ctx.getRequest<Request>();
+      const knownException = exception instanceof HttpException;
 
-      const status = knownException ? exception.getStatus() : 500;
-      const errorObj = knownException ? exception.getResponse() : exception;
-      const key = knownException ? errorObj?.key || errorObj?.message : ErrorsTypes.DEFAULT;
-      const message = knownException ? translateErrorMessage(this.i18n, key) : exception.message;
+      let status = defaultStatusCode;
+      let errorObj = exception;
+      let key = ErrorsTypes.DEFAULT;
+      let message = exception.message;
+
+      if (knownException) {
+        status = exception.getStatus();
+        errorObj = exception.getResponse();
+        key = errorObj?.key || errorObj?.message;
+        message = translateErrorMessage(this.i18n, key);
+      }
 
       this.logger.error(
         `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${key}, cause: ${message}`
@@ -41,7 +56,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         error: { statusCode: status, message: message || defaultErrorMessage },
       });
     } catch (error) {
-      response.status(500).json(defaultResponse);
+      response.status(defaultStatusCode).json(defaultResponse);
     }
   }
 }
