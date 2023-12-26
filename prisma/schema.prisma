@@ -45,6 +45,7 @@ model Booking {
 
 model Accommodation {
   id                    String    @id @default(uuid())
+  title                 String
   addressId             String
   thumbnailUrl          String
   ownerId               String
@@ -52,8 +53,9 @@ model Accommodation {
   numberOfRooms         Int
   price                 Int
   allowedNumberOfPeople Int
-  availableFrom         DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableFrom         DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date
   availableTo           DateTime  @db.Date
+  timezoneOffset        Int
   description           String?
   previewImgUrl         String
   isDeleted             Boolean   @default(false)

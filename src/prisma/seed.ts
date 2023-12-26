@@ -47,6 +47,9 @@ async function main() {
         amenities: {
           create: accommodation.amenities,
         },
+        booking: {
+          create: accommodation.booking,
+        },
         reviews: {
           create: accommodation.reviews,
         },

@@ -5,22 +5,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import * as dayjs from 'dayjs';
 import ErrorsTypes from 'src/errors/errors.enum';
+import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as dayjs from 'dayjs';
 import UpdateReviewDto from './dto/update-user.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ReviewsService {
-  constructor(
-    private prisma: PrismaService,
-    private readonly i18n: I18nService
-  ) {}
+  constructor(private prisma: PrismaService) {}
   getReviewQuery = {
     include: {
       user: {
@@ -53,23 +48,13 @@ export class ReviewsService {
         },
       });
 
-      if (!bookking) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_BOOKING')
-        );
-      }
+      if (!bookking) throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
 
       const currentDate = dayjs();
       const bookingEndDate = dayjs(bookking?.endDate);
 
-      if (!currentDate.isAfter(bookingEndDate, 'day')) {
-        throw new BadRequestException(
-          await translateErrorMessage(
-            this.i18n,
-            'errors.BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END'
-          )
-        );
-      }
+      if (!currentDate.isAfter(bookingEndDate, 'day'))
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END);
 
       const newReview = await this.prisma.review.create({
         data: createReviewBody,
@@ -79,11 +64,8 @@ export class ReviewsService {
       return newReview;
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
-        throw new ConflictException(
-          await translateErrorMessage(this.i18n, 'errors.CONFLICT_REVIEW_ALREADY_EXIST')
-        );
-      }
+      if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED)
+        throw new ConflictException(ErrorsTypes.CONFLICT_REVIEW_ALREADY_EXIST);
 
       throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_CREATE, error.message);
     }
@@ -99,10 +81,7 @@ export class ReviewsService {
       throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_GET_FOR_UPDATING, error.message);
     }
 
-    if (!existingReview)
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW_FOR_UPDATING')
-      );
+    if (!existingReview) throw new NotFoundException(ErrorsTypes.NOT_FOUND_REVIEW_FOR_UPDATING);
 
     try {
       const newAccommodation = await this.prisma.review.update({
@@ -128,10 +107,7 @@ export class ReviewsService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_GET, error.message);
     }
-    if (!review)
-      throw new NotFoundException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW')
-      );
+    if (!review) throw new NotFoundException(ErrorsTypes.NOT_FOUND_REVIEW);
     return review;
   }
 
@@ -144,9 +120,7 @@ export class ReviewsService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException(
-            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_REVIEW')
-          );
+          throw new NotFoundException(ErrorsTypes.NOT_FOUND_REVIEW);
         }
       }
       throw new GlobalException(ErrorsTypes.REVIEW_FAILED_TO_DELETE, error.message);

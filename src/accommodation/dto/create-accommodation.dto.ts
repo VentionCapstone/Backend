@@ -54,6 +54,13 @@ export default class CreateAccommodationDto {
   @IsDate()
   availableTo: Date;
 
+  @IsNotEmpty()
+  @IsInt()
+  @Min(-720)
+  @Max(720)
+  @Transform(({ value }) => value - (value % 15))
+  timezoneOffset: number;
+
   @IsOptional()
   @IsString()
   description: string;
