@@ -19,6 +19,7 @@ export class PhoneNumberTransformInterceptor implements NestInterceptor {
     const phoneNumber = request.body?.phoneNumber;
     if (phoneNumber && typeof phoneNumber === 'string') {
       request.body.phoneNumber = this.formatPhoneNumber(phoneNumber);
+      return;
     }
     throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_PHONE_NUMBER);
   }
