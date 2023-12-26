@@ -1,10 +1,7 @@
 import { IsEnum, IsOptional } from 'class-validator';
 import { PaginationDto } from './pagination.dto';
+import { SortOrder } from 'src/enums/sortOrder.enum';
 
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
 export enum reviewOrderBy {
   CREATEDAT_DATE = 'createdAt',
   RATE = 'rating',

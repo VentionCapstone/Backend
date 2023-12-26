@@ -1,19 +1,10 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional } from 'class-validator';
-import { OrderAndFilterReview } from './get-review.dto';
+import { IsBoolean, IsOptional } from 'class-validator';
+import { PaginationDto } from './pagination.dto';
 
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
-export enum reviewOrderBy {
-  CREATEDAT_DATE = 'createdAt',
-  RATE = 'rating',
-}
-
-export class GetUserAccommodationsDto extends OrderAndFilterReview {
+export class GetUserAccommodationsDto extends PaginationDto {
   @Transform(({ value }) => value === 'true')
   @IsOptional()
-  @IsInt()
+  @IsBoolean()
   includeDeleted?: boolean;
 }

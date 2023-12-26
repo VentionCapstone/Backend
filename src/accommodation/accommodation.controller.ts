@@ -29,7 +29,6 @@ import {
   getSchemaPath,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
@@ -316,20 +315,6 @@ export class AccommodationController {
   @ApiResponse({
     status: 500,
     description: 'Internal Server Error',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description:
-      'Optional query, brings equal or less number of reviews, need to be passed it pair with page.',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description:
-      'Optional query, skips <page * limit> number of reviews, need to be passed it pair with limit.',
   })
   @Get('/:userId/accommodations')
   async getUserAccommodations(
