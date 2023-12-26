@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,11 +14,12 @@ import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
 
+import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
+import { translateMessage } from 'src/helpers/translateMessage.helper';
+import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from '../prisma/prisma.service';
 import { VerificationSerivce } from './verification.service';
-import { I18nService } from 'nestjs-i18n';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 
 @Injectable()
 export class AuthService {
@@ -35,14 +37,10 @@ export class AuthService {
       const findUser = await this.prismaService.user.findUnique({ where: { email } });
 
       if (findUser)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE);
 
       if (password !== confirm_password)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
 
       const hashed_password: string = await bcrypt.hash(password, 12);
 
@@ -59,7 +57,7 @@ export class AuthService {
       });
       return {
         success: true,
-        message: 'User created successfully, please check your email to verify your account',
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_REGISTER_SUCCESS),
       };
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
@@ -72,10 +70,7 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.validateUser(email);
       const isMatchPass = await bcrypt.compare(password, user.password);
-      if (!isMatchPass)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+      if (!isMatchPass) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
@@ -88,8 +83,7 @@ export class AuthService {
       this.setRefreshTokenCookie(tokens.refresh_token, res);
       return { tokens, id: user.id };
     } catch (error) {
-      if (error instanceof UnauthorizedException || error instanceof BadRequestException)
-        throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN, error.message);
     }
   }
@@ -100,10 +94,7 @@ export class AuthService {
         secret: process.env.REFRESH_TOKEN_KEY,
       });
 
-      if (!adminData)
-        throw new ForbiddenException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+      if (!adminData) throw new ForbiddenException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken: null },
@@ -112,7 +103,7 @@ export class AuthService {
 
       res.clearCookie('refresh_token');
       const response = {
-        message: 'User logged out successfully',
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_LOGOUT_SUCCESS),
       };
       return response;
     } catch (error) {
@@ -128,29 +119,20 @@ export class AuthService {
       });
 
       if (!decodedToken)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_INVALID_REFRESH_TOKEN);
 
       if (userId != decodedToken['sub'])
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+        throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const user = await this.prismaService.user.findFirst({
         where: { id: userId },
       });
       if (!user || !user.hashedRefreshToken)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+        throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokenMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
 
-      if (!tokenMatch)
-        throw new ForbiddenException(
-          await translateErrorMessage(this.i18n, 'errors.FORBIDDEN_AUTH')
-        );
+      if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
       const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
@@ -162,15 +144,13 @@ export class AuthService {
       this.setRefreshTokenCookie(tokens.refresh_token, res);
       return {
         tokens,
-        message: 'Tokens have been refreshed successfully',
+        success: true,
       };
     } catch (error) {
       if (error instanceof TokenExpiredError)
-        throw new UnauthorizedException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EXPIRED_REFRESH_TOKEN')
-        );
+        throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_AUTH_EXPIRED_REFRESH_TOKEN);
 
-      if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS, error.message);
     }
   }
@@ -181,15 +161,11 @@ export class AuthService {
 
       if (user.email === newEmail) {
         if (user.isEmailVerified)
-          throw new BadRequestException(
-            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED')
-          );
+          throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_ALREADY_VERIFIED);
       } else {
         const findUser = await this.prismaService.user.findUnique({ where: { email: newEmail } });
         if (findUser)
-          throw new ConflictException(
-            await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE')
-          );
+          throw new ConflictException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_ALREADY_IN_USE);
       }
 
       const activationLink = await this.verificationService.send(newEmail);
@@ -198,10 +174,11 @@ export class AuthService {
         where: { id: user.id },
       });
       return {
-        message: 'Email update request sent',
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_EMAIL_VERIFICATION_LINK_SENT),
       };
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof ConflictException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_EMAIL, error.message);
     }
   }
@@ -220,18 +197,12 @@ export class AuthService {
   async validateUser(email: string) {
     try {
       const user = await this.prismaService.user.findUnique({ where: { email } });
-      if (!user)
-        throw new UnauthorizedException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+      if (!user) throw new UnauthorizedException(ErrorsTypes.NOT_FOUND_AUTH_USER);
       if (!user.isEmailVerified)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_EMAIL_NOT_VERIFIED);
       return user;
     } catch (error) {
-      if (error instanceof UnauthorizedException || error instanceof BadRequestException)
-        throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_VALIDATE, error.message);
     }
   }
@@ -259,7 +230,7 @@ export class AuthService {
         refresh_token: refreshToken,
       };
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_GET_TOKENS, error.message);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_GENERATE_TOKENS, error.message);
     }
   }
 }

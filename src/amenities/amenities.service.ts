@@ -4,7 +4,6 @@ import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AmenitiesRequestDto } from './dto';
 
@@ -24,15 +23,11 @@ export class AmenitiesService {
         .filter((column) => !excludedColumns.includes(column.column_name))
         .map((column) => column.column_name);
 
-      if (!columns) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_LIST')
-        );
-      }
+      if (!columns) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_LIST);
 
       return amenitiesList;
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.AMENITIES_LIST_FAILED_TO_GET, error.message);
+      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET_LIST, error.message);
     }
   }
 
@@ -43,11 +38,7 @@ export class AmenitiesService {
           accommodationId: id,
         },
       });
-      if (!amenities) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID')
-        );
-      }
+      if (!amenities) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID);
       return amenities;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -63,21 +54,12 @@ export class AmenitiesService {
       return addedAmenities;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
-          throw new ConflictException(
-            await translateErrorMessage(this.i18n, 'errors.CONFLICT_AMENITIES_ALREADY_EXIST')
-          );
-        }
-        if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED) {
-          throw new NotFoundException(
-            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID')
-          );
-        }
-        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException(
-            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
-          );
-        }
+        if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED)
+          throw new ConflictException(ErrorsTypes.CONFLICT_AMENITIES_ALREADY_EXIST);
+        if (error.code === PrismaErrorCodes.FOREIGN_KEY_CONSTRAINT_FAILED)
+          throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID);
+        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND)
+          throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID);
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_ADD, error.message);
     }
@@ -98,9 +80,7 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException(
-            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
-          );
+          throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID);
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE, error.message);
@@ -121,9 +101,7 @@ export class AmenitiesService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException(
-            await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID')
-          );
+          throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID);
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE, error.message);

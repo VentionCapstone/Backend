@@ -1,10 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UiTheme } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
+import { translateMessage } from 'src/helpers/translateMessage.helper';
+import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,16 +23,13 @@ export class UserService {
     private readonly i18n: I18nService
   ) {}
 
-  async validateUserAutherization(profileUserId: string, authUser: AuthUser) {
+  async validateUserAuthorization(profileUserId: string, authUser: AuthUser) {
     if (authUser.role === 'ADMIN') {
       return true;
     }
 
-    if (profileUserId !== authUser.id) {
-      throw new ForbiddenException(
-        await translateErrorMessage(this.i18n, 'errors.NOT_AUTHORIZED_USER')
-      );
-    }
+    if (profileUserId !== authUser.id)
+      throw new ForbiddenException(ErrorsTypes.FORBIDDEN_NOT_AUTHORIZED_USER);
 
     return true;
   }
@@ -37,11 +41,11 @@ export class UserService {
       });
 
       return {
-        message: 'Users successfully fetched',
+        success: true,
         data: users,
       };
     } catch {
-      throw new GlobalException(ErrorsTypes.USERS_LIST_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET_LIST);
     }
   }
 
@@ -52,14 +56,10 @@ export class UserService {
         include: { profile: true },
       });
 
-      if (!user) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
-      }
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       return {
-        message: 'User successfully fetched',
+        success: true,
         data: {
           id: user.id,
           email: user.email,
@@ -83,14 +83,10 @@ export class UserService {
         where: { id },
       });
 
-      if (!userProfile) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
-        );
-      }
+      if (!userProfile) throw new NotFoundException(ErrorsTypes.NOT_FOUND_USER_PROFILE);
 
       return {
-        message: 'User Profile successfully fetched',
+        success: true,
         data: userProfile,
       };
     } catch (error) {
@@ -107,13 +103,9 @@ export class UserService {
       });
 
       if (!user) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_AUTH_USER')
-        );
+        throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
       } else if (user.profile) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.USER_PROFILE_ALREADY_EXIST')
-        );
+        throw new ConflictException(ErrorsTypes.CONFLICT_USER_PROFILE_ALREADY_EXIST);
       }
 
       await this.prismaService.user.update({
@@ -156,13 +148,9 @@ export class UserService {
         where: { id },
       });
 
-      if (!userProfile) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
-        );
-      }
+      if (!userProfile) throw new NotFoundException(ErrorsTypes.NOT_FOUND_USER_PROFILE);
 
-      await this.validateUserAutherization(userProfile.userId, authUser);
+      await this.validateUserAuthorization(userProfile.userId, authUser);
 
       await this.prismaService.user.update({
         where: { id: userProfile.userId },
@@ -187,7 +175,7 @@ export class UserService {
         data: data,
       });
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE);
     }
   }
@@ -198,23 +186,19 @@ export class UserService {
         where: { id },
       });
 
-      if (!userProfile) {
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_USER_PROFILE')
-        );
-      }
+      if (!userProfile) throw new NotFoundException(ErrorsTypes.NOT_FOUND_USER_PROFILE);
 
-      await this.validateUserAutherization(userProfile.userId, authUser);
+      await this.validateUserAuthorization(userProfile.userId, authUser);
 
       await this.prismaService.userProfile.delete({
         where: { id },
       });
 
       return {
-        message: 'User Profile successfully deleted',
+        message: translateMessage(this.i18n, MessagesTypes.USER_PROFILE_DELETE_SUCCESS),
       };
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
     }
   }
