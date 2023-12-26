@@ -7,6 +7,7 @@ import { GlobalException } from 'src/exceptions/global.exception';
 import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReview, reviewOrderBy } from './dto/get-review.dto';
+import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -220,8 +221,24 @@ export class AccommodationService {
     }
   }
 
-  async getUserAccommodations(ownerId: string, { page, limit }: { page: string; limit: string }) {
+  async getUserAccommodations(ownerId: string, options: GetUserAccommodationsDto) {
     try {
+      const { page, limit, orderByDate, orderByRate, includeDeleted } = options;
+      console.log(
+        'file: accommodation.service.ts:227 ~ AccommodationService ~ getUserAccommodations ~ includeDeleted:',
+        includeDeleted
+      );
+
+      console.log(
+        'file: accommodation.service.ts:227 ~ AccommodationService ~ getUserAccommodations ~ orderByRate:',
+        orderByRate
+      );
+
+      console.log(
+        'file: accommodation.service.ts:227 ~ AccommodationService ~ getUserAccommodations ~ orderByDate:',
+        orderByDate
+      );
+
       const findAccommodationsQueryObj: any = {
         where: { ownerId },
         include: {

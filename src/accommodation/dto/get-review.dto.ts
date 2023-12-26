@@ -1,5 +1,5 @@
-import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
+import { PaginationDto } from './pagination.dto';
 
 export enum SortOrder {
   ASC = 'asc',
@@ -10,7 +10,7 @@ export enum reviewOrderBy {
   RATE = 'rating',
 }
 
-export class OrderAndFilterReview {
+export class OrderAndFilterReview extends PaginationDto {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByDate?: SortOrder;
@@ -18,14 +18,4 @@ export class OrderAndFilterReview {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByRate?: SortOrder;
-
-  @Transform(({ value }) => +value)
-  @IsOptional()
-  @IsInt()
-  limit?: number = 12;
-
-  @Transform(({ value }) => +value)
-  @IsOptional()
-  @IsInt()
-  page?: number = 1;
 }

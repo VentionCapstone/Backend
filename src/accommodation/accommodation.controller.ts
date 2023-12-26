@@ -40,6 +40,7 @@ import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
 import { OrderAndFilterReview } from './dto/get-review.dto';
+import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -331,14 +332,11 @@ export class AccommodationController {
       'Optional query, skips <page * limit> number of reviews, need to be passed it pair with limit.',
   })
   @Get('/:userId/accommodations')
-  async findAll(
+  async getUserAccommodations(
     @Param('userId') userId: string,
-    @Query() limitAndPage: { page: string; limit: string }
+    @Query() options: GetUserAccommodationsDto
   ) {
-    const accommodations = await this.accommodationService.getUserAccommodations(
-      userId,
-      limitAndPage
-    );
+    const accommodations = await this.accommodationService.getUserAccommodations(userId, options);
     return { success: true, data: accommodations };
   }
 
