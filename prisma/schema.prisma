@@ -45,6 +45,7 @@ model Booking {
 
 model Accommodation {
   id                    String    @id @default(uuid())
+  title                 String
   addressId             String
   thumbnailUrl          String
   ownerId               String

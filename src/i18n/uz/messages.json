@@ -1,0 +1,12 @@
+{
+  "AUTH_REGISTER_SUCCESS": "Foydalanuvchi muvaffaqiyatli yaratildi, hisobingizni tasdiqlash uchun elektron pochtangizni tekshiring",
+  "AUTH_LOGOUT_SUCCESS": "Tizimdan muvaffaqiyatli chiqarildi",
+  "AUTH_EMAIL_VERIFIED_SUCCESS": "Elektron pochta muvaffaqiyatli tasdiqlandi",
+  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Elektron pochtani yangilash so'rovi yuborildi, elektron pochtangizni tekshiring",
+
+  "AMENITY_ADD_SUCCESS": "Qulayliklar muvaffaqiyatli qo'shildi",
+  "AMENITY_UPDATE_SUCCESS": "Qulayliklar muvaffaqiyatli yangilandi",
+  "AMENITY_DELETE_SUCCESS": "Qulayliklar muvaffaqiyatli o'chirildi",
+
+  "USER_PROFILE_DELETE_SUCCESS": "Foydalanuvchi muvaffaqiyatli o'chirildi"
+}

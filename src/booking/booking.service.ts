@@ -3,10 +3,8 @@ import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as utc from 'dayjs/plugin/utc';
-import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateErrorMessage } from 'src/helpers/translateErrorMessage.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BookingReqDto } from './dto';
 
@@ -14,10 +12,7 @@ dayjs.extend(utc);
 
 @Injectable()
 export class BookingService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly i18n: I18nService
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async getAccommodationAvailableDates(accommodationId: string) {
     try {
@@ -47,10 +42,7 @@ export class BookingService {
         },
       });
 
-      if (!accommodation)
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
-        );
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
       let availableFrom = this.getTimeInZone(
         accommodation.availableFrom,
@@ -119,10 +111,7 @@ export class BookingService {
         },
       });
 
-      if (!accommodation)
-        throw new NotFoundException(
-          await translateErrorMessage(this.i18n, 'errors.NOT_FOUND_ACCOMODATION')
-        );
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
       const bookingStart = this.getTimeInZone(startDate, accommodation.timezoneOffset);
       const bookingEnd = this.getTimeInZone(endDate, accommodation.timezoneOffset);
@@ -130,9 +119,7 @@ export class BookingService {
         !bookingStart.isBefore(bookingEnd, 'day') ||
         !bookingStart.isAfter(dayjs().utcOffset(-accommodation.timezoneOffset).endOf('day'))
       )
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BOOKING_INVALID_DATES')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
 
       let availableFrom = this.getTimeInZone(
         accommodation.availableFrom,
@@ -150,9 +137,7 @@ export class BookingService {
       if (availableFrom < tomorrow) availableFrom = tomorrow;
 
       if (bookingStart.isBefore(availableFrom) || bookingEnd.isAfter(availableTo))
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BOOKING_INVALID_DATES')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
 
       const alreadyBooked = accommodation.booking.some(
         ({ startDate, endDate }) =>
@@ -161,9 +146,7 @@ export class BookingService {
       );
 
       if (alreadyBooked)
-        throw new BadRequestException(
-          await translateErrorMessage(this.i18n, 'errors.BOOKING_ALREADY_BOOKED')
-        );
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_ALREADY_BOOKED);
 
       const booking = await this.prismaService.booking.create({
         data: {

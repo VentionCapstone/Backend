@@ -21,13 +21,13 @@ import { UserService } from './user.service';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiBearerAuth()
-@ApiTags('USER')
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(AdminGuard)
-  @ApiOperation({ summary: 'GET ALL USERS' })
+  @ApiOperation({ summary: 'Get all users' })
   @LangQuery()
   @Get()
   findAll() {
@@ -35,8 +35,8 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'GET USER BY ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiParam({ name: 'id', description: 'User id' })
   @LangQuery()
   @Get(':id')
   getUser(@Param('id') id: string) {
@@ -44,8 +44,8 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'GET USER PROFILE BY ID' })
-  @ApiParam({ name: 'id', description: 'User profile ID' })
+  @ApiOperation({ summary: 'Get user profile by id' })
+  @ApiParam({ name: 'id', description: 'User profile id' })
   @LangQuery()
   @Get('profile/:id')
   getUserProfile(@Param('id') id: string) {
@@ -54,7 +54,7 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
-  @ApiOperation({ summary: 'CREATE USER PROFILE' })
+  @ApiOperation({ summary: 'Create user profile' })
   @LangQuery()
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: AuthUser) {
@@ -63,10 +63,10 @@ export class UserController {
 
   @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
-  @ApiOperation({ summary: 'UPDATE USER PROFILE BY ID' })
-  @ApiParam({ name: 'id', description: 'User profile ID' })
+  @ApiOperation({ summary: 'Update user profile id' })
+  @ApiParam({ name: 'id', description: 'User profile id' })
+  @Patch('/:id')
   @LangQuery()
-  @Patch('profile/:id')
   updateProfile(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -76,9 +76,9 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
-  @ApiOperation({ summary: 'DELETE USER PROFILE BY ID' })
+  @ApiOperation({ summary: 'Delete user profile by id' })
+  @Delete('/:id')
   @LangQuery()
-  @Delete('profile/:id')
   removeProfile(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.userService.removeUserProfile(id, user);
   }
