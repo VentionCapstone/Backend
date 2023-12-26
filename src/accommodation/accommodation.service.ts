@@ -229,7 +229,7 @@ export class AccommodationService {
       }
       return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
   }
 
