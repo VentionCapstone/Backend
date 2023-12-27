@@ -3,10 +3,10 @@ import * as dayjs from 'dayjs';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrderAndFilterReview, reviewOrderBy } from './dto/get-review.dto';
+import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { SortOrder } from 'src/enums/sortOrder.enum';
-import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
+import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -233,7 +233,7 @@ export class AccommodationService {
     }
   }
 
-  async getAllAccommodations(options: OrderAndFilter) {
+  async getAllAccommodations(options: OrderAndFilterDto) {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
@@ -278,7 +278,20 @@ export class AccommodationService {
     }
   }
 
-  private generateFindAllQueryObj(options: OrderAndFilter) {
+  private generateFindAllQueryObj(options: OrderAndFilterDto) {
+    const {
+      minPrice,
+      maxPrice,
+      minRooms,
+      maxRooms,
+      minPeople,
+      maxPeople,
+      page,
+      limit,
+      orderByPeople,
+      orderByPrice,
+      orderByRoom,
+    } = options;
     const findManyOptions: any = {
       select: {
         id: true,
@@ -297,27 +310,27 @@ export class AccommodationService {
       where: {
         isDeleted: false,
         price: {
-          gte: options.minPrice,
-          lte: options.maxPrice,
+          gte: minPrice,
+          lte: maxPrice,
         },
         numberOfRooms: {
-          gte: options.minRooms,
-          lte: options.maxRooms,
+          gte: minRooms,
+          lte: maxRooms,
         },
         allowedNumberOfPeople: {
-          gte: options.minPeople,
-          lte: options.maxPeople,
+          gte: minPeople,
+          lte: maxPeople,
         },
       },
 
-      skip: (options.page! - 1) * options.limit!,
-      take: options.limit,
+      skip: (page! - 1) * limit!,
+      take: limit,
     };
 
     const orderingBy = this.generateOderingArray<Record<OrderBy, string>>([
-      [options.orderByPeople, OrderBy.NUMBER_OF_PEOPLE],
-      [options.orderByPrice, OrderBy.PRICE],
-      [options.orderByRoom, OrderBy.NUMBER_OF_ROOMS],
+      [orderByPeople, OrderBy.NUMBER_OF_PEOPLE],
+      [orderByPrice, OrderBy.PRICE],
+      [orderByRoom, OrderBy.NUMBER_OF_ROOMS],
     ]);
 
     findManyOptions.orderBy = orderingBy;
@@ -325,7 +338,7 @@ export class AccommodationService {
     return findManyOptions;
   }
 
-  async getAccommodationReviews(accommodationId: string, options: OrderAndFilterReview) {
+  async getAccommodationReviews(accommodationId: string, options: OrderAndFilterReviewDto) {
     try {
       const { orderByDate, orderByRate, page, limit } = options;
 

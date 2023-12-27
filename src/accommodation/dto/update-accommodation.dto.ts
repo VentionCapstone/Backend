@@ -19,6 +19,10 @@ export default class UpdateAccommodationDto {
 
   @IsOptional()
   @IsString()
+  previewImgUrl: string;
+
+  @IsOptional()
+  @IsString()
   title: string;
 
   @IsOptional()

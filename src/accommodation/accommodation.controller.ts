@@ -32,13 +32,13 @@ import {
 } from '@nestjs/swagger';
 import { UserGuard } from 'src/common/guards/user.guard';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
-import { OrderAndFilter } from './dto/orderAndFilter.dto';
+import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
-import { OrderAndFilterReview } from './dto/get-review.dto';
+import { OrderAndFilterReviewDto } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 
 @ApiTags('accommodation')
@@ -69,8 +69,6 @@ export class AccommodationController {
   ) {
     const createAccommodationAndAdress = {
       ...body,
-      previewImgUrl: body.previewImgUrl || 'none',
-      thumbnailUrl: body.thumbnailUrl || 'none',
       ownerId: userId,
       address: {
         create: body.address,
@@ -291,7 +289,7 @@ export class AccommodationController {
     },
   })
   @Get('/')
-  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
+  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
     const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
     return { success: true, ...data };
   }
@@ -361,7 +359,7 @@ export class AccommodationController {
   @Get('/:accommodationId/reviews')
   async getAllReviews(
     @Param('accommodationId') accommodationId: string,
-    @Query() limitAndPage: OrderAndFilterReview
+    @Query() limitAndPage: OrderAndFilterReviewDto
   ) {
     const review = await this.accommodationService.getAccommodationReviews(
       accommodationId,

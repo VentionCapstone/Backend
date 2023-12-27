@@ -13,7 +13,7 @@ const parseNumberOrDefault = (value: string | undefined): number => {
   return value ? +value : 2147483647;
 };
 
-export class OrderAndFilter extends PaginationDto {
+export class OrderAndFilterDto extends PaginationDto {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByPrice?: SortOrder;

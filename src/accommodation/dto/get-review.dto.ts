@@ -7,7 +7,7 @@ export enum reviewOrderBy {
   RATE = 'rating',
 }
 
-export class OrderAndFilterReview extends PaginationDto {
+export class OrderAndFilterReviewDto extends PaginationDto {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByDate?: SortOrder;
