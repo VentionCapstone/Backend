@@ -1,10 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { PaginationDto } from './pagination.dto';
+import { SortOrder } from 'src/enums/sortOrder.enum';
 
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
 export enum OrderBy {
   PRICE = 'price',
   NUMBER_OF_ROOMS = 'numberOfRooms',
@@ -15,7 +13,7 @@ const parseNumberOrDefault = (value: string | undefined): number => {
   return value ? +value : 2147483647;
 };
 
-export class OrderAndFilter {
+export class OrderAndFilterDto extends PaginationDto {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByPrice?: SortOrder;
@@ -27,16 +25,6 @@ export class OrderAndFilter {
   @IsEnum(SortOrder)
   @IsOptional()
   public orderByPeople?: SortOrder;
-
-  @Transform(({ value }) => +value)
-  @IsOptional()
-  @IsInt()
-  limit?: number = 12;
-
-  @Transform(({ value }) => +value)
-  @IsOptional()
-  @IsInt()
-  page?: number = 1;
 
   @Transform(({ value }) => +value)
   @IsInt()
