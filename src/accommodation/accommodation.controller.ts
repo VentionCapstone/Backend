@@ -351,10 +351,6 @@ export class AccommodationController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
   @Get('/:accommodationId/reviews')
   async getAllReviews(@Param('accommodationId') accommodationId: string) {
     const review = await this.accommodationService.getAccommodationReviews(accommodationId);

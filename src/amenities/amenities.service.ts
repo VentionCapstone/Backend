@@ -4,10 +4,8 @@ import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { translateMessage } from 'src/helpers/translateMessage.helper';
-import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AmenitiesDto } from './dto';
+import { AmenitiesRequestDto } from './dto';
 
 @Injectable()
 export class AmenitiesService {
@@ -21,16 +19,18 @@ export class AmenitiesService {
       const columns: Array<{ column_name: string }> = await this.prisma
         .$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'Amenity';`;
       const excludedColumns = ['accommodationId', 'id'];
-      const list = columns
-        .filter((column) => !excludedColumns.includes(column.column_name))
-        .map((column) => column.column_name);
+
+      const amenitiesList: string[] = [];
+
+      for (const column of columns) {
+        if (!excludedColumns.includes(column.column_name)) {
+          amenitiesList.push(column.column_name);
+        }
+      }
 
       if (!columns) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_LIST);
 
-      return {
-        success: true,
-        data: list,
-      };
+      return amenitiesList;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET_LIST, error.message);
     }
@@ -44,22 +44,19 @@ export class AmenitiesService {
         },
       });
       if (!amenities) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID);
-      return { success: true, data: amenities };
+      return amenities;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET, error.message);
     }
   }
 
-  async addAmenities(id: string, dto: AmenitiesDto, userId: string) {
+  async addAmenities(id: string, dto: AmenitiesRequestDto, userId: string) {
     try {
-      const newAmenities = await this.prisma.amenity.create({
+      const addedAmenities = await this.prisma.amenity.create({
         data: { ...dto, accommodation: { connect: { id, ownerId: userId } } },
       });
-      return {
-        message: translateMessage(this.i18n, MessagesTypes.AMENITY_ADD_SUCCESS),
-        data: newAmenities,
-      };
+      return addedAmenities;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED)
@@ -73,7 +70,7 @@ export class AmenitiesService {
     }
   }
 
-  async updateAmenities(id: string, dto: AmenitiesDto, userId: string) {
+  async updateAmenities(id: string, dto: AmenitiesRequestDto, userId: string) {
     try {
       const updatedAmenities = await this.prisma.amenity.update({
         where: {
@@ -84,10 +81,7 @@ export class AmenitiesService {
         },
         data: { ...dto },
       });
-      return {
-        message: translateMessage(this.i18n, MessagesTypes.AMENITY_UPDATE_SUCCESS),
-        data: updatedAmenities,
-      };
+      return updatedAmenities;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
@@ -100,7 +94,7 @@ export class AmenitiesService {
 
   async deleteAmenities(id: string, userId: string) {
     try {
-      const deletedAmenities = await this.prisma.amenity.delete({
+      await this.prisma.amenity.delete({
         where: {
           accommodationId: id,
           accommodation: {
@@ -108,10 +102,7 @@ export class AmenitiesService {
           },
         },
       });
-      return {
-        message: translateMessage(this.i18n, MessagesTypes.AMENITY_DELETE_SUCCESS),
-        data: deletedAmenities,
-      };
+      return;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
