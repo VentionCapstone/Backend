@@ -4,18 +4,18 @@ import ErrorsTypes from 'src/errors/errors.enum';
 export const CookieOrHeaderGetter = createParamDecorator(
   async (data: string, context: ExecutionContext): Promise<string> => {
     const request = context.switchToHttp().getRequest();
-    let refreshToken = request.cookies[data];
+    const refreshToken = request.cookies[data];
 
     if (!refreshToken) {
       const refreshHeader = request.headers[data];
 
       if (!refreshHeader) throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_TOKEN_NOT_FOUND);
 
-      const bearer = refreshHeader.split(' ')[0];
-      refreshToken = refreshHeader.split(' ')[1];
+      const [bearer, token] = refreshHeader.split(' ');
 
-      if (bearer !== 'Bearer' || !refreshToken)
+      if (bearer !== 'Bearer' || !token)
         throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_TOKEN_NOT_FOUND);
+      return token;
     }
 
     return refreshToken;

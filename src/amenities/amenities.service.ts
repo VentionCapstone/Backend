@@ -19,9 +19,14 @@ export class AmenitiesService {
       const columns: Array<{ column_name: string }> = await this.prisma
         .$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name = 'Amenity';`;
       const excludedColumns = ['accommodationId', 'id'];
-      const amenitiesList = columns
-        .filter((column) => !excludedColumns.includes(column.column_name))
-        .map((column) => column.column_name);
+
+      const amenitiesList: string[] = [];
+
+      for (const column of columns) {
+        if (!excludedColumns.includes(column.column_name)) {
+          amenitiesList.push(column.column_name);
+        }
+      }
 
       if (!columns) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_LIST);
 
