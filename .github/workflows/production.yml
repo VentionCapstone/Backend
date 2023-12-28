@@ -1,11 +1,11 @@
-name: VENTION BOOKING CI (DEV)
+name: VENTION BOOKING CI (PROD)
 
 on:
   push:
-    branches: ['develop']
+    branches: ['master']
 
 env:
-  DOCKERHUB_IMAGE_NAME: vention-booking-dev
+  DOCKERHUB_IMAGE_NAME: vention-booking-prod
   DOCKER_CONTAINER_NAME: backend-server
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Login to EC2 instance
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST_PROD }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
