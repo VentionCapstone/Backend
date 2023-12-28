@@ -158,6 +158,8 @@ export class AccommodationService {
         where: { id },
         include: {
           address: true,
+          media: true,
+          amenities: true,
         },
       });
     } catch (error) {
