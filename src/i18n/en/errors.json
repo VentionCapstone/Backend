@@ -69,5 +69,7 @@
   "REVIEW_FAILED_TO_GET_FOR_UPDATING": "Failed to get updating review",
   "REVIEW_FAILED_TO_UPDATE": "Failed to update review",
   "REVIEW_FAILED_TO_GET": "Failed to get review",
-  "REVIEW_FAILED_TO_DELETE": "Failed to delete review"
+  "REVIEW_FAILED_TO_DELETE": "Failed to delete review",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Invalid old password",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Failed to update user password"
 }
