@@ -69,5 +69,7 @@
   "REVIEW_FAILED_TO_GET_FOR_UPDATING": "Жаңартылған шолуды алу мүмкін болмады",
   "REVIEW_FAILED_TO_UPDATE": "Шолуды жаңарту мүмкін болмады",
   "REVIEW_FAILED_TO_GET": "Тексеру мүмкін болмады",
-  "REVIEW_FAILED_TO_DELETE": "Пікірді жою мүмкін болмады"
+  "REVIEW_FAILED_TO_DELETE": "Пікірді жою мүмкін болмады",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Жарамсыз ескі құпия сөз",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды"
 }

@@ -69,5 +69,7 @@
   "REVIEW_FAILED_TO_GET_FOR_UPDATING": "Sharhni yangilashda xatolik",
   "REVIEW_FAILED_TO_UPDATE": "Sharhni yangilab bo'lmadi",
   "REVIEW_FAILED_TO_GET": "Sharhni olishda xatolik",
-  "REVIEW_FAILED_TO_DELETE": "Sharhni o'chirib bo'lmadi"
+  "REVIEW_FAILED_TO_DELETE": "Sharhni o'chirib bo'lmadi",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Eski parol noto'g'ri",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Foydalanuvchi parolini yangilab bo'lmadi"
 }

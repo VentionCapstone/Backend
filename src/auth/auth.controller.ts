@@ -17,6 +17,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
 import { AuthService } from './auth.service';
 import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
+import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
 
 @ApiTags('auth')
@@ -131,5 +132,19 @@ export class AuthController {
   @Put('email')
   updateEmail(@Body() body: EmailUpdateDto, @CurrentUser() user: AuthUser) {
     return this.authService.updateEmailRequest(body, user);
+  }
+
+  @ApiOperation({ summary: 'Update password' })
+  @ApiBearerAuth()
+  @ApiBadRequestResponse({ description: 'Invalid old password' })
+  @LangQuery()
+  @UseGuards(UserGuard)
+  @Put('password')
+  updatePassword(
+    @CurrentUser() user: AuthUser,
+    @Body() body: PasswordUpdateDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.updatePassword(user, body, res);
   }
 }
