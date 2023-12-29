@@ -43,13 +43,19 @@ export class AuthService {
       if (password !== confirm_password)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
 
-      const hashed_password: string = await bcrypt.hash(password, 12);
+      const hashed_password: string = await bcrypt.hash(
+        password,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
 
       const newUser = await this.prismaService.user.create({
         data: { email, password: hashed_password },
       });
       const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
       const activationLink = await this.verificationService.send(newUser.email);
 
       await this.prismaService.user.update({
@@ -74,7 +80,10 @@ export class AuthService {
       if (!isMatchPass) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
@@ -136,7 +145,10 @@ export class AuthService {
       if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
         where: { id: userId },
@@ -195,7 +207,10 @@ export class AuthService {
       if (!isMatchPass)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_INVALID_OLD_PASS);
 
-      const hashed_password: string = await bcrypt.hash(newPassword, 12);
+      const hashed_password: string = await bcrypt.hash(
+        newPassword,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
       await this.prismaService.user.update({
         data: { password: hashed_password },
         where: { id: user.id },
