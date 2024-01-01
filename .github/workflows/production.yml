@@ -5,7 +5,7 @@ on:
     branches: ['master']
 
 env:
-  DOCKERHUB_IMAGE_NAME: vention-booking-prod
+  DOCKERHUB_IMAGE_NAME: vention-booking
   DOCKER_CONTAINER_NAME: backend-server
 
 jobs:
