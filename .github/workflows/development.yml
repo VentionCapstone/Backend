@@ -5,7 +5,7 @@ on:
     branches: ['develop']
 
 env:
-  DOCKERHUB_IMAGE_NAME: vention-booking-dev
+  DOCKERHUB_IMAGE_NAME: vention-booking
   DOCKER_CONTAINER_NAME: backend-server
 
 jobs:
@@ -41,8 +41,6 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY }} ./docker-compose.ci.yml ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST_DEV }}:/$(pwd)/docker-compose.yml
-            scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY }} ./.env.development ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST_DEV }}:/$(pwd)/.env
             docker-compose down
             docker-compose rm -f ${{env.DOCKER_CONTAINER_NAME}}
             docker-compose pull ${{env.DOCKER_CONTAINER_NAME}}
