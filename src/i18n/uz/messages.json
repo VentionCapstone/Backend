@@ -3,6 +3,7 @@
   "AUTH_LOGOUT_SUCCESS": "Tizimdan muvaffaqiyatli chiqarildi",
   "AUTH_EMAIL_VERIFIED_SUCCESS": "Elektron pochta muvaffaqiyatli tasdiqlandi",
   "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Elektron pochtani yangilash so'rovi yuborildi, elektron pochtangizni tekshiring",
+  "AUTH_PASSWORD_UPDATE_SUCCESS": "Parol muvaffaqiyatli yangilandi, elektron pochta manzilingizni qayta tasdiqlang",
 
   "AMENITY_ADD_SUCCESS": "Qulayliklar muvaffaqiyatli qo'shildi",
   "AMENITY_UPDATE_SUCCESS": "Qulayliklar muvaffaqiyatli yangilandi",

@@ -46,7 +46,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
 
       this.logger.error(
-        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorMessage: ${key}, cause: ${message}`
+        `method: ${request.method}, to: ${request.originalUrl}, status: ${status}, errorKey: ${key}, errorMessage: ${message}, cause: ${exception.message}`
       );
 
       if (!knownException) return response.status(status).json(defaultResponse);

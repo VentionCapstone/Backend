@@ -44,8 +44,8 @@ export class UserService {
         success: true,
         data: users,
       };
-    } catch {
-      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET_LIST);
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET_LIST, error.message);
     }
   }
 
@@ -73,7 +73,7 @@ export class UserService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.USER_FAILED_TO_GET, error.message);
     }
   }
 
@@ -91,7 +91,7 @@ export class UserService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_GET);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_GET, error.message);
     }
   }
 
@@ -138,7 +138,7 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_ADD);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_ADD, error.message);
     }
   }
 
@@ -176,7 +176,7 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_UPDATE, error.message);
     }
   }
 
@@ -199,7 +199,7 @@ export class UserService {
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE);
+      throw new GlobalException(ErrorsTypes.USER_PROFILE_FAILED_TO_DELETE, error.message);
     }
   }
 }

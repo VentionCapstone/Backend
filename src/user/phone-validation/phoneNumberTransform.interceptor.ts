@@ -1,12 +1,6 @@
-import {
-  BadRequestException,
-  CallHandler,
-  ExecutionContext,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
-import ErrorsTypes from 'src/errors/errors.enum';
 
 export class PhoneNumberTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -21,7 +15,7 @@ export class PhoneNumberTransformInterceptor implements NestInterceptor {
       request.body.phoneNumber = this.formatPhoneNumber(phoneNumber);
       return;
     }
-    throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_PHONE_NUMBER);
+    return;
   }
 
   private formatPhoneNumber(phoneNumber: string): string {

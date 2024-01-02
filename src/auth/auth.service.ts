@@ -19,6 +19,7 @@ import { AuthUser } from 'src/common/types/AuthUser.type';
 import { translateMessage } from 'src/helpers/translateMessage.helper';
 import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from '../prisma/prisma.service';
+import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
 
 @Injectable()
@@ -42,13 +43,19 @@ export class AuthService {
       if (password !== confirm_password)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
 
-      const hashed_password: string = await bcrypt.hash(password, 12);
+      const hashed_password: string = await bcrypt.hash(
+        password,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
 
       const newUser = await this.prismaService.user.create({
         data: { email, password: hashed_password },
       });
       const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
       const activationLink = await this.verificationService.send(newUser.email);
 
       await this.prismaService.user.update({
@@ -73,7 +80,10 @@ export class AuthService {
       if (!isMatchPass) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
@@ -135,7 +145,10 @@ export class AuthService {
       if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, 12);
+      const hashedRefreshToken = await bcrypt.hash(
+        tokens.refresh_token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
         where: { id: userId },
@@ -180,6 +193,44 @@ export class AuthService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_EMAIL, error.message);
+    }
+  }
+
+  async updatePassword(authUser: AuthUser, body: PasswordUpdateDto, res: Response) {
+    try {
+      const { oldPassword, newPassword } = body;
+
+      const user = await this.prismaService.user.findUnique({ where: { id: authUser.id } });
+      if (!user) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+
+      const isMatchPass = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatchPass)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_INVALID_OLD_PASS);
+
+      const hashed_password: string = await bcrypt.hash(
+        newPassword,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
+      await this.prismaService.user.update({
+        data: { password: hashed_password },
+        where: { id: user.id },
+      });
+
+      res.clearCookie('refresh_token');
+
+      const activationLink = await this.verificationService.send(user.email);
+      await this.prismaService.user.update({
+        data: { activationLink, isEmailVerified: false },
+        where: { id: user.id },
+      });
+
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_PASSWORD_UPDATE_SUCCESS),
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_PASSWORD, error.message);
     }
   }
 

@@ -72,5 +72,7 @@
   "REVIEW_FAILED_TO_DELETE": "Bewertung konnte nicht gelöscht werden",
   "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Ungültige Zahlungsoption",
   "BAD_REQUEST_PAYMENT_FAILED": "Zahlung fehlgeschlagen",
-  "PAYMENT_FAILED_TO_PROCESS": "Die Zahlung konnte nicht verarbeitet werden"
+  "PAYMENT_FAILED_TO_PROCESS": "Die Zahlung konnte nicht verarbeitet werden",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Ungültiges altes Passwort",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden"
 }

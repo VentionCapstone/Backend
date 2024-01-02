@@ -3,7 +3,10 @@ import * as dayjs from 'dayjs';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrderAndFilter, OrderBy } from './dto/orderAndFilter.dto';
+import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
+import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
+import { SortOrder } from 'src/enums/sortOrder.enum';
+import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
 export class AccommodationService {
@@ -155,6 +158,8 @@ export class AccommodationService {
         where: { id },
         include: {
           address: true,
+          media: true,
+          amenities: true,
         },
       });
     } catch (error) {
@@ -199,22 +204,38 @@ export class AccommodationService {
     }
   }
 
-  async getUserAccommodations(ownerId: string) {
-    let accommodation;
+  async getUserAccommodations(ownerId: string, options: GetUserAccommodationsDto) {
     try {
-      accommodation = await this.prisma.accommodation.findMany({
+      const { page, limit, includeDeleted } = options;
+      const findAccommodationsQueryObj: any = {
         where: { ownerId },
         include: {
           address: true,
         },
-      });
+      };
+
+      if (page && limit) {
+        findAccommodationsQueryObj.skip = (+page - 1) * +limit;
+        findAccommodationsQueryObj.take = +limit;
+      }
+
+      if (includeDeleted === true) {
+        findAccommodationsQueryObj.where = { ...findAccommodationsQueryObj.where, isDeleted: true };
+      }
+
+      if (includeDeleted === false) {
+        findAccommodationsQueryObj.where = {
+          ...findAccommodationsQueryObj.where,
+          isDeleted: false,
+        };
+      }
+      return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
-    return accommodation;
   }
 
-  async getAllAccommodations(options: OrderAndFilter) {
+  async getAllAccommodations(options: OrderAndFilterDto) {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
@@ -259,7 +280,20 @@ export class AccommodationService {
     }
   }
 
-  private generateFindAllQueryObj(options: OrderAndFilter) {
+  private generateFindAllQueryObj(options: OrderAndFilterDto) {
+    const {
+      minPrice,
+      maxPrice,
+      minRooms,
+      maxRooms,
+      minPeople,
+      maxPeople,
+      page,
+      limit,
+      orderByPeople,
+      orderByPrice,
+      orderByRoom,
+    } = options;
     const findManyOptions: any = {
       select: {
         id: true,
@@ -278,49 +312,39 @@ export class AccommodationService {
       where: {
         isDeleted: false,
         price: {
-          gte: options.minPrice,
-          lte: options.maxPrice,
+          gte: minPrice,
+          lte: maxPrice,
         },
         numberOfRooms: {
-          gte: options.minRooms,
-          lte: options.maxRooms,
+          gte: minRooms,
+          lte: maxRooms,
         },
         allowedNumberOfPeople: {
-          gte: options.minPeople,
-          lte: options.maxPeople,
+          gte: minPeople,
+          lte: maxPeople,
         },
       },
 
-      skip: (options.page! - 1) * options.limit!,
-      take: options.limit,
-
-      orderBy: [],
+      skip: (page! - 1) * limit!,
+      take: limit,
     };
 
-    if (options.orderByPeople) {
-      findManyOptions.orderBy.push({
-        [OrderBy.NUMBER_OF_PEOPLE]: options.orderByPeople,
-      });
-    }
+    const orderingBy = this.generateOderingArray<Record<OrderBy, string>>([
+      [orderByPeople, OrderBy.NUMBER_OF_PEOPLE],
+      [orderByPrice, OrderBy.PRICE],
+      [orderByRoom, OrderBy.NUMBER_OF_ROOMS],
+    ]);
 
-    if (options.orderByPrice) {
-      findManyOptions.orderBy.push({
-        [OrderBy.PRICE]: options.orderByPrice,
-      });
-    }
-
-    if (options.orderByRoom) {
-      findManyOptions.orderBy.push({
-        [OrderBy.NUMBER_OF_ROOMS]: options.orderByRoom,
-      });
-    }
+    findManyOptions.orderBy = orderingBy;
 
     return findManyOptions;
   }
 
-  async getAccommodationReviews(accommodationId: string) {
+  async getAccommodationReviews(accommodationId: string, options: OrderAndFilterReviewDto) {
     try {
-      const findAllReviewsQuery = this.prisma.review.findMany({
+      const { orderByDate, orderByRate, page, limit } = options;
+
+      const findAllReviewsQueryObj: any = {
         where: { accommodationId },
         include: {
           user: {
@@ -331,11 +355,30 @@ export class AccommodationService {
               profile: {
                 select: {
                   country: true,
+                  imageUrl: true,
                 },
               },
             },
           },
         },
+      };
+
+      if (page && limit) {
+        findAllReviewsQueryObj.skip = (+page - 1) * +limit;
+        findAllReviewsQueryObj.take = +limit;
+      }
+
+      const orderingBy = this.generateOderingArray<Record<reviewOrderBy, string>>([
+        [orderByDate, reviewOrderBy.CREATEDAT_DATE],
+        [orderByRate, reviewOrderBy.RATE],
+      ]);
+
+      findAllReviewsQueryObj.orderBy = orderingBy;
+
+      const findAllReviewsQuery = this.prisma.review.findMany(findAllReviewsQueryObj);
+
+      const countAccommodationReviewsQuery = this.prisma.review.count({
+        where: { accommodationId },
       });
 
       const reviewsCountQuery = this.prisma.review.groupBy({
@@ -351,10 +394,11 @@ export class AccommodationService {
         },
       });
 
-      const [reviews, ratingCounts, averageRating] = await Promise.all([
+      const [reviews, ratingCounts, averageRating, totalCount] = await Promise.all([
         findAllReviewsQuery,
         reviewsCountQuery,
         averageRateQuery,
+        countAccommodationReviewsQuery,
       ]);
 
       const {
@@ -363,7 +407,7 @@ export class AccommodationService {
 
       const countByRating = this.getCountByRating(ratingCounts);
 
-      return { data: reviews, countByRating, averageRate };
+      return { data: reviews, countByRating, averageRate, totalCount };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
@@ -380,5 +424,18 @@ export class AccommodationService {
     }
 
     return countByRating;
+  }
+
+  private generateOderingArray<T>(array: [value: SortOrder | undefined, columnName: keyof T][]) {
+    const orderingObjsArray = [];
+
+    for (const order of array) {
+      if (order[0]) {
+        const orderingObj = { [order[1]]: order[0] };
+        orderingObjsArray.push(orderingObj);
+      }
+    }
+
+    return orderingObjsArray;
   }
 }

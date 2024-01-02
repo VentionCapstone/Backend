@@ -47,17 +47,17 @@ model Accommodation {
   id                    String    @id @default(uuid())
   title                 String
   addressId             String
-  thumbnailUrl          String
+  thumbnailUrl          String?
   ownerId               String
   squareMeters          Int
   numberOfRooms         Int
   price                 Int
   allowedNumberOfPeople Int
-  availableFrom         DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableFrom         DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
   availableTo           DateTime  @db.Date
   timezoneOffset        Int
   description           String?
-  previewImgUrl         String
+  previewImgUrl         String?
   isDeleted             Boolean   @default(false)
   address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
   amenities             Amenity[]

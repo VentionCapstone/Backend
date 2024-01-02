@@ -72,5 +72,7 @@
   "REVIEW_FAILED_TO_DELETE": "Sharhni o'chirib bo'lmadi",
   "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Noto'g'ri to'lov usuli",
   "BAD_REQUEST_PAYMENT_FAILED": "To'lov muvaffaqiyatsiz",
-  "PAYMENT_FAILED_TO_PROCESS": "To'lovni amalga oshirishda xatolik"
+  "PAYMENT_FAILED_TO_PROCESS": "To'lovni amalga oshirishda xatolik",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Eski parol noto'g'ri",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Foydalanuvchi parolini yangilab bo'lmadi"
 }

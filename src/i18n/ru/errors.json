@@ -72,5 +72,7 @@
   "REVIEW_FAILED_TO_DELETE": "Не удалось удалить отзыв",
   "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Неверный вариант оплаты",
   "BAD_REQUEST_PAYMENT_FAILED": "Ошибка оплаты",
-  "PAYMENT_FAILED_TO_PROCESS": "Не удалось обработать платеж"
+  "PAYMENT_FAILED_TO_PROCESS": "Не удалось обработать платеж",
+  "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Неверный старый пароль",
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя."
 }

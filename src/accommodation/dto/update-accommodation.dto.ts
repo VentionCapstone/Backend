@@ -1,11 +1,29 @@
-import { Transform } from 'class-transformer';
-import { IsDate, IsInt, IsOptional, IsString, IsUrl, Max, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsString,
+  IsInt,
+  IsDate,
+  IsOptional,
+  IsUrl,
+  Max,
+  ValidateNested,
+  Min,
+} from 'class-validator';
+import UpdateAddressDto from './update-address.dto';
 
 export default class UpdateAccommodationDto {
   @IsOptional()
   @IsString()
   @IsUrl()
   thumbnailUrl: string;
+
+  @IsOptional()
+  @IsString()
+  previewImgUrl: string;
+
+  @IsOptional()
+  @IsString()
+  title: string;
 
   @IsOptional()
   @IsInt()
@@ -46,4 +64,8 @@ export default class UpdateAccommodationDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ValidateNested()
+  @Type(() => UpdateAddressDto)
+  address: UpdateAddressDto;
 }

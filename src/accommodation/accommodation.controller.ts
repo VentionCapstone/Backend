@@ -16,28 +16,30 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AccommodationService } from './accommodation.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
-import CreateAccommodationAndAddressDto from './dto/create-accommodation-address.dto';
-import UpdateAccommodationAndAddressDto from './dto/update-accommodation-address.dto';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
-  getSchemaPath,
-  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
-import { UserGuard } from 'src/common/guards/user.guard';
-import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
-import { OrderAndFilter } from './dto/orderAndFilter.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { ReviewDto } from 'src/reviews/dto/review-response.dto';
+import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import { ReviewDto } from 'src/reviews/dto/review-response.dto';
+import { AccommodationService } from './accommodation.service';
+import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
+import CreateAccommodationDto from './dto/create-accommodation.dto';
+import { OrderAndFilterReviewDto } from './dto/get-review.dto';
+import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
+import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
+import SingleAccommodationResponseDto from './dto/single-accommodation.dto';
+import UpdateAccommodationDto from './dto/update-accommodation.dto';
 
 @ApiTags('accommodation')
 @Controller('accommodations')
@@ -62,13 +64,11 @@ export class AccommodationController {
   @LangQuery()
   @Post('/')
   async createAccommodation(
-    @Body() body: CreateAccommodationAndAddressDto,
+    @Body() body: CreateAccommodationDto,
     @CurrentUser('id') userId: string
   ) {
     const createAccommodationAndAdress = {
-      ...body.accommodation,
-      previewImgUrl: body.accommodation.previewImgUrl || 'none',
-      thumbnailUrl: body.accommodation.thumbnailUrl || 'none',
+      ...body,
       ownerId: userId,
       address: {
         create: body.address,
@@ -179,12 +179,12 @@ export class AccommodationController {
   @LangQuery()
   @Put('/:id')
   async updateAccommodation(
-    @Body() body: UpdateAccommodationAndAddressDto,
+    @Body() body: UpdateAccommodationDto,
     @Param('id') id: string,
     @CurrentUser('id') userId: string
   ) {
     const updateAccommodationAndAdress = {
-      ...body.accommodation,
+      ...body,
       address: {
         update: body.address,
       },
@@ -289,7 +289,7 @@ export class AccommodationController {
     },
   })
   @Get('/')
-  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilter) {
+  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
     const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
     return { success: true, ...data };
   }
@@ -314,15 +314,16 @@ export class AccommodationController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiBearerAuth()
-  @UseGuards(UserGuard)
-  @Get('/getAll')
-  async findAll(@CurrentUser('id') userId: string) {
-    const accommodations = await this.accommodationService.getUserAccommodations(userId);
+  @Get('/:userId/accommodations')
+  async getUserAccommodations(
+    @Param('userId') userId: string,
+    @Query() options: GetUserAccommodationsDto
+  ) {
+    const accommodations = await this.accommodationService.getUserAccommodations(userId, options);
     return { success: true, data: accommodations };
   }
 
-  @ApiOperation({ summary: 'Get all reviews to this accommodation' })
+  @ApiOperation({ summary: 'Get reviews to this accommodation' })
   @ApiResponse({
     status: 200,
     description: 'Reviews of this accommodation',
@@ -351,13 +352,15 @@ export class AccommodationController {
     status: 500,
     description: 'Internal Server Error',
   })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
   @Get('/:accommodationId/reviews')
-  async getAllReviews(@Param('accommodationId') accommodationId: string) {
-    const review = await this.accommodationService.getAccommodationReviews(accommodationId);
+  async getAllReviews(
+    @Param('accommodationId') accommodationId: string,
+    @Query() limitAndPage: OrderAndFilterReviewDto
+  ) {
+    const review = await this.accommodationService.getAccommodationReviews(
+      accommodationId,
+      limitAndPage
+    );
     return { success: true, ...review };
   }
 
@@ -365,7 +368,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'Accommodation with provided id',
-    type: AccommodationResponseDto,
+    type: SingleAccommodationResponseDto,
   })
   @ApiUnauthorizedResponse({
     status: 401,

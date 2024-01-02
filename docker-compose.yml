@@ -21,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: backend-server
     restart: always
     environment:
       DATABASE_URL: ${DATABASE_URL}
