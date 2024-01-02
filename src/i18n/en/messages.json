@@ -1,0 +1,13 @@
+{
+  "AUTH_REGISTER_SUCCESS": "User created successfully, please check your email to verify your account",
+  "AUTH_LOGOUT_SUCCESS": "User logged out successfully",
+  "AUTH_EMAIL_VERIFIED_SUCCESS": "Email verified successfully",
+  "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Email update request sent, check your email",
+  "AUTH_PASSWORD_UPDATE_SUCCESS": "Password updated successfully, please verify your email again",
+
+  "AMENITY_ADD_SUCCESS": "Success adding amenities",
+  "AMENITY_UPDATE_SUCCESS": "Success updating amenities",
+  "AMENITY_DELETE_SUCCESS": "Success deleting amenities",
+
+  "USER_PROFILE_DELETE_SUCCESS": "Profile successfully deleted"
+}

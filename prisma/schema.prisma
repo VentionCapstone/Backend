@@ -1,5 +1,164 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+model User {
+  id                 String         @id @default(uuid())
+  firstName          String?
+  lastName           String?
+  email              String         @unique
+  password           String
+  role               Role           @default(USER)
+  isEmailVerified    Boolean        @default(false)
+  isVerified         Boolean        @default(false)
+  isDeleted          Boolean        @default(false)
+  hashedRefreshToken String?
+  activationLink     String?
+  profile            UserProfile?
+  booking            Booking[]
+  review             Review[]
+  notifications      Notification[]
+}
+
+model UserProfile {
+  id          String  @id @default(uuid())
+  phoneNumber String
+  imageUrl    String?
+  gender      Gender
+  country     String
+  language    String
+  uiTheme     UiTheme @default(LIGHT)
+  description String?
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  userId          String
+  accommodationId String
+  paymentId       String?
+  startDate       DateTime      @db.Date
+  endDate         DateTime      @db.Date
+  status          Status        @default(PENDING)
+  user            User          @relation(fields: [userId], references: [id])
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  payment         Payment?      @relation(fields: [paymentId], references: [id])
+  review          Review?
+}
+
+model Accommodation {
+  id                    String    @id @default(uuid())
+  title                 String
+  addressId             String
+  thumbnailUrl          String?
+  ownerId               String
+  squareMeters          Int
+  numberOfRooms         Int
+  price                 Int
+  allowedNumberOfPeople Int
+  availableFrom         DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableTo           DateTime  @db.Date
+  timezoneOffset        Int
+  description           String?
+  previewImgUrl         String?
+  isDeleted             Boolean   @default(false)
+  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  amenities             Amenity[]
+  media                 Media[]
+  reviews               Review[]
+  booking               Booking[]
+}
+
+model Amenity {
+  id                  String        @id @default(uuid())
+  hasWifi             Boolean       @default(false)
+  hasParking          Boolean       @default(false)
+  hasSwimmingPool     Boolean       @default(false)
+  hasPetAllowance     Boolean       @default(false)
+  isQuiteArea         Boolean       @default(false)
+  hasBackyard         Boolean       @default(false)
+  hasSmokingAllowance Boolean       @default(false)
+  isChildFriendly     Boolean       @default(false)
+  hasHospitalNearby   Boolean       @default(false)
+  isCloseToCenter     Boolean       @default(false)
+  hasLaundryService   Boolean       @default(false)
+  hasKitchen          Boolean       @default(false)
+  hasAirConditioning  Boolean       @default(false)
+  hasTv               Boolean       @default(false)
+  hasAirportTransfer  Boolean       @default(false)
+  accommodationId     String        @unique
+  otherAmenities      String?
+  accommodation       Accommodation @relation(fields: [accommodationId], references: [id])
+}
+
+model Media {
+  id              String        @id @default(uuid())
+  imageUrl        String
+  thumbnailUrl    String
+  accommodationId String
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+}
+
+model Notification {
+  id      String @id @default(uuid())
+  type    String
+  title   String
+  message String
+  users   User[]
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  type          String
+  transactionId String
+  totalAmount   Float
+  status        Status
+  booking       Booking[]
+}
+
+model Address {
+  id            String          @id @default(uuid())
+  street        String
+  city          String
+  country       String
+  zipCode       String
+  latitude      Float
+  longitude     Float
+  accommodation Accommodation[]
+}
+
+model Review {
+  id              String        @id @default(uuid())
+  userId          String
+  accommodationId String
+  feedback        String
+  bookingId       String        @unique
+  rating          Int
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id])
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum UiTheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+  COMPLETED
+}
 
 generator client {
   provider = "prisma-client-js"
