@@ -24,12 +24,18 @@ export class PaymentService {
       const paymentIntent = await this.stripeService.createPaymentIntent(
         Math.round(totalAmount * 100)
       );
+      await this.prismaService.payment.create({
+        data: {
+          type: createPaymentDto.paymentOption,
+          totalAmount,
+          status: Status.PENDING,
+        },
+      });
       return paymentIntent.client_secret;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
   }
-
   async processCashPayment(createPaymentDto: CreatePaymentDto) {
     try {
       const totalAmount = await this.getTotalAmount(createPaymentDto.bookingId);
