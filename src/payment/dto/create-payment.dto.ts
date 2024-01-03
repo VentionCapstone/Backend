@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export enum PaymentOption {
   cash = 'cash',
@@ -11,6 +11,6 @@ export class CreatePaymentDto {
   paymentOption: PaymentOption;
 
   @IsNotEmpty()
-  @IsNumber()
-  totalAmount: number;
+  @IsString()
+  bookingId: string;
 }
