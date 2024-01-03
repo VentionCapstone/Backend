@@ -74,5 +74,6 @@
   "BAD_REQUEST_PAYMENT_FAILED": "Ошибка оплаты",
   "PAYMENT_FAILED_TO_PROCESS": "Не удалось обработать платеж",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Неверный старый пароль",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя."
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя.",
+  "NOT_FOUND_PAYMENT": "Платеж не найден"
 }

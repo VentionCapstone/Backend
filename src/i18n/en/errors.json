@@ -74,5 +74,6 @@
   "BAD_REQUEST_PAYMENT_FAILED": "Payment failed",
   "PAYMENT_FAILED_TO_PROCESS": "Failed to process payment",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Invalid old password",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Failed to update user password"
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Failed to update user password",
+  "NOT_FOUND_PAYMENT": "Payment not found"
 }

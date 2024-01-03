@@ -74,5 +74,6 @@
   "BAD_REQUEST_PAYMENT_FAILED": "Төлем сәтсіздік көрсетті",
   "PAYMENT_FAILED_TO_PROCESS": "Төлем өңделмеді",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Жарамсыз ескі құпия сөз",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды"
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды",
+  "NOT_FOUND_PAYMENT": "Төлем табылмады"
 }

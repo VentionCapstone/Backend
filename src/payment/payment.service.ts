@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from '../stripe/stripe.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import dayjs from 'dayjs';
+import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -24,18 +25,47 @@ export class PaymentService {
       const paymentIntent = await this.stripeService.createPaymentIntent(
         Math.round(totalAmount * 100)
       );
-      await this.prismaService.payment.create({
+      const payment = await this.prismaService.payment.create({
         data: {
           type: createPaymentDto.paymentOption,
           totalAmount,
           status: Status.PENDING,
         },
       });
+      await this.prismaService.booking.update({
+        data: { paymentId: payment.id },
+        where: { id: createPaymentDto.bookingId },
+      });
       return paymentIntent.client_secret;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
   }
+
+  async confirmPaymentProcess(confirmPaymentDto: ConfirmPaymentDto) {
+    const bookingDetails = await this.prismaService.booking.findFirst({
+      where: { id: confirmPaymentDto.bookingId },
+    });
+    if (bookingDetails == null) {
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
+    }
+    if (bookingDetails.paymentId === null) {
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_PAYMENT);
+    }
+    await this.prismaService.payment.update({
+      data: { status: Status.COMPLETED },
+      where: { id: bookingDetails.paymentId },
+    });
+    await this.prismaService.booking.update({
+      data: { status: Status.COMPLETED },
+      where: { id: confirmPaymentDto.bookingId },
+    });
+    return {
+      success: true,
+      message: await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS),
+    };
+  }
+
   async processCashPayment(createPaymentDto: CreatePaymentDto) {
     try {
       const totalAmount = await this.getTotalAmount(createPaymentDto.bookingId);

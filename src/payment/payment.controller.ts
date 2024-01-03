@@ -5,6 +5,7 @@ import ErrorsTypes from '../errors/errors.enum';
 import { GlobalException } from '../exceptions/global.exception';
 import { CreatePaymentDto, PaymentOption } from './dto/create-payment.dto';
 import { PaymentService } from './payment.service';
+import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 
 type PaymentHandler = (
   createPaymentDto: CreatePaymentDto
@@ -30,6 +31,14 @@ export class PaymentController {
           paymentOption: createPaymentDto.paymentOption || PaymentOption.card,
         }),
     };
+  }
+
+  @Post('confirm-payment')
+  @ApiOperation({ summary: 'Confirm payment' })
+  @ApiResponse({ status: 200, description: 'Payment processed successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto) {
+    return this.paymentService.confirmPaymentProcess(confirmPaymentDto);
   }
 
   @Post('')

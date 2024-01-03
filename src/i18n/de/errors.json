@@ -74,5 +74,6 @@
   "BAD_REQUEST_PAYMENT_FAILED": "Zahlung fehlgeschlagen",
   "PAYMENT_FAILED_TO_PROCESS": "Die Zahlung konnte nicht verarbeitet werden",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Ungültiges altes Passwort",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden"
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden",
+  "NOT_FOUND_PAYMENT": "Zahlung nicht gefunden"
 }
