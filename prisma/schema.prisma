@@ -10,6 +10,7 @@ model User {
   isDeleted          Boolean        @default(false)
   hashedRefreshToken String?
   activationLink     String?
+  passwordResetToken String?
   profile            UserProfile?
   booking            Booking[]
   review             Review[]
