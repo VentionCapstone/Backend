@@ -75,5 +75,6 @@
   "PAYMENT_FAILED_TO_PROCESS": "To'lovni amalga oshirishda xatolik",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Eski parol noto'g'ri",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Foydalanuvchi parolini yangilab bo'lmadi",
-  "NOT_FOUND_PAYMENT": "To'lov topilmadi"
+  "NOT_FOUND_PAYMENT": "To'lov topilmadi",
+  "PAYMNET_FAILED_WHILE_CONFIRM": "To'lov tasdiqlanmadi"
 }

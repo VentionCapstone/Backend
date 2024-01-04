@@ -33,4 +33,13 @@ export class StripeService {
       currency: 'usd',
     });
   }
+
+  async confirmPayment(clientSecret: string): Promise<Stripe.PaymentIntent> {
+    try {
+      const paymentIntent = await this.stripe.paymentIntents.confirm(clientSecret);
+      return paymentIntent;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
+    }
+  }
 }

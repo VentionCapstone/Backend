@@ -11,5 +11,6 @@
 
   "USER_PROFILE_DELETE_SUCCESS": "Profil erfolgreich gelöscht",
 
-  "BOOKING_PAYMENT_SUCCESS": "Zahlung erfolgreich verarbeitet"
+  "BOOKING_PAYMENT_SUCCESS": "Zahlung erfolgreich verarbeitet",
+  "BOOKING_PAYMENT_FAILED": "Zahlungsbestätigung fehlgeschlagen: Zahlungsstatus ist nicht erfolgreich"
 }

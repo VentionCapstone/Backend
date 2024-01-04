@@ -11,5 +11,6 @@
 
   "USER_PROFILE_DELETE_SUCCESS": "Foydalanuvchi muvaffaqiyatli o'chirildi",
 
-  "BOOKING_PAYMENT_SUCCESS": "To'lov muvaffaqiyatli amalga oshirildi"
+  "BOOKING_PAYMENT_SUCCESS": "To'lov muvaffaqiyatli amalga oshirildi",
+  "BOOKING_PAYMENT_FAILED": "To'lov tasdiqlanmadi: To'lov holati muvaffaqiyatli bajarilmagan"
 }

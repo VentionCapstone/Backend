@@ -46,24 +46,42 @@ export class PaymentService {
     const bookingDetails = await this.prismaService.booking.findFirst({
       where: { id: confirmPaymentDto.bookingId },
     });
+
     if (bookingDetails == null) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
     }
+
     if (bookingDetails.paymentId === null) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_PAYMENT);
     }
-    await this.prismaService.payment.update({
-      data: { status: Status.COMPLETED },
-      where: { id: bookingDetails.paymentId },
-    });
-    await this.prismaService.booking.update({
-      data: { status: Status.COMPLETED },
-      where: { id: confirmPaymentDto.bookingId },
-    });
-    return {
-      success: true,
-      message: await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS),
-    };
+
+    try {
+      const confirmedPayment = await this.stripeService.confirmPayment(
+        confirmPaymentDto.client_secret
+      );
+
+      if (confirmedPayment.status === 'succeeded') {
+        await this.prismaService.payment.update({
+          data: { status: Status.COMPLETED },
+          where: { id: bookingDetails.paymentId },
+        });
+        await this.prismaService.booking.update({
+          data: { status: Status.COMPLETED },
+          where: { id: confirmPaymentDto.bookingId },
+        });
+
+        return {
+          success: true,
+          message: await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS),
+        };
+      }
+      return {
+        success: false,
+        message: await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_FAILED),
+      };
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.PAYMNET_FAILED_WHILE_CONFIRM, error.message);
+    }
   }
 
   async processCashPayment(createPaymentDto: CreatePaymentDto) {

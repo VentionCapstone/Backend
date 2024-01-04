@@ -11,5 +11,6 @@
 
   "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален",
 
-  "BOOKING_PAYMENT_SUCCESS": "Платеж успешно обработан"
+  "BOOKING_PAYMENT_SUCCESS": "Платеж успешно обработан",
+  "BOOKING_PAYMENT_FAILED": "Подтверждение платежа не удалось: Статус платежа не выполнен успешно"
 }
