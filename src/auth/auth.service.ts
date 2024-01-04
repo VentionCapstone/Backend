@@ -16,9 +16,9 @@ import { GlobalException } from 'src/exceptions/global.exception';
 import {
   EmailUpdateDto,
   ForgotPasswordEmailDto,
+  ForgotPasswordResetDto,
   LoginDto,
   RegisterDto,
-  ForgotPasswordResetDto,
 } from './dto';
 
 import { I18nService } from 'nestjs-i18n';
@@ -258,7 +258,12 @@ export class AuthService {
         }
       );
 
-      const hashedResetToken = await bcrypt.hash(token, parseInt(this.config.get('SALT_LENGTH')!));
+      const hashLimit = this.config.get('MAX_HASH_LENGTH')!;
+
+      const hashedResetToken = await bcrypt.hash(
+        token.length > hashLimit ? token.slice(-hashLimit) : token,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
 
       await this.prismaService.user.update({
         data: { passwordResetToken: hashedResetToken },
@@ -289,31 +294,48 @@ export class AuthService {
     }
   }
 
-  async forgotPasswordReset(body: ForgotPasswordResetDto) {
+  async validateForgotPasswordToken(token: string) {
     try {
-      const { token, newPassword, confirmPassword } = body;
-
-      if (newPassword !== confirmPassword)
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
-
       const decodedToken = await this.jwtService.verify(token, {
         secret: process.env.FORGOT_PASSWORD_RESET_TOKEN_KEY,
       });
 
       if (!decodedToken)
-        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
 
       const user = await this.prismaService.user.findUnique({ where: { id: decodedToken.userId } });
 
       if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       if (!user.passwordResetToken)
-        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const hashLimit = this.config.get('MAX_HASH_LENGTH')!;
+
+      if (token.length > hashLimit) {
+        token = token.slice(-hashLimit);
+      }
 
       const tokenMatch = await bcrypt.compare(token, user.passwordResetToken);
 
       if (!tokenMatch)
-        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      return user.id;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY, error.message);
+    }
+  }
+
+  async resetForgotPassword(body: ForgotPasswordResetDto) {
+    try {
+      const { token, newPassword, confirmPassword } = body;
+
+      if (newPassword !== confirmPassword)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
+
+      const userId = await this.validateForgotPasswordToken(token);
 
       const hashed_new_password: string = await bcrypt.hash(
         newPassword,
@@ -326,7 +348,7 @@ export class AuthService {
           hashedRefreshToken: null,
           passwordResetToken: null,
         },
-        where: { id: user.id },
+        where: { id: userId },
       });
 
       return {

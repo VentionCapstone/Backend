@@ -183,6 +183,6 @@ export class AuthController {
   @LangQuery()
   @Patch('forgot-password-reset')
   forgotPasswordReset(@Body() body: ForgotPasswordResetDto) {
-    return this.authService.forgotPasswordReset(body);
+    return this.authService.resetForgotPassword(body);
   }
 }
