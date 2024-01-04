@@ -13,7 +13,13 @@ import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { EmailUpdateDto, ForgotPasswordDto, LoginDto, RegisterDto, SetNewPasswordDto } from './dto';
+import {
+  EmailUpdateDto,
+  ForgotPasswordEmailDto,
+  LoginDto,
+  RegisterDto,
+  ForgotPasswordResetDto,
+} from './dto';
 
 import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
@@ -237,7 +243,7 @@ export class AuthService {
     }
   }
 
-  async forgotPasswordEmail(body: ForgotPasswordDto) {
+  async forgotPasswordEmail(body: ForgotPasswordEmailDto) {
     try {
       const { email } = body;
 
@@ -283,7 +289,7 @@ export class AuthService {
     }
   }
 
-  async forgotPasswordReset(body: SetNewPasswordDto) {
+  async forgotPasswordReset(body: ForgotPasswordResetDto) {
     try {
       const { token, newPassword, confirmPassword } = body;
 

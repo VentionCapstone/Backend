@@ -31,10 +31,10 @@ import { AuthService } from './auth.service';
 import {
   EmailUpdateDto,
   EmailVerificationDto,
-  ForgotPasswordDto,
+  ForgotPasswordEmailDto,
+  ForgotPasswordResetDto,
   LoginDto,
   RegisterDto,
-  SetNewPasswordDto,
 } from './dto';
 import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
@@ -171,7 +171,7 @@ export class AuthController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @LangQuery()
   @Post('forgot-password-email')
-  forgotPasswordEmail(@Body() body: ForgotPasswordDto) {
+  forgotPasswordEmail(@Body() body: ForgotPasswordEmailDto) {
     return this.authService.forgotPasswordEmail(body);
   }
 
@@ -181,7 +181,7 @@ export class AuthController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @LangQuery()
   @Patch('forgot-password-reset')
-  forgotPasswordReset(@Body() body: SetNewPasswordDto) {
+  forgotPasswordReset(@Body() body: ForgotPasswordResetDto) {
     return this.authService.forgotPasswordReset(body);
   }
 }
