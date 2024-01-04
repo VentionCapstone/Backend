@@ -12,7 +12,7 @@ export class ForgotPasswordResetDto {
   @IsStrongPassword()
   newPassword: string;
 
-  @ApiProperty({ example: 'Qwerty!2345', description: 'new password' })
+  @ApiProperty({ example: 'Qwerty!2345', description: 'confirm password' })
   @MinLength(8)
   @IsStrongPassword()
   confirmPassword: string;
