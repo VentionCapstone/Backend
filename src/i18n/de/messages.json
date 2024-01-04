@@ -4,6 +4,8 @@
   "AUTH_EMAIL_VERIFIED_SUCCESS": "E-Mail erfolgreich bestätigt",
   "AUTH_EMAIL_VERIFICATION_LINK_SENT": "E-Mail-Aktualisierungsanfrage gesendet, überprüfen Sie Ihre E-Mails",
   "AUTH_PASSWORD_UPDATE_SUCCESS": "Das Passwort wurde erfolgreich aktualisiert. Bitte bestätigen Sie Ihre E-Mail-Adresse erneut",
+  "AUTH_FORGOT_PASSWORD_EMAIL_SENT": "Link zum Festlegen eines neuen Passworts gesendet, bitte überprüfen Sie Ihre E-Mails",
+  "AUTH_FORGOT_PASSWORD_RESET_SUCCESS": "Passwort vergessen, neues Passwort erfolgreich gesetzt",
 
   "AMENITY_ADD_SUCCESS": "Erfolgreicher Zusatz von Annehmlichkeiten",
   "AMENITY_UPDATE_SUCCESS": "Erfolgreiche Aktualisierung der Annehmlichkeiten",

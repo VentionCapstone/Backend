@@ -4,6 +4,8 @@
   "AUTH_EMAIL_VERIFIED_SUCCESS": "Email verified successfully",
   "AUTH_EMAIL_VERIFICATION_LINK_SENT": "Email update request sent, check your email",
   "AUTH_PASSWORD_UPDATE_SUCCESS": "Password updated successfully, please verify your email again",
+  "AUTH_FORGOT_PASSWORD_EMAIL_SENT": "Link to set a new password sent, please check your email",
+  "AUTH_FORGOT_PASSWORD_RESET_SUCCESS": "Forgotten password, new password set successfully",
 
   "AMENITY_ADD_SUCCESS": "Success adding amenities",
   "AMENITY_UPDATE_SUCCESS": "Success updating amenities",
