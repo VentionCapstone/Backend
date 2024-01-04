@@ -1,9 +1,21 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiGoneResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -16,7 +28,14 @@ import { CookieOrHeaderGetter } from '../common/decorators/cookie-getter.decorat
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserGuard } from '../common/guards/user.guard';
 import { AuthService } from './auth.service';
-import { EmailUpdateDto, EmailVerificationDto, LoginDto, RegisterDto } from './dto';
+import {
+  EmailUpdateDto,
+  EmailVerificationDto,
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  SetNewPasswordDto,
+} from './dto';
 import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
 
@@ -146,5 +165,23 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.updatePassword(user, body, res);
+  }
+
+  @ApiOperation({ summary: 'Forgot password email' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @LangQuery()
+  @Post('forgot-password-email')
+  forgotPasswordEmail(@Body() body: ForgotPasswordDto) {
+    return this.authService.forgotPasswordEmail(body);
+  }
+
+  @ApiOperation({ summary: 'Forgot password reset' })
+  @ApiBadRequestResponse({ description: 'Passwords dont match' })
+  @ApiBadRequestResponse({ description: 'Invalid token' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @LangQuery()
+  @Patch('forgot-password-reset')
+  forgotPasswordReset(@Body() body: SetNewPasswordDto) {
+    return this.authService.forgotPasswordReset(body);
   }
 }

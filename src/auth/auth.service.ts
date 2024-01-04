@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   HttpException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,11 +13,12 @@ import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
+import { EmailUpdateDto, ForgotPasswordDto, LoginDto, RegisterDto, SetNewPasswordDto } from './dto';
 
 import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import { translateMessage } from 'src/helpers/translateMessage.helper';
+import { MailerService } from 'src/mailer/mailer.service';
 import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from '../prisma/prisma.service';
 import { PasswordUpdateDto } from './dto/update-password.dto';
@@ -29,7 +31,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly verificationService: VerificationSerivce,
     private readonly config: ConfigService,
-    private readonly i18n: I18nService
+    private readonly i18n: I18nService,
+    private readonly mailerService: MailerService
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -227,6 +230,102 @@ export class AuthService {
       return {
         success: true,
         message: translateMessage(this.i18n, MessagesTypes.AUTH_PASSWORD_UPDATE_SUCCESS),
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_PASSWORD, error.message);
+    }
+  }
+
+  async forgotPasswordEmail(body: ForgotPasswordDto) {
+    try {
+      const { email } = body;
+
+      const user = await this.prismaService.user.findUnique({ where: { email: email } });
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+      const userId = user.id;
+      const token = await this.jwtService.signAsync(
+        { userId },
+        {
+          secret: this.config.get('FORGOT_PASSWORD_RESET_TOKEN_KEY'),
+          expiresIn: this.config.get('FORGOT_PASSWORD_RESET_TOKEN_EXPIRY'),
+        }
+      );
+
+      const hashedResetToken = await bcrypt.hash(token, parseInt(this.config.get('SALT_LENGTH')!));
+
+      await this.prismaService.user.update({
+        data: { passwordResetToken: hashedResetToken },
+        where: { id: user.id },
+      });
+
+      const forgotPasswordLink = new URL(
+        `/forgot-password-reset?token=${token}`,
+        this.config.get('MAILER_CALLBACK_URL')
+      );
+
+      await this.mailerService.sendHtmlEmail(
+        email,
+        'Set new password',
+        `<p> Please use this <a href="${forgotPasswordLink}">link</a> to set a new password. </p>`
+      );
+
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_FORGOT_PASSWORD_EMAIL_SENT),
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(
+        ErrorsTypes.AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL,
+        error.message
+      );
+    }
+  }
+
+  async forgotPasswordReset(body: SetNewPasswordDto) {
+    try {
+      const { token, newPassword, confirmPassword } = body;
+
+      if (newPassword !== confirmPassword)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
+
+      const decodedToken = await this.jwtService.verify(token, {
+        secret: process.env.FORGOT_PASSWORD_RESET_TOKEN_KEY,
+      });
+
+      if (!decodedToken)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const user = await this.prismaService.user.findUnique({ where: { id: decodedToken.userId } });
+
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+
+      if (!user.passwordResetToken)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const tokenMatch = await bcrypt.compare(token, user.passwordResetToken);
+
+      if (!tokenMatch)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const hashed_new_password: string = await bcrypt.hash(
+        newPassword,
+        parseInt(this.config.get('SALT_LENGTH')!)
+      );
+
+      await this.prismaService.user.update({
+        data: {
+          password: hashed_new_password,
+          hashedRefreshToken: null,
+          passwordResetToken: null,
+        },
+        where: { id: user.id },
+      });
+
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_FORGOT_PASSWORD_RESET_SUCCESS),
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
