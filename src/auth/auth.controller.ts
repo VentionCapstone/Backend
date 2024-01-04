@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiGoneResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -177,7 +178,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Forgot password reset' })
   @ApiBadRequestResponse({ description: 'Passwords dont match' })
-  @ApiBadRequestResponse({ description: 'Invalid token' })
+  @ApiForbiddenResponse({ description: 'Invalid token' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @LangQuery()
   @Patch('forgot-password-reset')

@@ -55,7 +55,7 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Растау электрондық поштасын жіберу мүмкін болмады",
   "AUTH_FAILED_TOKEN_VERIFY": "Пайдаланушы таңбалауышы расталмады",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Жаңа құпия сөз орнату үшін электрондық поштаны жіберу мүмкін болмады",
-  "BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN": "Жарамсыз қалпына келтіру белгісі",
+  "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Жарамсыз қалпына келтіру белгісі",
   "USER_FAILED_TO_GET_LIST": "Пайдаланушылар тізімін алу мүмкін болмады",
   "USER_FAILED_TO_GET": "Пайдаланушыны алу мүмкін болмады",
   "USER_PROFILE_FAILED_TO_ADD": "Пайдаланушы профилін қосу мүмкін болмады",

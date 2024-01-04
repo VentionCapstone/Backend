@@ -266,7 +266,7 @@ export class AuthService {
       });
 
       const forgotPasswordLink = new URL(
-        `/forgot-password-reset?token=${token}`,
+        `/auth/forgot-password-reset?token=${token}`,
         this.config.get('MAILER_CALLBACK_URL')
       );
 
@@ -301,19 +301,19 @@ export class AuthService {
       });
 
       if (!decodedToken)
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
 
       const user = await this.prismaService.user.findUnique({ where: { id: decodedToken.userId } });
 
       if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       if (!user.passwordResetToken)
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
 
       const tokenMatch = await bcrypt.compare(token, user.passwordResetToken);
 
       if (!tokenMatch)
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN);
+        throw new ForbiddenException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
 
       const hashed_new_password: string = await bcrypt.hash(
         newPassword,

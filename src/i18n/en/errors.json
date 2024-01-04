@@ -55,7 +55,7 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Failed to send verification email",
   "AUTH_FAILED_TOKEN_VERIFY": "Failed to verify user token",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Failed to send email to set a new password",
-  "BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN": "Invalid reset token",
+  "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Invalid reset token",
   "USER_FAILED_TO_GET_LIST": "Failed to get users list",
   "USER_FAILED_TO_GET": "Failed to get user",
   "USER_PROFILE_FAILED_TO_ADD": "Failed to add user profile",

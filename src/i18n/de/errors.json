@@ -55,7 +55,7 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Bestätigungs-E-Mail konnte nicht gesendet werden",
   "AUTH_FAILED_TOKEN_VERIFY": "Benutzertoken konnte nicht überprüft werden",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Das Senden einer E-Mail zum Festlegen eines neuen Passworts ist fehlgeschlagen",
-  "BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN": "Ungültiges Reset-Token",
+  "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Ungültiges Reset-Token",
   "USER_FAILED_TO_GET_LIST": "Benutzerliste konnte nicht abgerufen werden",
   "USER_FAILED_TO_GET": "Benutzer konnte nicht abgerufen werden",
   "USER_PROFILE_FAILED_TO_ADD": "Benutzerprofil konnte nicht hinzugefügt werden",
