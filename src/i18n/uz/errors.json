@@ -54,6 +54,8 @@
   "AUTH_FAILED_VERIFY_EMAIL": "Elektron pochtani tasdiqlashda xatolik",
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Tasdiqlash xati yuborilmadi",
   "AUTH_FAILED_TOKEN_VERIFY": "Tokenni tasdiqlashda xatolik",
+  "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Yangi parol oʻrnatish uchun xat yuborishda xatolik",
+  "BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN": "Noto'g'ri tiklash tokeni",
   "USER_FAILED_TO_GET_LIST": "Foydalanuvchilar ro'yxatini olib bo'lmadi",
   "USER_FAILED_TO_GET": "Foydalanuvchini topib bo'lmadi",
   "USER_PROFILE_FAILED_TO_ADD": "Foydalanuvchi profilini yaratishda xatolik",

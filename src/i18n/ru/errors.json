@@ -54,6 +54,8 @@
   "AUTH_FAILED_VERIFY_EMAIL": "Не удалось проверить электронную почту пользователя",
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Не удалось отправить письмо с подтверждением",
   "AUTH_FAILED_TOKEN_VERIFY": "Не удалось проверить токен пользователя",
+  "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Не удалось отправить электронное письмо для установки нового пароля.",
+  "BAD_REQUEST_FORGOT_PASSWORD_INVALID_TOKEN": "Неверный токен сброса",
   "USER_FAILED_TO_GET_LIST": "Не удалось получить список пользователей",
   "USER_FAILED_TO_GET": "Не удалось получить пользователя",
   "USER_PROFILE_FAILED_TO_ADD": "Не удалось добавить профиль пользователя",
