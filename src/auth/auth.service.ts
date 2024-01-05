@@ -277,7 +277,7 @@ export class AuthService {
 
       await this.mailerService.sendHtmlEmail(
         email,
-        'Set new password',
+        'Forgot password',
         `<p> Please use this <a href="${forgotPasswordLink}">link</a> to set a new password. </p>`
       );
 
