@@ -42,37 +42,47 @@ export class PaymentService {
     }
   }
 
-  async confirmPayment(confrimPaymentDto: ConfirmPaymentDto) {
-    switch (confrimPaymentDto.status) {
-      case 'succeeded':
+  async confirmPayment(confirmPaymentDto: ConfirmPaymentDto) {
+    const handlers: {
+      [key: string]: () => Promise<{ success: boolean; message: string }>;
+    } = {
+      succeeded: async () => {
         await this.prismaService.booking.update({
           data: { status: Status.COMPLETED },
-          where: { id: confrimPaymentDto.bookingId },
+          where: { id: confirmPaymentDto.bookingId },
         });
+        const paymentId = await this.getPaymentId(confirmPaymentDto.bookingId);
         await this.prismaService.payment.update({
           data: { status: Status.COMPLETED },
-          where: { id: await this.getPaymentId(confrimPaymentDto.bookingId) },
+          where: { id: paymentId },
         });
         return this.setMessage(
           true,
           await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_SUCCESS)
         );
-      case 'processing':
+      },
+      processing: async () => {
         return this.setMessage(
           true,
           await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_PROCESSING)
         );
-      case 'requires_payment_method':
+      },
+      requires_payment_method: async () => {
         return this.setMessage(
           false,
           await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_REQUEIRED_METHOD)
         );
-      default:
+      },
+      default: async () => {
         return this.setMessage(
           false,
           await translateMessage(this.i18n, MessagesTypes.BOOKING_PAYMENT_FAILED)
         );
-    }
+      },
+    };
+    const status = confirmPaymentDto.status;
+    const handler = handlers[status] || handlers.default;
+    return handler();
   }
 
   async processCashPayment(createPaymentDto: CreatePaymentDto) {
@@ -104,18 +114,20 @@ export class PaymentService {
     const bookingDetails = await this.prismaService.booking.findFirst({
       where: { id: bookingId, status: Status.PENDING },
     });
-    if (bookingDetails == null) {
+    if (!bookingDetails) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
     }
 
+    const { accommodationId, startDate, endDate } = bookingDetails;
+
     const accommodationDetails = await this.prismaService.accommodation.findFirst({
-      where: { id: bookingDetails.accommodationId },
+      where: { id: accommodationId },
     });
-    if (accommodationDetails == null) {
+    if (!accommodationDetails) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
     }
-    const startDay = dayjs(bookingDetails.startDate);
-    const endDay = dayjs(bookingDetails.endDate);
+    const startDay = dayjs(startDate);
+    const endDay = dayjs(endDate);
     const amountOfDays = endDay.diff(startDay, 'day');
     return accommodationDetails.price * amountOfDays;
   }
@@ -128,13 +140,13 @@ export class PaymentService {
     const bookingDetails = await this.prismaService.booking.findUnique({
       where: { id: bookingId },
     });
-    if (bookingDetails == null) {
+    if (!bookingDetails) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
     }
     const paymentDetails = await this.prismaService.payment.findFirst({
-      where: { id: bookingDetails.paymentId! },
+      where: { id: bookingDetails.paymentId },
     });
-    if (paymentDetails == null) {
+    if (!paymentDetails) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_PAYMENT);
     }
     return paymentDetails.id;
