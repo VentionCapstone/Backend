@@ -12,5 +12,7 @@
   "USER_PROFILE_DELETE_SUCCESS": "Профиль сәтті жойылды",
 
   "BOOKING_PAYMENT_SUCCESS": "Төлем сәтті өңделді",
-  "BOOKING_PAYMENT_FAILED": "Төлем растау сәтсіздікті: Төлемдің мәртебесі сәтсіз емес"
+  "BOOKING_PAYMENT_PROCESSING": "Сіздің төлемі өңделуде.",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Сіздің төлеміңіз сәтті атталмады, қайталап көріңіз.",
+  "BOOKING_PAYMENT_FAILED": "Көмек көрсету қажет."
 }

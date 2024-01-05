@@ -32,15 +32,6 @@ export class PaymentController {
         }),
     };
   }
-
-  @Post('confirm-payment')
-  @ApiOperation({ summary: 'Confirm payment' })
-  @ApiResponse({ status: 200, description: 'Payment processed successfully' })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  async confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto) {
-    return this.paymentService.confirmPaymentProcess(confirmPaymentDto);
-  }
-
   @Post('')
   @ApiOperation({ summary: 'Handle payment' })
   @ApiResponse({ status: 200, description: 'Payment processed successfully' })
@@ -57,5 +48,12 @@ export class PaymentController {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.PAYMENT_FAILED_TO_PROCESS, error.message);
     }
+  }
+  @Post('confirm')
+  @ApiOperation({ summary: 'Confirm payment' })
+  @ApiResponse({ status: 200, description: 'Payment processed successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto) {
+    return this.paymentService.confirmPayment(confirmPaymentDto);
   }
 }

@@ -76,5 +76,5 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Invalid old password",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Failed to update user password",
   "NOT_FOUND_PAYMENT": "Payment not found",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Failed to confirm payment"
+  "PAYMENT_FAILED_WHILE_CONFIRM": "Failed to confirm payment"
 }

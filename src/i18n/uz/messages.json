@@ -12,5 +12,7 @@
   "USER_PROFILE_DELETE_SUCCESS": "Foydalanuvchi muvaffaqiyatli o'chirildi",
 
   "BOOKING_PAYMENT_SUCCESS": "To'lov muvaffaqiyatli amalga oshirildi",
-  "BOOKING_PAYMENT_FAILED": "To'lov tasdiqlanmadi: To'lov holati muvaffaqiyatli bajarilmagan"
+  "BOOKING_PAYMENT_PROCESSING": "Sizning to'lovingiz amalga oshirilmoqda.",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Sizning to'lovingiz muvaffaqiyatsiz bo'ldi, iltimos, qayta urinib ko'ring.",
+  "BOOKING_PAYMENT_FAILED": "Nimadir noto'g'ri ketdi."
 }
