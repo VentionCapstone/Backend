@@ -37,14 +37,14 @@ const {
   REFRESH_TOKEN_KEY,
   REFRESH_TOKEN_TIME,
   MAX_REFRESH_TOKEN_AGE,
-  MAILER_CALLBACK_URL,
+  FRONTEND_URL,
   SALT_LENGTH,
   FORGOT_PASSWORD_RESET_TOKEN_KEY,
   FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
-  MAX_HASH_LENGTH,
+  HASHING_LIMIT,
 } = process.env;
 
-const MaxHashLength = parseInt(MAX_HASH_LENGTH!);
+const HashingLimit = parseInt(HASHING_LIMIT!);
 const SaltLength = parseInt(SALT_LENGTH!);
 
 @Injectable()
@@ -268,7 +268,7 @@ export class AuthService {
 
       const forgotPasswordLink = new URL(
         `/auth/forgot-password-reset?token=${token}`,
-        MAILER_CALLBACK_URL
+        FRONTEND_URL
       );
 
       await this.mailerService.sendHtmlEmail(
@@ -352,8 +352,8 @@ export class AuthService {
   }
 
   async cropTokenIfTooLong(token: string) {
-    if (token.length > MaxHashLength) {
-      token = token.slice(-MaxHashLength);
+    if (token.length > HashingLimit) {
+      token = token.slice(-HashingLimit);
     }
     return token;
   }
