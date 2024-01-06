@@ -30,6 +30,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
 
+const {
+  SALT_LENGTH,
+  FORGOT_PASSWORD_RESET_TOKEN_KEY,
+  FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
+  MAX_HASH_LENGTH,
+} = process.env;
+
+const MaxHashLength = parseInt(MAX_HASH_LENGTH!);
+const SaltLength = parseInt(SALT_LENGTH!);
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -253,17 +263,12 @@ export class AuthService {
       const token = await this.jwtService.signAsync(
         { userId },
         {
-          secret: this.config.get('FORGOT_PASSWORD_RESET_TOKEN_KEY'),
-          expiresIn: this.config.get('FORGOT_PASSWORD_RESET_TOKEN_EXPIRY'),
+          secret: FORGOT_PASSWORD_RESET_TOKEN_KEY,
+          expiresIn: FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
         }
       );
 
-      const hashLimit = this.config.get('MAX_HASH_LENGTH')!;
-
-      const hashedResetToken = await bcrypt.hash(
-        token.length > hashLimit ? token.slice(-hashLimit) : token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedResetToken = await bcrypt.hash(await this.cropTokenIfTooLong(token), SaltLength);
 
       await this.prismaService.user.update({
         data: { passwordResetToken: hashedResetToken },
@@ -310,13 +315,10 @@ export class AuthService {
       if (!user.passwordResetToken)
         throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
 
-      const hashLimit = this.config.get('MAX_HASH_LENGTH')!;
-
-      if (token.length > hashLimit) {
-        token = token.slice(-hashLimit);
-      }
-
-      const tokenMatch = await bcrypt.compare(token, user.passwordResetToken);
+      const tokenMatch = await bcrypt.compare(
+        await this.cropTokenIfTooLong(token),
+        user.passwordResetToken
+      );
 
       if (!tokenMatch)
         throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
@@ -359,6 +361,13 @@ export class AuthService {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_PASSWORD, error.message);
     }
+  }
+
+  async cropTokenIfTooLong(token: string) {
+    if (token.length > MaxHashLength) {
+      return token.slice(-MaxHashLength);
+    }
+    return token;
   }
 
   /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
