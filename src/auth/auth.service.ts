@@ -7,7 +7,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
@@ -31,6 +30,14 @@ import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
 
 const {
+  ACCESS_TOKEN_KEY,
+  ACCESS_TOKEN_TIME,
+  COOKIE_SAME_SITE,
+  COOKIE_SECURE,
+  REFRESH_TOKEN_KEY,
+  REFRESH_TOKEN_TIME,
+  MAX_REFRESH_TOKEN_AGE,
+  MAILER_CALLBACK_URL,
   SALT_LENGTH,
   FORGOT_PASSWORD_RESET_TOKEN_KEY,
   FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
@@ -46,7 +53,6 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly verificationService: VerificationSerivce,
-    private readonly config: ConfigService,
     private readonly i18n: I18nService,
     private readonly mailerService: MailerService
   ) {}
@@ -62,19 +68,13 @@ export class AuthService {
       if (password !== confirm_password)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
 
-      const hashed_password: string = await bcrypt.hash(
-        password,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashed_password: string = await bcrypt.hash(password, SaltLength);
 
       const newUser = await this.prismaService.user.create({
         data: { email, password: hashed_password },
       });
       const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
       const activationLink = await this.verificationService.send(newUser.email);
 
       await this.prismaService.user.update({
@@ -99,10 +99,7 @@ export class AuthService {
       if (!isMatchPass) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
@@ -120,7 +117,7 @@ export class AuthService {
   async logout(refreshToken: string, res: Response) {
     try {
       const adminData = await this.jwtService.verify(refreshToken, {
-        secret: process.env.REFRESH_TOKEN_KEY,
+        secret: REFRESH_TOKEN_KEY,
       });
 
       if (!adminData) throw new ForbiddenException(ErrorsTypes.NOT_FOUND_AUTH_USER);
@@ -144,7 +141,7 @@ export class AuthService {
   async refreshToken(userId: string, refreshToken: string, res: Response) {
     try {
       const decodedToken = await this.jwtService.verify(refreshToken, {
-        secret: process.env.REFRESH_TOKEN_KEY,
+        secret: REFRESH_TOKEN_KEY,
       });
 
       if (!decodedToken)
@@ -164,10 +161,7 @@ export class AuthService {
       if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
         where: { id: userId },
@@ -226,10 +220,7 @@ export class AuthService {
       if (!isMatchPass)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_INVALID_OLD_PASS);
 
-      const hashed_password: string = await bcrypt.hash(
-        newPassword,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashed_password: string = await bcrypt.hash(newPassword, SaltLength);
       await this.prismaService.user.update({
         data: { password: hashed_password },
         where: { id: user.id },
@@ -277,7 +268,7 @@ export class AuthService {
 
       const forgotPasswordLink = new URL(
         `/auth/forgot-password-reset?token=${token}`,
-        this.config.get('MAILER_CALLBACK_URL')
+        MAILER_CALLBACK_URL
       );
 
       await this.mailerService.sendHtmlEmail(
@@ -302,7 +293,7 @@ export class AuthService {
   async validateForgotPasswordToken(token: string) {
     try {
       const decodedToken = await this.jwtService.verify(token, {
-        secret: process.env.FORGOT_PASSWORD_RESET_TOKEN_KEY,
+        secret: FORGOT_PASSWORD_RESET_TOKEN_KEY,
       });
 
       if (!decodedToken)
@@ -339,10 +330,7 @@ export class AuthService {
 
       const userId = await this.validateForgotPasswordToken(token);
 
-      const hashed_new_password: string = await bcrypt.hash(
-        newPassword,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashed_new_password: string = await bcrypt.hash(newPassword, SaltLength);
 
       await this.prismaService.user.update({
         data: {
@@ -365,19 +353,19 @@ export class AuthService {
 
   async cropTokenIfTooLong(token: string) {
     if (token.length > MaxHashLength) {
-      return token.slice(-MaxHashLength);
+      token = token.slice(-MaxHashLength);
     }
     return token;
   }
 
   /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
   private setRefreshTokenCookie(refresh_token: string, res: Response) {
-    const maxAge = parseInt(process.env.MAX_REFRESH_TOKEN_AGE || '0', 10);
+    const maxAge = parseInt(MAX_REFRESH_TOKEN_AGE || '0', 10);
     res.cookie('refresh_token', refresh_token, {
       maxAge,
       httpOnly: true,
-      sameSite: this.config.get('COOKIE_SAME_SITE') as 'strict' | 'lax' | 'none' | undefined,
-      secure: this.config.get('COOKIE_SECURE') === 'true',
+      sameSite: COOKIE_SAME_SITE as 'strict' | 'lax' | 'none' | undefined,
+      secure: COOKIE_SECURE === 'true',
     });
   }
   /** VALIDATE USER HELPER FUNCTION */
@@ -404,12 +392,12 @@ export class AuthService {
     try {
       const [accessToken, refreshToken] = await Promise.all([
         this.jwtService.signAsync(jwtPayload, {
-          secret: process.env.ACCESS_TOKEN_KEY,
-          expiresIn: process.env.ACCESS_TOKEN_TIME,
+          secret: ACCESS_TOKEN_KEY,
+          expiresIn: ACCESS_TOKEN_TIME,
         }),
         this.jwtService.signAsync(jwtPayload, {
-          secret: process.env.REFRESH_TOKEN_KEY,
-          expiresIn: process.env.REFRESH_TOKEN_TIME,
+          secret: REFRESH_TOKEN_KEY,
+          expiresIn: REFRESH_TOKEN_TIME,
         }),
       ]);
       return {
