@@ -70,6 +70,11 @@
   "REVIEW_FAILED_TO_UPDATE": "Шолуды жаңарту мүмкін болмады",
   "REVIEW_FAILED_TO_GET": "Тексеру мүмкін болмады",
   "REVIEW_FAILED_TO_DELETE": "Пікірді жою мүмкін болмады",
+  "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Жарамсыз төлем өсімі",
+  "BAD_REQUEST_PAYMENT_FAILED": "Төлем сәтсіздік көрсетті",
+  "PAYMENT_FAILED_TO_PROCESS": "Төлем өңделмеді",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Жарамсыз ескі құпия сөз",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды"
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды",
+  "NOT_FOUND_PAYMENT": "Төлем табылмады",
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Төлем растау сәтсіздікті"
 }
