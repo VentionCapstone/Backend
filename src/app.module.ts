@@ -11,6 +11,7 @@ import { HealthModule } from './health-check/health.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import * as path from 'path';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { ProfileCustomerModule } from './profile_customer/profile_customer.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
     BookingModule,
     HealthModule,
     ReviewsModule,
+    ProfileCustomerModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
