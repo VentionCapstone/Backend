@@ -143,6 +143,9 @@ export class PaymentService {
     if (!bookingDetails) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
     }
+    if (!bookingDetails.paymentId) {
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_PAYMENT);
+    }
     const paymentDetails = await this.prismaService.payment.findFirst({
       where: { id: bookingDetails.paymentId },
     });
