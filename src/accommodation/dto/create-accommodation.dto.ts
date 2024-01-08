@@ -1,16 +1,18 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsString,
-  IsInt,
   IsDate,
-  IsOptional,
-  IsUrl,
+  IsInt,
   IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
   Max,
   Min,
   ValidateNested,
 } from 'class-validator';
 import CreateAddressDto from './create-address.dto';
+
+const { ACCOMMODATION_MAX_ROOMS, ACCOMMODATION_MAX_PEOPLE, ACCOMMODATION_MAX_PRICE } = process.env;
 
 export default class CreateAccommodationDto {
   @IsOptional()
@@ -33,19 +35,19 @@ export default class CreateAccommodationDto {
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_ROOMS ? +process.env.ACCOMMODATION_MAX_ROOMS : 2147483647)
+  @Max(ACCOMMODATION_MAX_ROOMS ? +ACCOMMODATION_MAX_ROOMS : 2147483647)
   numberOfRooms: number;
 
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PEOPLE ? +process.env.ACCOMMODATION_MAX_PEOPLE : 2147483647)
+  @Max(ACCOMMODATION_MAX_PEOPLE ? +ACCOMMODATION_MAX_PEOPLE : 2147483647)
   allowedNumberOfPeople: number;
 
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(process.env.ACCOMMODATION_MAX_PRICE ? +process.env.ACCOMMODATION_MAX_PRICE : 2147483647)
+  @Max(ACCOMMODATION_MAX_PRICE ? +ACCOMMODATION_MAX_PRICE : 2147483647)
   price: number;
 
   @IsOptional()

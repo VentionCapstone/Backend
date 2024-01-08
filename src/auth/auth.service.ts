@@ -4,23 +4,48 @@ import {
   ForbiddenException,
   HttpException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { EmailUpdateDto, LoginDto, RegisterDto } from './dto';
+import {
+  EmailUpdateDto,
+  ForgotPasswordEmailDto,
+  ForgotPasswordResetDto,
+  LoginDto,
+  RegisterDto,
+} from './dto';
 
 import { I18nService } from 'nestjs-i18n';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import { translateMessage } from 'src/helpers/translateMessage.helper';
+import { MailerService } from 'src/mailer/mailer.service';
 import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from '../prisma/prisma.service';
 import { PasswordUpdateDto } from './dto/update-password.dto';
 import { VerificationSerivce } from './verification.service';
+
+const {
+  ACCESS_TOKEN_KEY,
+  ACCESS_TOKEN_TIME,
+  COOKIE_SAME_SITE,
+  COOKIE_SECURE,
+  REFRESH_TOKEN_KEY,
+  REFRESH_TOKEN_TIME,
+  MAX_REFRESH_TOKEN_AGE,
+  FRONTEND_URL,
+  SALT_LENGTH,
+  FORGOT_PASSWORD_RESET_TOKEN_KEY,
+  FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
+  HASHING_LIMIT,
+} = process.env;
+
+const HashingLimit = parseInt(HASHING_LIMIT!);
+const SaltLength = parseInt(SALT_LENGTH!);
 
 @Injectable()
 export class AuthService {
@@ -28,8 +53,8 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly verificationService: VerificationSerivce,
-    private readonly config: ConfigService,
-    private readonly i18n: I18nService
+    private readonly i18n: I18nService,
+    private readonly mailerService: MailerService
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -43,19 +68,13 @@ export class AuthService {
       if (password !== confirm_password)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
 
-      const hashed_password: string = await bcrypt.hash(
-        password,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashed_password: string = await bcrypt.hash(password, SaltLength);
 
       const newUser = await this.prismaService.user.create({
         data: { email, password: hashed_password },
       });
       const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
       const activationLink = await this.verificationService.send(newUser.email);
 
       await this.prismaService.user.update({
@@ -80,10 +99,7 @@ export class AuthService {
       if (!isMatchPass) throw new BadRequestException(ErrorsTypes.NOT_FOUND_AUTH_USER);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
 
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
@@ -101,7 +117,7 @@ export class AuthService {
   async logout(refreshToken: string, res: Response) {
     try {
       const adminData = await this.jwtService.verify(refreshToken, {
-        secret: process.env.REFRESH_TOKEN_KEY,
+        secret: REFRESH_TOKEN_KEY,
       });
 
       if (!adminData) throw new ForbiddenException(ErrorsTypes.NOT_FOUND_AUTH_USER);
@@ -125,7 +141,7 @@ export class AuthService {
   async refreshToken(userId: string, refreshToken: string, res: Response) {
     try {
       const decodedToken = await this.jwtService.verify(refreshToken, {
-        secret: process.env.REFRESH_TOKEN_KEY,
+        secret: REFRESH_TOKEN_KEY,
       });
 
       if (!decodedToken)
@@ -145,10 +161,7 @@ export class AuthService {
       if (!tokenMatch) throw new ForbiddenException(ErrorsTypes.FORBIDDEN_INVALID_TOKEN);
 
       const tokens = await this.getTokens(user.id, user.email, user.role);
-      const hashedRefreshToken = await bcrypt.hash(
-        tokens.refresh_token,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
       await this.prismaService.user.update({
         data: { hashedRefreshToken },
         where: { id: userId },
@@ -207,10 +220,7 @@ export class AuthService {
       if (!isMatchPass)
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_INVALID_OLD_PASS);
 
-      const hashed_password: string = await bcrypt.hash(
-        newPassword,
-        parseInt(this.config.get('SALT_LENGTH')!)
-      );
+      const hashed_password: string = await bcrypt.hash(newPassword, SaltLength);
       await this.prismaService.user.update({
         data: { password: hashed_password },
         where: { id: user.id },
@@ -234,14 +244,128 @@ export class AuthService {
     }
   }
 
+  async forgotPasswordEmail(body: ForgotPasswordEmailDto) {
+    try {
+      const { email } = body;
+
+      const user = await this.prismaService.user.findUnique({ where: { email: email } });
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+      const userId = user.id;
+      const token = await this.jwtService.signAsync(
+        { userId },
+        {
+          secret: FORGOT_PASSWORD_RESET_TOKEN_KEY,
+          expiresIn: FORGOT_PASSWORD_RESET_TOKEN_EXPIRY,
+        }
+      );
+
+      const hashedResetToken = await bcrypt.hash(await this.cropTokenIfTooLong(token), SaltLength);
+
+      await this.prismaService.user.update({
+        data: { passwordResetToken: hashedResetToken },
+        where: { id: user.id },
+      });
+
+      const forgotPasswordLink = new URL(
+        `/auth/forgot-password-reset?token=${token}`,
+        FRONTEND_URL
+      );
+
+      await this.mailerService.sendHtmlEmail(
+        email,
+        'Forgot password',
+        `<p> Please use this <a href="${forgotPasswordLink}">link</a> to set a new password. </p>`
+      );
+
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_FORGOT_PASSWORD_EMAIL_SENT),
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(
+        ErrorsTypes.AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL,
+        error.message
+      );
+    }
+  }
+
+  async validateForgotPasswordToken(token: string) {
+    try {
+      const decodedToken = await this.jwtService.verify(token, {
+        secret: FORGOT_PASSWORD_RESET_TOKEN_KEY,
+      });
+
+      if (!decodedToken)
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const user = await this.prismaService.user.findUnique({ where: { id: decodedToken.userId } });
+
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+
+      if (!user.passwordResetToken)
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      const tokenMatch = await bcrypt.compare(
+        await this.cropTokenIfTooLong(token),
+        user.passwordResetToken
+      );
+
+      if (!tokenMatch)
+        throw new BadRequestException(ErrorsTypes.FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN);
+
+      return user.id;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY, error.message);
+    }
+  }
+
+  async resetForgotPassword(body: ForgotPasswordResetDto) {
+    try {
+      const { token, newPassword, confirmPassword } = body;
+
+      if (newPassword !== confirmPassword)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_AUTH_PASSWORDS_DONT_MATCH);
+
+      const userId = await this.validateForgotPasswordToken(token);
+
+      const hashed_new_password: string = await bcrypt.hash(newPassword, SaltLength);
+
+      await this.prismaService.user.update({
+        data: {
+          password: hashed_new_password,
+          hashedRefreshToken: null,
+          passwordResetToken: null,
+        },
+        where: { id: userId },
+      });
+
+      return {
+        success: true,
+        message: translateMessage(this.i18n, MessagesTypes.AUTH_FORGOT_PASSWORD_RESET_SUCCESS),
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_UPDATE_PASSWORD, error.message);
+    }
+  }
+
+  async cropTokenIfTooLong(token: string) {
+    if (token.length > HashingLimit) {
+      token = token.slice(-HashingLimit);
+    }
+    return token;
+  }
+
   /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
   private setRefreshTokenCookie(refresh_token: string, res: Response) {
-    const maxAge = parseInt(process.env.MAX_REFRESH_TOKEN_AGE || '0', 10);
+    const maxAge = parseInt(MAX_REFRESH_TOKEN_AGE || '0', 10);
     res.cookie('refresh_token', refresh_token, {
       maxAge,
       httpOnly: true,
-      sameSite: this.config.get('COOKIE_SAME_SITE') as 'strict' | 'lax' | 'none' | undefined,
-      secure: this.config.get('COOKIE_SECURE') === 'true',
+      sameSite: COOKIE_SAME_SITE as 'strict' | 'lax' | 'none' | undefined,
+      secure: COOKIE_SECURE === 'true',
     });
   }
   /** VALIDATE USER HELPER FUNCTION */
@@ -268,12 +392,12 @@ export class AuthService {
     try {
       const [accessToken, refreshToken] = await Promise.all([
         this.jwtService.signAsync(jwtPayload, {
-          secret: process.env.ACCESS_TOKEN_KEY,
-          expiresIn: process.env.ACCESS_TOKEN_TIME,
+          secret: ACCESS_TOKEN_KEY,
+          expiresIn: ACCESS_TOKEN_TIME,
         }),
         this.jwtService.signAsync(jwtPayload, {
-          secret: process.env.REFRESH_TOKEN_KEY,
-          expiresIn: process.env.REFRESH_TOKEN_TIME,
+          secret: REFRESH_TOKEN_KEY,
+          expiresIn: REFRESH_TOKEN_TIME,
         }),
       ]);
       return {
