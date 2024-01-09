@@ -2,13 +2,16 @@ import { BadRequestException, HttpException, Injectable, NotFoundException } fro
 import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
+import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as utc from 'dayjs/plugin/utc';
+import { DEFAULT_DATE_FORMAT } from 'src/common/constants/date';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BookingReqDto } from './dto';
 
 dayjs.extend(utc);
+dayjs.extend(isSameOrBefore);
 
 @Injectable()
 export class BookingService {
@@ -192,16 +195,16 @@ export class BookingService {
       const bookingStart = this.getTimeInZone(booking.startDate, offset);
       const bookingEnd = this.getTimeInZone(booking.endDate, offset);
 
-      if (rangeStart.isBefore(bookingStart)) {
+      if (rangeStart.isBefore(bookingStart) && bookingStart.isSameOrBefore(availableTo)) {
         const rangeEnd = bookingStart < availableTo ? bookingStart : availableTo;
-        range = [rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD')];
+        range = [rangeStart.format(DEFAULT_DATE_FORMAT), rangeEnd.format(DEFAULT_DATE_FORMAT)];
         ranges.push(range);
       }
       rangeStart = bookingEnd;
     }
 
     if (rangeStart.isBefore(availableTo)) {
-      range = [rangeStart.format('YYYY-MM-DD'), availableTo.format('YYYY-MM-DD')];
+      range = [rangeStart.format(DEFAULT_DATE_FORMAT), availableTo.format(DEFAULT_DATE_FORMAT)];
       ranges.push(range);
     }
 
