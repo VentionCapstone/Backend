@@ -7,6 +7,7 @@ import { I18nService } from 'nestjs-i18n';
 import { format, transports } from 'winston';
 import 'winston-daily-rotate-file';
 import { AppModule } from './app.module';
+import { DEFAULT_DATE_FORMAT } from './common/constants/date';
 import { GlobalExceptionFilter } from './filters/global.filter';
 
 async function bootstrap() {
@@ -17,14 +18,14 @@ async function bootstrap() {
           filename: `logs/%DATE%-error.log`,
           level: 'error',
           format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
-          datePattern: 'YYYY-MM-DD',
+          datePattern: DEFAULT_DATE_FORMAT,
           zippedArchive: false,
           maxFiles: '30d',
         }),
         new transports.DailyRotateFile({
           filename: `logs/%DATE%-combined.log`,
           format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
-          datePattern: 'YYYY-MM-DD',
+          datePattern: DEFAULT_DATE_FORMAT,
           zippedArchive: false,
           maxFiles: '30d',
         }),
