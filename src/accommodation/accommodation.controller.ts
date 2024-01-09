@@ -37,6 +37,7 @@ import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import { OrderAndFilterReviewDto } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
+import ListOfAccommodationsResponseDto from './dto/list-of-accommodations.dto';
 import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
 import SingleAccommodationResponseDto from './dto/single-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
@@ -276,17 +277,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'All available accommodations list',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          type: 'array',
-          items: {
-            $ref: getSchemaPath(AccommodationDto),
-          },
-        },
-      },
-    },
+    type: ListOfAccommodationsResponseDto,
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
@@ -343,6 +334,9 @@ export class AccommodationController {
           },
         },
         averageRate: {
+          type: 'number',
+        },
+        totalCount: {
           type: 'number',
         },
       },
