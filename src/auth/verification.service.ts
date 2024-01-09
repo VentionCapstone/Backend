@@ -5,7 +5,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import base64url from 'base64url';
 import * as crypto from 'crypto';
 import { I18nService } from 'nestjs-i18n';
@@ -17,11 +16,12 @@ import MessagesTypes from 'src/messages/messages.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EmailVerificationDto } from './dto';
 
+const { EMAIL_EXPIRATION_TIME_MS, MAILER_CALLBACK_URL } = process.env;
+
 @Injectable()
 export class VerificationSerivce {
   constructor(
     private readonly mailerService: MailerService,
-    private readonly config: ConfigService,
     private readonly prismaService: PrismaService,
     private readonly i18n: I18nService
   ) {}
@@ -29,10 +29,10 @@ export class VerificationSerivce {
   async send(email: string): Promise<string> {
     try {
       const hash = crypto.randomBytes(32).toString('hex');
-      const expires = Date.now() + this.config.get('EMAIL_EXPIRATION_TIME_MS');
+      const expires = Date.now() + EMAIL_EXPIRATION_TIME_MS!;
       const token = base64url(`${email}$$${expires}$$${hash}`);
 
-      const url = new URL(this.config.get('MAILER_CALLBACK_URL')!);
+      const url = new URL(MAILER_CALLBACK_URL!);
       url.searchParams.append('token', token);
 
       await this.mailerService.sendHtmlEmail(

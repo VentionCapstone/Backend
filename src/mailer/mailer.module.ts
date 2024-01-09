@@ -1,26 +1,26 @@
 import { Module } from '@nestjs/common';
 import { MailerModule as NestMailerModule } from '@nestjs-modules/mailer';
 import { MailerService } from './mailer.service';
-import { ConfigService } from '@nestjs/config';
+
+const { MAILER_HOST, MAILER_USER, MAILER_PASS } = process.env;
 
 @Module({
   imports: [
     NestMailerModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
+      useFactory: () => ({
         transport: {
-          host: config.get('MAILER_HOST'),
+          host: MAILER_HOST,
           port: 587,
           secure: false,
           auth: {
-            user: config.get('MAILER_USER'),
-            pass: config.get('MAILER_PASS'),
+            user: MAILER_USER,
+            pass: MAILER_PASS,
           },
         },
         defaults: {
-          from: `Vention Team <${config.get('MAILER_USER')}>`,
+          from: `Vention Team <${MAILER_USER}>`,
         },
       }),
-      inject: [ConfigService],
     }),
   ],
   providers: [MailerService],
