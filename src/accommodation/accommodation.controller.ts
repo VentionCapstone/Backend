@@ -285,7 +285,7 @@ export class AccommodationController {
     return { success: true, ...data };
   }
 
-  @ApiOperation({ summary: 'Get all your accommodations' })
+  @ApiOperation({ summary: 'Get all accommodations, of one user. By provided userId ' })
   @ApiResponse({
     status: 200,
     description: 'Accommodations list',
@@ -297,6 +297,9 @@ export class AccommodationController {
           items: {
             $ref: getSchemaPath(AccommodationDto),
           },
+        },
+        totalCount: {
+          type: 'number',
         },
       },
     },
@@ -310,8 +313,8 @@ export class AccommodationController {
     @Param('userId') userId: string,
     @Query() options: GetUserAccommodationsDto
   ) {
-    const accommodations = await this.accommodationService.getUserAccommodations(userId, options);
-    return { success: true, data: accommodations };
+    const data = await this.accommodationService.getUserAccommodations(userId, options);
+    return { success: true, ...data };
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })
