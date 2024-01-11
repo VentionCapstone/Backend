@@ -73,6 +73,10 @@ export class OrderAndFilterDto extends PaginationDto {
 
   @IsOptional()
   @IsString()
+  @ApiProperty({
+    example: 'Eastchester, Bronx, United States',
+    description: 'street?, city?, country?',
+  })
   location?: string;
 
   @IsOptional()
