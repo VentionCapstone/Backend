@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
+import { countryAbbreviationsMapping } from 'src/common/mappings/countryAbbreviations.mapping';
 
 @Injectable()
 export class AccommodationService {
@@ -311,7 +312,7 @@ export class AccommodationService {
         mode: 'insensitive',
       };
     };
-    addAddressCondition('country', country);
+    addAddressCondition('country', this.normalizeCountry(country));
     addAddressCondition('city', city);
     addAddressCondition('street', street);
     return addressConditions;
@@ -323,6 +324,11 @@ export class AccommodationService {
     const [country, city, street] = addressComponents.reverse();
     return { country, city, street };
   }
+
+  private normalizeCountry = (input: string): string => {
+    const normalizedCountry = countryAbbreviationsMapping[input.toUpperCase()] || input;
+    return normalizedCountry;
+  };
 
   private generateFindAllQueryObj(options: OrderAndFilterDto) {
     const {
