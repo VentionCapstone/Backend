@@ -303,20 +303,17 @@ export class AccommodationService {
 
   private makeAddressConditions(location: string) {
     const addressConditions: any = {};
-
     const { country, city, street } = this.parseAddress(location);
-    if (country || city || street) {
-      const addAddressCondition = (addressCondition: string, addressQuery: string | undefined) => {
-        if (!addressQuery) return;
-        addressConditions[addressCondition] = {
-          contains: addressQuery,
-          mode: 'insensitive',
-        };
+    const addAddressCondition = (addressCondition: string, addressQuery: string | undefined) => {
+      if (!addressQuery) return;
+      addressConditions[addressCondition] = {
+        contains: addressQuery,
+        mode: 'insensitive',
       };
-      addAddressCondition('country', country);
-      addAddressCondition('city', city);
-      addAddressCondition('street', street);
-    }
+    };
+    addAddressCondition('country', country);
+    addAddressCondition('city', city);
+    addAddressCondition('street', street);
     return addressConditions;
   }
 
