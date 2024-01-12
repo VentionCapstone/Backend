@@ -8,8 +8,8 @@ export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
-    const apiVersion = process.env.YOUR_STRIPE_API_VERSION;
-    const stripeKey = process.env.YOUR_STRIPE_SECRET_KEY;
+    const apiVersion = process.env.STRIPE_API_VERSION;
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
 
     if (!apiVersion && !stripeKey) {
       throw new GlobalException(
