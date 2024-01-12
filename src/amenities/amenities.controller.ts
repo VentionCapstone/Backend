@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -11,7 +11,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { AmenitiesService } from './amenities.service';
-import { AmenitiesRequestDto, AmenitiesResponseDto, AmenitiesListResponseDto } from './dto';
+import { AmenitiesListResponseDto, AmenitiesRequestDto, AmenitiesResponseDto } from './dto';
 
 @ApiTags('amenitites')
 @UseGuards(UserGuard)
@@ -43,32 +43,6 @@ export class AmenitiesController {
   async getAmenitiesList() {
     const amenitiesList = await this.amenitiesService.getAmenitiesList();
     return { success: true, data: amenitiesList };
-  }
-
-  @Get('/:id')
-  @LangQuery()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get amenities by id' })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Success getting amenities',
-    type: AmenitiesResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  async getAmenities(@Param('id') id: string) {
-    const amenitiesById = await this.amenitiesService.getAmenities(id);
-    return { success: true, data: amenitiesById };
   }
 
   @Post('/:id')
@@ -135,31 +109,5 @@ export class AmenitiesController {
   ) {
     const updatedAmenities = await this.amenitiesService.updateAmenities(id, dto, userId);
     return { success: true, data: updatedAmenities };
-  }
-
-  @Delete('/:id')
-  @LangQuery()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete amenities by id' })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Success deleting amenities',
-    type: AmenitiesResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error',
-  })
-  async deleteAmenities(@Param('id') id: string, @CurrentUser('id') userId: string) {
-    await this.amenitiesService.deleteAmenities(id, userId);
-    return { success: true, data: {} };
   }
 }

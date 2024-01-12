@@ -1,11 +1,11 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import * as dayjs from 'dayjs';
+import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
-import { SortOrder } from 'src/enums/sortOrder.enum';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
 
 @Injectable()
@@ -229,7 +229,23 @@ export class AccommodationService {
           isDeleted: false,
         };
       }
-      return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
+      const countAccommodationsQuery = this.prisma.accommodation.count({
+        where: { ownerId },
+      });
+
+      const findAccommodationsQuery = this.prisma.accommodation.findMany(
+        findAccommodationsQueryObj
+      );
+
+      const [accommodations, totalCount] = await Promise.all([
+        findAccommodationsQuery,
+        countAccommodationsQuery,
+      ]);
+
+      return {
+        totalCount,
+        data: accommodations,
+      };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
