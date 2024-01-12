@@ -321,7 +321,7 @@ export class AccommodationService {
   private parseAddress(addressString: string) {
     const addressComponents = addressString.split(',').map((component) => component.trim());
 
-    const [street, city, country] = addressComponents;
+    const [country, city, street] = addressComponents;
     return { country, city, street };
   }
 
