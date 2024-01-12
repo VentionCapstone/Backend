@@ -3,11 +3,12 @@ import * as dayjs from 'dayjs';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
-import { normalizeLocationName } from 'src/helpers/normalizeLocationName.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
+import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
+import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
 
 @Injectable()
 export class AccommodationService {
@@ -312,8 +313,8 @@ export class AccommodationService {
         mode: 'insensitive',
       };
     };
-    addAddressCondition('country', normalizeLocationName(country));
-    addAddressCondition('city', normalizeLocationName(city));
+    addAddressCondition('country', normalizeCountryName(country));
+    addAddressCondition('city', normalizeCityName(city));
     addAddressCondition('street', street);
     return addressConditions;
   }

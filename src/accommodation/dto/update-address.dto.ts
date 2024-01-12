@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { normalizeLocationName } from 'src/helpers/normalizeLocationName.helper';
+import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
+import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
 
 export default class UpdateAddressDto {
   @IsOptional()
@@ -9,12 +10,12 @@ export default class UpdateAddressDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => normalizeLocationName(value))
+  @Transform(({ value }) => normalizeCityName(value))
   city: string;
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => normalizeLocationName(value))
+  @Transform(({ value }) => normalizeCountryName(value))
   country: string;
 
   @IsOptional()
