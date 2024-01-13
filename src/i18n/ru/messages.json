@@ -11,5 +11,10 @@
   "AMENITY_UPDATE_SUCCESS": "Успешное обновление удобств",
   "AMENITY_DELETE_SUCCESS": "Успешное удаление удобств",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален"
+  "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален",
+
+  "BOOKING_PAYMENT_SUCCESS": "Оплата успешно обработана",
+  "BOOKING_PAYMENT_PROCESSING": "Ваш платеж обрабатывается.",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Ваш платеж не был успешным, пожалуйста, попробуйте еще раз.",
+  "BOOKING_PAYMENT_FAILED": "Что-то пошло не так."
 }

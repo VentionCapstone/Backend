@@ -108,7 +108,7 @@ model Notification {
 model Payment {
   id            String    @id @default(uuid())
   type          String
-  transactionId String
+  transactionId String?
   totalAmount   Float
   status        Status
   booking       Booking[]
