@@ -63,15 +63,18 @@
   "USER_PROFILE_FAILED_TO_GET": "Benutzerprofil konnte nicht abgerufen werden",
   "USER_PROFILE_FAILED_TO_DELETE": "Benutzerprofil konnte nicht gelöscht werden",
   "AMENITIES_FAILED_TO_GET_LIST": "Die Ausstattungsliste konnte nicht abgerufen werden",
-  "AMENITIES_FAILED_TO_GET": "Es konnten keine Annehmlichkeiten in Anspruch genommen werden",
   "AMENITIES_FAILED_TO_ADD": "Das Hinzufügen von Annehmlichkeiten ist fehlgeschlagen",
   "AMENITIES_FAILED_TO_UPDATE": "Die Ausstattung konnte nicht aktualisiert werden",
-  "AMENITIES_FAILED_TO_DELETE": "Die Ausstattung konnte nicht gelöscht werden",
   "REVIEW_FAILED_TO_CREATE": "Es konnte keine Bewertung für diese Unterkunft erstellt werden",
   "REVIEW_FAILED_TO_GET_FOR_UPDATING": "Aktualisierungsbewertung konnte nicht abgerufen werden",
   "REVIEW_FAILED_TO_UPDATE": "Die Rezension konnte nicht aktualisiert werden",
   "REVIEW_FAILED_TO_GET": "Bewertung konnte nicht abgerufen werden",
   "REVIEW_FAILED_TO_DELETE": "Bewertung konnte nicht gelöscht werden",
+  "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Ungültige Zahlungsoption",
+  "BAD_REQUEST_PAYMENT_FAILED": "Zahlung fehlgeschlagen",
+  "PAYMENT_FAILED_TO_PROCESS": "Die Zahlung konnte nicht verarbeitet werden",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Ungültiges altes Passwort",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden"
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden",
+  "NOT_FOUND_PAYMENT": "Zahlung nicht gefunden",
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Zahlungsbestätigung fehlgeschlagen"
 }

@@ -231,7 +231,23 @@ export class AccommodationService {
           isDeleted: false,
         };
       }
-      return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
+      const countAccommodationsQuery = this.prisma.accommodation.count({
+        where: { ownerId },
+      });
+
+      const findAccommodationsQuery = this.prisma.accommodation.findMany(
+        findAccommodationsQueryObj
+      );
+
+      const [accommodations, totalCount] = await Promise.all([
+        findAccommodationsQuery,
+        countAccommodationsQuery,
+      ]);
+
+      return {
+        totalCount,
+        data: accommodations,
+      };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }

@@ -63,15 +63,18 @@
   "USER_PROFILE_FAILED_TO_GET": "Не удалось получить профиль пользователя",
   "USER_PROFILE_FAILED_TO_DELETE": "Не удалось удалить профиль пользователя",
   "AMENITIES_FAILED_TO_GET_LIST": "Не удалось получить список удобств",
-  "AMENITIES_FAILED_TO_GET": "Не удалось получить удобства",
   "AMENITIES_FAILED_TO_ADD": "Не удалось добавить удобства",
   "AMENITIES_FAILED_TO_UPDATE": "Не удалось обновить удобства",
-  "AMENITIES_FAILED_TO_DELETE": "Не удалось удалить удобства",
   "REVIEW_FAILED_TO_CREATE": "Не удалось создать отзыв об этом жилье",
   "REVIEW_FAILED_TO_GET_FOR_UPDATING": "Не удалось получить отзыв для обновления",
   "REVIEW_FAILED_TO_UPDATE": "Не удалось обновить отзыв",
   "REVIEW_FAILED_TO_GET": "Не удалось получить отзыв",
   "REVIEW_FAILED_TO_DELETE": "Не удалось удалить отзыв",
+  "BAD_REQUEST_INVALID_PAYMENT_OPTION": "Неверный вариант оплаты",
+  "BAD_REQUEST_PAYMENT_FAILED": "Ошибка оплаты",
+  "PAYMENT_FAILED_TO_PROCESS": "Не удалось обработать платеж",
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Неверный старый пароль",
-  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя."
+  "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя.",
+  "NOT_FOUND_PAYMENT": "Платеж не найден",
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Ошибка подтверждения платежа"
 }
