@@ -1,13 +1,14 @@
 model User {
-  id                 String         @id @default(uuid())
+  id                 String          @id @default(uuid())
   firstName          String?
   lastName           String?
-  email              String         @unique
+  email              String          @unique
   password           String
-  role               Role           @default(USER)
-  isEmailVerified    Boolean        @default(false)
-  isVerified         Boolean        @default(false)
-  isDeleted          Boolean        @default(false)
+  role               Role            @default(USER)
+  isEmailVerified    Boolean         @default(false)
+  isVerified         Boolean         @default(false)
+  isDeleted          Boolean         @default(false)
+  createdAt          DateTime        @default(now())
   hashedRefreshToken String?
   activationLink     String?
   passwordResetToken String?
@@ -15,6 +16,7 @@ model User {
   booking            Booking[]
   review             Review[]
   notifications      Notification[]
+  accommodations     Accommodation[]
 }
 
 model UserProfile {
@@ -65,6 +67,7 @@ model Accommodation {
   media                 Media[]
   reviews               Review[]
   booking               Booking[]
+  owner                 User      @relation(fields: [ownerId], references: [id])
 }
 
 model Amenity {

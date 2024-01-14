@@ -6,25 +6,40 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUser } from 'src/common/types/AuthUser.type';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { HostReviewsDto, HostUserDto } from './dto/host-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { HostService } from './host.service';
 import { PhoneNumberTransformInterceptor } from './phone-validation/phoneNumberTransform.interceptor';
 import { UserService } from './user.service';
-import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly hostService: HostService
+  ) {}
 
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Get all users' })
@@ -81,5 +96,26 @@ export class UserController {
   @LangQuery()
   removeProfile(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.userService.removeUserProfile(id, user);
+  }
+
+  @ApiOperation({ summary: 'Get host by id' })
+  @ApiParam({ name: 'id', description: 'Host id' })
+  @ApiOkResponse({ description: 'Returns host user with details', type: HostUserDto })
+  @ApiBadRequestResponse({ description: 'Not a host profile' })
+  @ApiNotFoundResponse({ description: 'Host profile not found' })
+  @LangQuery()
+  @Get('/host/:id')
+  getHostUserProfile(@Param('id') id: string) {
+    return this.hostService.getHostUserProfile(id);
+  }
+
+  @ApiOperation({ summary: 'Get host comment by page' })
+  @ApiParam({ name: 'id', description: 'Host id' })
+  @ApiQuery({ name: 'page', description: 'Page number' })
+  @ApiOkResponse({ description: 'Returns host reviews', type: HostReviewsDto })
+  @LangQuery()
+  @Get('/host/:id/comments')
+  getHostComments(@Param('id') id: string, @Query('page') page: number) {
+    return this.hostService.getHostComments(id, page);
   }
 }

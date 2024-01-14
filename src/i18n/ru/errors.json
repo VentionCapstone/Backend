@@ -76,5 +76,9 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Неверный старый пароль",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя.",
   "NOT_FOUND_PAYMENT": "Платеж не найден",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Ошибка подтверждения платежа"
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Ошибка подтверждения платежа",
+  "BAD_REQUEST_NOT_A_HOST_PROFILE": "Этот пользователь не является хостом",
+  "NOT_FOUND_HOST_PROFILE": "Профиль хоста не найден",
+  "HOST_PROFILE_FAILED_TO_GET": "Не удалось получить профиль хоста",
+  "REVIEWS_FAILED_TO_GET_LIST": "Не удалось получить список отзывов."
 }

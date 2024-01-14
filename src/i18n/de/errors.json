@@ -76,5 +76,9 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Ungültiges altes Passwort",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden",
   "NOT_FOUND_PAYMENT": "Zahlung nicht gefunden",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Zahlungsbestätigung fehlgeschlagen"
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Zahlungsbestätigung fehlgeschlagen",
+  "BAD_REQUEST_NOT_A_HOST_PROFILE": "Dieser Benutzer ist kein Host",
+  "NOT_FOUND_HOST_PROFILE": "Hostprofil nicht gefunden",
+  "HOST_PROFILE_FAILED_TO_GET": "Hostprofil konnte nicht abgerufen werden",
+  "REVIEWS_FAILED_TO_GET_LIST": "Bewertungsliste konnte nicht abgerufen werden"
 }
