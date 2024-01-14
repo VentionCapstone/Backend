@@ -7,6 +7,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
+import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
+import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
 
 @Injectable()
 export class AccommodationService {
@@ -255,6 +257,8 @@ export class AccommodationService {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
+      this.updateQueryWithSearchOptions(findManyOptions, options);
+
       const findAccommodationsQuery = this.prisma.accommodation.findMany(findManyOptions);
       const countAccommodationsQuery = this.prisma.accommodation.count({
         where: findManyOptions.where,
@@ -296,6 +300,48 @@ export class AccommodationService {
     }
   }
 
+  private updateQueryWithSearchOptions(findManyOptions: any, options: OrderAndFilterDto) {
+    const { location, checkInDate, checkOutDate } = options;
+
+    if (location) {
+      const addressConditions = this.makeAddressConditions(location);
+      findManyOptions.where = {
+        ...findManyOptions.where,
+        address: addressConditions,
+      };
+    }
+
+    if (checkInDate && checkOutDate) {
+      findManyOptions.where = {
+        ...findManyOptions.where,
+        AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
+      };
+    }
+  }
+
+  private makeAddressConditions(location: string) {
+    const addressConditions: any = {};
+    const { country, city, street } = this.parseAddress(location);
+    const addAddressCondition = (addressCondition: string, addressQuery: string | undefined) => {
+      if (!addressQuery) return;
+      addressConditions[addressCondition] = {
+        contains: addressQuery,
+        mode: 'insensitive',
+      };
+    };
+    addAddressCondition('country', normalizeCountryName(country));
+    addAddressCondition('city', normalizeCityName(city));
+    addAddressCondition('street', street);
+    return addressConditions;
+  }
+
+  private parseAddress(addressString: string) {
+    const addressComponents = addressString.split(',').map((component) => component.trim());
+
+    const [country, city, street] = addressComponents.reverse();
+    return { country, city, street };
+  }
+
   private generateFindAllQueryObj(options: OrderAndFilterDto) {
     const {
       minPrice,
@@ -320,6 +366,8 @@ export class AccommodationService {
         price: true,
         address: {
           select: {
+            street: true,
+            city: true,
             country: true,
           },
         },
