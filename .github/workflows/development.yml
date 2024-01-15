@@ -33,6 +33,8 @@ jobs:
           docker build --platform linux/amd64 -t ${{ secrets.DOCKER_USERNAME }}/${{env.DOCKERHUB_IMAGE_NAME}}:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{env.DOCKERHUB_IMAGE_NAME}}:latest
 
+      - name: Rename docker compose config file
+        run: mv docker-compose.ci.yml docker-compose.yml
       - name: Copy docker compose config file to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -40,8 +42,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
-          source: 'docker-compose.ci.yml'
-          target: '/home/ec2-user'
+          source: 'docker-compose.yml'
+          target: /home/ec2-user
 
       - name: Login to EC2 instance
         uses: appleboy/ssh-action@v1.0.0
@@ -51,7 +53,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            docker-compose -f docker-compose.ci.yml down
-            docker-compose -f docker-compose.ci.yml rm -f ${{env.DOCKER_CONTAINER_NAME}}
-            docker-compose -f docker-compose.ci.yml pull ${{env.DOCKER_CONTAINER_NAME}}
-            docker-compose -f docker-compose.ci.yml up -d ${{env.DOCKER_CONTAINER_NAME}}
+            docker-compose down
+            docker-compose rm -f ${{env.DOCKER_CONTAINER_NAME}}
+            docker-compose pull ${{env.DOCKER_CONTAINER_NAME}}
+            docker-compose up -d ${{env.DOCKER_CONTAINER_NAME}}
