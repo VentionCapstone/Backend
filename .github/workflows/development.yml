@@ -33,6 +33,16 @@ jobs:
           docker build --platform linux/amd64 -t ${{ secrets.DOCKER_USERNAME }}/${{env.DOCKERHUB_IMAGE_NAME}}:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{env.DOCKERHUB_IMAGE_NAME}}:latest
 
+      - name: Copy docker compose config file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST_DEV }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          source: 'docker-compose.ci.yml'
+          target: '/home/ec2-user'
+
       - name: Login to EC2 instance
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -41,7 +51,6 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            scp -o StrictHostKeyChecking=no docker-compose.ci.yml ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST_DEV }}:/home/ec2-user
             docker-compose -f docker-compose.ci.yml down
             docker-compose -f docker-compose.ci.yml rm -f ${{env.DOCKER_CONTAINER_NAME}}
             docker-compose -f docker-compose.ci.yml pull ${{env.DOCKER_CONTAINER_NAME}}
