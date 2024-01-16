@@ -1,7 +1,6 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CustomerProfileService } from './customer_profile.service';
 import { UserGuard } from '../common/guards/user.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @UseGuards(UserGuard)
 @Controller('customer-profile')
@@ -13,8 +12,13 @@ export class CustomerProfileController {
     return this.customerProfileService.getReviewsOnAccommodation(accoommodationId);
   }
 
-  @Get('rating')
-  getAverageRating(@CurrentUser('id') userId: string) {
+  @Get('rating/:id')
+  getAverageRating(@Param('id') userId: string) {
     return this.customerProfileService.getAverageRating(userId);
+  }
+
+  @Get('basic-informations/:id')
+  getBasicInformations(@Param('id') userId: string) {
+    return this.customerProfileService.getBasicInformations(userId);
   }
 }

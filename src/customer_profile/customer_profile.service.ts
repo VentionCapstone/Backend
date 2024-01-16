@@ -22,4 +22,19 @@ export class CustomerProfileService {
     const totalRating = userReviews.reduce((sum, review) => sum + review.rating, 0);
     return totalRating / userReviews.length;
   }
+
+  async getBasicInformations(userId: string) {
+    const userBasicInfo = await this.prismaService.user.findMany({
+      where: { id: userId },
+      select: {
+        firstName: true,
+        lastName: true,
+        isVerified: true,
+      },
+    });
+    if (!userBasicInfo.length) {
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
+    }
+    return userBasicInfo;
+  }
 }
