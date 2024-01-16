@@ -24,7 +24,7 @@ model UserProfile {
   gender      Gender
   country     String
   language    String
-  uiTheme     UiTheme @default(LIGHT)
+  uiTheme     UiTheme @default(light)
   description String?
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id])
@@ -149,9 +149,9 @@ enum Gender {
 }
 
 enum UiTheme {
-  LIGHT
-  DARK
-  SYSTEM
+  light
+  dark
+  system
 }
 
 enum Status {

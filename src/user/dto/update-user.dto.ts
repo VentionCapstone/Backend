@@ -34,7 +34,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   language: string;
 
-  @ApiProperty({ example: 'DARK', description: 'UI Theme' })
+  @ApiProperty({ example: 'dark', description: 'UI Theme' })
   @IsEnum(UiTheme)
   uiTheme: UiTheme;
 
