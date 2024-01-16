@@ -76,5 +76,6 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Ungültiges altes Passwort",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Benutzerpasswort konnte nicht aktualisiert werden",
   "NOT_FOUND_PAYMENT": "Zahlung nicht gefunden",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Zahlungsbestätigung fehlgeschlagen"
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Zahlungsbestätigung fehlgeschlagen",
+  "NOT_FOUND_REVIEW_FOR_GET_RATING": "Bewertung nicht gefunden"
 }

@@ -76,5 +76,6 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Неверный старый пароль",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Не удалось обновить пароль пользователя.",
   "NOT_FOUND_PAYMENT": "Платеж не найден",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Ошибка подтверждения платежа"
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Ошибка подтверждения платежа",
+  "NOT_FOUND_REVIEW_FOR_GET_RATING": "Отзыв не найден"
 }

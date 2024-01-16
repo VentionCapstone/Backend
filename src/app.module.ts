@@ -13,6 +13,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import * as path from 'path';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
     PaymentModule,
     StripeModule,
     ReviewsModule,
+    CustomerProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

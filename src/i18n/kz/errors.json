@@ -76,5 +76,6 @@
   "BAD_REQUEST_AUTH_INVALID_OLD_PASS": "Жарамсыз ескі құпия сөз",
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды",
   "NOT_FOUND_PAYMENT": "Төлем табылмады",
-  "PAYMNET_FAILED_WHILE_CONFIRM": "Төлем растау сәтсіздікті"
+  "PAYMNET_FAILED_WHILE_CONFIRM": "Төлем растау сәтсіздікті",
+  "NOT_FOUND_REVIEW_FOR_GET_RATING": "Пікір табылмады"
 }
