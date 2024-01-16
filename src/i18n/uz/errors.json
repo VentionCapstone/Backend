@@ -77,7 +77,6 @@
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Foydalanuvchi parolini yangilab bo'lmadi",
   "NOT_FOUND_PAYMENT": "To'lov topilmadi",
   "PAYMNET_FAILED_WHILE_CONFIRM": "To'lov tasdiqlanmadi",
-  "BAD_REQUEST_NOT_A_HOST_PROFILE": "Bu foydalanuvchi xost emas",
   "NOT_FOUND_HOST_PROFILE": "Xost profili topilmadi",
   "HOST_PROFILE_FAILED_TO_GET": "Xost profilini olib bo'lmadi",
   "REVIEWS_FAILED_TO_GET_LIST": "Sharhlar ro'yxatini olib bo'lmadi"

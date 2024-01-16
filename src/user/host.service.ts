@@ -3,6 +3,7 @@ import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { HostUser } from './type/HostUser';
 
 @Injectable()
 export class HostService {
@@ -12,78 +13,58 @@ export class HostService {
 
   async getHostUserProfile(id: string) {
     try {
-      const user = await this.prismaService.user.findUnique({
-        where: { id, isDeleted: false },
-        include: {
-          profile: true,
-          accommodations: {
-            where: { isDeleted: false },
-            select: {
-              id: true,
-              title: true,
-              previewImgUrl: true,
-            },
-          },
-        },
-      });
+      const user = (
+        await this.prismaService.$queryRaw<HostUser[]>`
+WITH 
+	"userAccommodations" AS (SELECT * FROM "Accommodation" WHERE "ownerId" = ${id}),
+	"userReviews" AS (SELECT * FROM "Review" WHERE "accommodationId" IN (SELECT id FROM "userAccommodations"))
+SELECT 
+	usr.id, usr.email, usr."firstName", usr."lastName", usr."isVerified", usr."isEmailVerified", usr."createdAt", 
+	up.language, up.country, up.description, up."imageUrl",
+	(SELECT AVG(rating) FROM "userReviews") as "rating",
+	(SELECT COUNT(*)::int FROM "userReviews") as "reviewsCount",
+	(
+	  SELECT json_agg(
+	    json_build_object(
+	      'id', "id",
+	      'title', "title",
+	      'previewImgUrl', "previewImgUrl",
+	      'rating', (SELECT AVG(rating) FROM "userReviews" WHERE "accommodationId" = usr_acc.id)
+	    )
+	  )
+	  FROM "userAccommodations" usr_acc
+	  WHERE  "isDeleted" = false
+	) as "accommodations",
+	(
+	  SELECT json_agg(reviewRows.review)
+	  FROM (
+	      SELECT json_build_object(
+		      'id', r.id,
+		      'accommodationId', r."accommodationId",
+		      'feedback', r.feedback,
+		      'rating', r.rating,
+		      'createdAt', r."createdAt",
+		      'user', json_build_object(
+		        'id', u.id,
+		        'firstName', u."firstName",
+		        'lastName', u."lastName",
+		        'profile', json_build_object(
+              'imageUrl', p."imageUrl"
+            )
+		      )
+		    ) AS review
+		  FROM "userReviews" r
+		  JOIN "User" u ON u.id = r."userId"
+		  JOIN "UserProfile" p ON p."userId" = u.id
+		  ORDER BY r."createdAt" DESC
+		  LIMIT ${this.PAGE_SIZE}
+	  ) AS reviewRows
+	) as "reviews"
+FROM "User" usr JOIN "UserProfile" up ON usr.id = up."userId"
+WHERE usr.id = ${id} AND "isDeleted" = FALSE;`
+      )[0];
 
-      if (!user || !user.profile) throw new NotFoundException(ErrorsTypes.NOT_FOUND_HOST_PROFILE);
-
-      if (user.accommodations.length === 0)
-        throw new NotFoundException(ErrorsTypes.BAD_REQUEST_NOT_A_HOST_PROFILE);
-
-      const [reviews, reviewsCount, ratingAverages] = await this.prismaService.$transaction([
-        this.prismaService.review.findMany({
-          where: { accommodation: { ownerId: id } },
-          select: {
-            id: true,
-            accommodationId: true,
-            feedback: true,
-            rating: true,
-            createdAt: true,
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                profile: {
-                  select: {
-                    imageUrl: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: { createdAt: SortOrder.DESC },
-          take: this.PAGE_SIZE,
-        }),
-        this.prismaService.review.count({
-          where: { accommodation: { ownerId: id } },
-        }),
-        this.prismaService.review.groupBy({
-          by: ['accommodationId'],
-          _avg: { rating: true },
-          where: { accommodation: { ownerId: id } },
-          orderBy: { _avg: { rating: SortOrder.DESC } },
-        }),
-      ]);
-
-      let ratingCount = 0;
-      const overallRating =
-        ratingAverages.reduce((acc, cur) => {
-          if (!cur._avg || !cur._avg.rating) return acc;
-
-          ratingCount++;
-
-          return acc + cur._avg.rating;
-        }, 0) / ratingCount;
-
-      const accommodations = user.accommodations.map((accommodation) => ({
-        ...accommodation,
-        rating: ratingAverages
-          .find((rating) => rating.accommodationId === accommodation.id)
-          ?._avg?.rating?.toFixed(1),
-      }));
+      if (!user) throw new NotFoundException(ErrorsTypes.NOT_FOUND_HOST_PROFILE);
 
       return {
         success: true,
@@ -94,17 +75,17 @@ export class HostService {
           lastName: user.lastName,
           isVerified: user.isVerified,
           isEmailVerified: user.isEmailVerified,
-          language: user.profile.language,
-          country: user.profile.country,
-          description: user.profile.description,
-          imageUrl: user.profile.imageUrl,
-          joinedAt: user.createdAt,
-          rating: overallRating.toFixed(1),
-          accommodations: accommodations,
+          createdAt: user.createdAt,
+          language: user.language,
+          country: user.country,
+          description: user.description,
+          imageUrl: user.imageUrl,
+          rating: user.rating,
+          accommodations: user.accommodations,
           reviews: {
-            count: reviewsCount,
+            count: user.reviewsCount,
             page: 1,
-            list: reviews,
+            list: user.reviews,
           },
         },
       };

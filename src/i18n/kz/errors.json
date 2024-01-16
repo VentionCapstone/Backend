@@ -77,7 +77,6 @@
   "AUTH_FAILED_TO_UPDATE_PASSWORD": "Пайдаланушы құпия сөзін жаңарту сәтсіз аяқталды",
   "NOT_FOUND_PAYMENT": "Төлем табылмады",
   "PAYMNET_FAILED_WHILE_CONFIRM": "Төлем растау сәтсіздікті",
-  "BAD_REQUEST_NOT_A_HOST_PROFILE": "Бұл пайдаланушы хост емес",
   "NOT_FOUND_HOST_PROFILE": "Хост профилі табылмады",
   "HOST_PROFILE_FAILED_TO_GET": "Хост профилін алу мүмкін болмады",
   "REVIEWS_FAILED_TO_GET_LIST": "Пікірлер тізімін алу мүмкін болмады"
