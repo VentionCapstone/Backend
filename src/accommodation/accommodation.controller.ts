@@ -28,6 +28,11 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import {
+  ACCOMMODATION_IMAGES_MIN_LENGTH,
+  ACCOMMODATION_IMAGE_MAX_SIZE,
+  IMAGES_FILE_TYPES,
+} from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
@@ -120,7 +125,7 @@ export class AccommodationController {
           base64Image: { type: 'string' },
         },
       },
-      description: 'Images file (only .jpg, .jpeg, .png allowed), size < 10MB!',
+      description: `Images file (only ${IMAGES_FILE_TYPES} allowed), size < ${ACCOMMODATION_IMAGE_MAX_SIZE}mb!`,
     },
   })
   @ApiBearerAuth()
@@ -132,8 +137,8 @@ export class AccommodationController {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new MaxFileSizeValidator({ maxSize: ACCOMMODATION_IMAGE_MAX_SIZE * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
         ],
       })
     )
@@ -141,7 +146,7 @@ export class AccommodationController {
     @Param('id') id: string,
     @CurrentUser('id') userId: string
   ) {
-    if (!images || images.length < 5) {
+    if (!images || images.length < ACCOMMODATION_IMAGES_MIN_LENGTH) {
       throw new BadRequestException(ErrorsTypes.NOT_ENOUGH_IMAGES_TO_UPLOAD);
     }
 

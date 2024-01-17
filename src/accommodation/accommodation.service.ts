@@ -207,10 +207,7 @@ export class AccommodationService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            throw new GlobalException(
-              ErrorsTypes.ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_S3,
-              error.message
-            );
+            throw new GlobalException(ErrorsTypes.FAILED_TO_STORE_IMAGES_TO_STORAGE, error.message);
           })
         )
     );
@@ -247,7 +244,7 @@ export class AccommodationService {
       const imagesToCreate = uploadedImagesResponse.map((image) => ({
         imageUrl: image.data.imageUrl,
         thumbnailUrl: image.data.thumbnailUrl,
-        accommodationId: accommodationId,
+        accommodationId,
       }));
 
       await this.prisma.media.createMany({
