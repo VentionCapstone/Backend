@@ -1,13 +1,14 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsString,
-  IsInt,
+  IsBoolean,
   IsDate,
+  IsInt,
   IsOptional,
+  IsString,
   IsUrl,
   Max,
-  ValidateNested,
   Min,
+  ValidateNested,
 } from 'class-validator';
 import UpdateAddressDto from './update-address.dto';
 
@@ -44,6 +45,10 @@ export default class UpdateAccommodationDto {
   @IsInt()
   @Max(ACCOMMODATION_MAX_PRICE ? +ACCOMMODATION_MAX_PRICE : 2147483647)
   price: number;
+
+  @IsOptional()
+  @IsBoolean()
+  available: boolean;
 
   @IsOptional()
   @Transform(({ value }) => new Date(value))

@@ -35,7 +35,22 @@ async function main() {
   for (const accommodation of accommodations) {
     await prisma.accommodation.create({
       data: {
-        ...accommodation,
+        owner: {
+          connect: {
+            id: accommodation.ownerId,
+          },
+        },
+        title: accommodation.title,
+        thumbnailUrl: accommodation.thumbnailUrl,
+        squareMeters: accommodation.squareMeters,
+        timezoneOffset: accommodation.timezoneOffset,
+        numberOfRooms: accommodation.numberOfRooms,
+        price: accommodation.price,
+        allowedNumberOfPeople: accommodation.allowedNumberOfPeople,
+        availableFrom: accommodation.availableFrom,
+        availableTo: accommodation.availableTo,
+        description: accommodation.description,
+        previewImgUrl: accommodation.previewImgUrl,
         address: {
           connect: {
             id: accommodation.address.id,

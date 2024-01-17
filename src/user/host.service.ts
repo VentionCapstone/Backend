@@ -33,7 +33,7 @@ SELECT
 	    )
 	  )
 	  FROM "userAccommodations" usr_acc
-	  WHERE  "isDeleted" = false
+	  WHERE  "isDeleted" = false AND "available" = true
 	) as "accommodations",
 	(
 	  SELECT json_agg(reviewRows.review)

@@ -56,6 +56,7 @@ model Accommodation {
   numberOfRooms         Int
   price                 Int
   allowedNumberOfPeople Int
+  available             Boolean   @default(true)
   availableFrom         DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
   availableTo           DateTime  @db.Date
   timezoneOffset        Int

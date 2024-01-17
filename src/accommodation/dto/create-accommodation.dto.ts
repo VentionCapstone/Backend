@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDate,
   IsInt,
   IsNotEmpty,
@@ -49,6 +50,10 @@ export default class CreateAccommodationDto {
   @Min(0)
   @Max(ACCOMMODATION_MAX_PRICE ? +ACCOMMODATION_MAX_PRICE : 2147483647)
   price: number;
+
+  @IsOptional()
+  @IsBoolean()
+  available: boolean;
 
   @IsOptional()
   @Transform(({ value }) => new Date(value))
