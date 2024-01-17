@@ -24,7 +24,7 @@ export class CustomerProfileService {
   }
 
   async getBasicInformations(userId: string) {
-    const userBasicInfo = await this.prismaService.user.findMany({
+    const userBasicInfo = await this.prismaService.user.findFirst({
       where: { id: userId },
       select: {
         firstName: true,
@@ -32,11 +32,12 @@ export class CustomerProfileService {
         isVerified: true,
       },
     });
-    if (!userBasicInfo.length) {
+    if (!userBasicInfo) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
     }
     const userBooking = await this.prismaService.booking.findFirst({ where: { userId } });
     if (!userBooking) throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
-    return userBasicInfo;
+    const result = { ...userBasicInfo, registrationDate: userBooking.registrationDate };
+    return result;
   }
 }
