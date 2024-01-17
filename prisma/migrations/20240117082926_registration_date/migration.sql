@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Booking" ADD COLUMN     "registrationDate" DATE NOT NULL DEFAULT CURRENT_TIMESTAMP;

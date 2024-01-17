@@ -37,6 +37,7 @@ model Booking {
   paymentId       String?
   startDate       DateTime      @db.Date
   endDate         DateTime      @db.Date
+  registrationDate DateTime      @db.Date @default(now())
   status          Status        @default(PENDING)
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])

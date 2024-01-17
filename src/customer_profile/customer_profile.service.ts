@@ -35,6 +35,8 @@ export class CustomerProfileService {
     if (!userBasicInfo.length) {
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_AUTH_USER);
     }
+    const userBooking = await this.prismaService.booking.findFirst({ where: { userId } });
+    if (!userBooking) throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
     return userBasicInfo;
   }
 }
