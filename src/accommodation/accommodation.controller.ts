@@ -1,22 +1,22 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
-  NotFoundException,
   Param,
   ParseFilePipe,
   Patch,
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,6 +31,7 @@ import {
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import ErrorsTypes from 'src/errors/errors.enum';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { AccommodationService } from './accommodation.service';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
@@ -80,7 +81,7 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'Add image to accommodation' })
+  @ApiOperation({ summary: 'Add images to accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
@@ -111,43 +112,42 @@ export class AccommodationController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'Image file (only .jpg, .jpeg, .png allowed), size < 10MB!',
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          filename: { type: 'string' },
+          base64Image: { type: 'string' },
         },
       },
+      description: 'Images file (only .jpg, .jpeg, .png allowed), size < 10MB!',
     },
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @LangQuery()
   @Post('/:id/file')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('images', 10))
   async updateAccommodationAddFile(
-    @UploadedFile(
+    @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
           new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
       })
     )
-    file: Express.Multer.File,
+    images: Array<Express.Multer.File>,
     @Param('id') id: string,
     @CurrentUser('id') userId: string
   ) {
-    if (!file) throw new NotFoundException('File for updation not provided');
+    if (!images || images.length < 5) {
+      throw new BadRequestException(ErrorsTypes.NOT_ENOUGH_IMAGES_TO_UPLOAD);
+    }
 
-    const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
-      id,
-      file,
-      userId
-    );
+    await this.accommodationService.addFileToAccommodation(id, images, userId);
 
-    return { success: true, data: updatedAccommodation };
+    return { success: true, data: {} };
   }
 
   @ApiOperation({ summary: 'Update accommodation' })
