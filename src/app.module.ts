@@ -1,18 +1,19 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import * as path from 'path';
 import { AccommodationModule } from './accommodation/accommodation.module';
 import { AmenitiesModule } from './amenities/amenities.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
-import { UserModule } from './user/user.module';
 import { HealthModule } from './health-check/health.module';
 import { PaymentModule } from './payment/payment.module';
-import { StripeModule } from './stripe/stripe.module';
 import { ReviewsModule } from './reviews/reviews.module';
-import * as path from 'path';
-import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { StripeModule } from './stripe/stripe.module';
+import { UserModule } from './user/user.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
     PaymentModule,
     StripeModule,
     ReviewsModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
