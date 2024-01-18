@@ -80,5 +80,5 @@
   "NOT_FOUND_HOST_PROFILE": "Профиль хоста не найден",
   "HOST_PROFILE_FAILED_TO_GET": "Не удалось получить профиль хоста",
   "REVIEWS_FAILED_TO_GET_LIST": "Не удалось получить список отзывов.",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Жилье недоступно для бронирования"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Апартамент временно недоступен для бронирования"
 }

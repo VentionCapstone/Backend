@@ -11,6 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { POSTGRES_MAX_SAFE_INTEGER } from 'src/common/constants/postgres';
 import CreateAddressDto from './create-address.dto';
 
 const { ACCOMMODATION_MAX_ROOMS, ACCOMMODATION_MAX_PEOPLE, ACCOMMODATION_MAX_PRICE } = process.env;
@@ -36,19 +37,19 @@ export default class CreateAccommodationDto {
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(ACCOMMODATION_MAX_ROOMS ? +ACCOMMODATION_MAX_ROOMS : 2147483647)
+  @Max(ACCOMMODATION_MAX_ROOMS ? +ACCOMMODATION_MAX_ROOMS : POSTGRES_MAX_SAFE_INTEGER)
   numberOfRooms: number;
 
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(ACCOMMODATION_MAX_PEOPLE ? +ACCOMMODATION_MAX_PEOPLE : 2147483647)
+  @Max(ACCOMMODATION_MAX_PEOPLE ? +ACCOMMODATION_MAX_PEOPLE : POSTGRES_MAX_SAFE_INTEGER)
   allowedNumberOfPeople: number;
 
   @IsNotEmpty()
   @IsInt()
   @Min(0)
-  @Max(ACCOMMODATION_MAX_PRICE ? +ACCOMMODATION_MAX_PRICE : 2147483647)
+  @Max(ACCOMMODATION_MAX_PRICE ? +ACCOMMODATION_MAX_PRICE : POSTGRES_MAX_SAFE_INTEGER)
   price: number;
 
   @IsOptional()
