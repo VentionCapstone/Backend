@@ -179,6 +179,7 @@ export class BookingService {
 
       return {
         id: booking.id,
+        accommodationId,
         startDate: booking.startDate,
         endDate: booking.endDate,
         status: booking.status,
