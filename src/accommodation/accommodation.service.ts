@@ -327,14 +327,21 @@ export class AccommodationService {
       };
     }
 
-    if (checkInDate && checkOutDate) {
-      if (dayjs(checkOutDate).isSameOrBefore(dayjs(checkInDate)))
-        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
-      findManyOptions.where = {
-        ...findManyOptions.where,
-        AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
-      };
+    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
     }
+
+    findManyOptions.where = {
+      ...findManyOptions.where,
+      AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
+    };
+  }
+
+  private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
+    const result =
+      !(checkIn && checkOut) ||
+      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn)));
+    return result;
   }
 
   private makeAddressConditions(location: string) {
