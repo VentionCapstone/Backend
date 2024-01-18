@@ -388,7 +388,7 @@ export class AccommodationController {
   @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodations = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodations };
+    const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data: { ...accommodation, owner } };
   }
 }

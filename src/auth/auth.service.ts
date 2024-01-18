@@ -173,8 +173,10 @@ export class AuthService {
         success: true,
       };
     } catch (error) {
-      if (error instanceof TokenExpiredError)
+      if (error instanceof TokenExpiredError) {
+        res.clearCookie('refresh_token');
         throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_AUTH_EXPIRED_REFRESH_TOKEN);
+      }
 
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_REFRESH_TOKENS, error.message);
