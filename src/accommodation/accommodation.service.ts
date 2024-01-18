@@ -329,7 +329,7 @@ export class AccommodationService {
     }
 
     if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
-      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
     findManyOptions.where = {
@@ -340,7 +340,8 @@ export class AccommodationService {
 
   private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
     const result =
-      !(checkIn && checkOut) ||
+      (!checkIn && checkOut) ||
+      (checkIn && !checkOut) ||
       (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn)));
     return result;
   }
