@@ -312,6 +312,7 @@ export class AccommodationService {
         data: accommodations,
       };
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
   }

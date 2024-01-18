@@ -79,5 +79,6 @@
   "PAYMENT_FAILED_WHILE_CONFIRM": "Failed to confirm payment",
   "NOT_FOUND_HOST_PROFILE": "Host profile not found",
   "HOST_PROFILE_FAILED_TO_GET": "Failed to get host profile",
-  "REVIEWS_FAILED_TO_GET_LIST": "Failed to get reviews list"
+  "REVIEWS_FAILED_TO_GET_LIST": "Failed to get reviews list",
+  "BAD_REQUEST_INVALID_DATE_RANGE": "Date range is invalid"
 }
