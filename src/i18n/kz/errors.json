@@ -80,5 +80,6 @@
   "NOT_FOUND_HOST_PROFILE": "Хост профилі табылмады",
   "HOST_PROFILE_FAILED_TO_GET": "Хост профилін алу мүмкін болмады",
   "REVIEWS_FAILED_TO_GET_LIST": "Пікірлер тізімін алу мүмкін болмады",
+  "BAD_REQUEST_INVALID_DATE_RANGE": "Күндер ауқымы жарамсыз",
   "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Брондау үшін тұру уақытша қолжетімсіз"
 }

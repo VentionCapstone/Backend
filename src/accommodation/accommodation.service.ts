@@ -316,6 +316,7 @@ export class AccommodationService {
         data: accommodations,
       };
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
   }
@@ -331,12 +332,22 @@ export class AccommodationService {
       };
     }
 
-    if (checkInDate && checkOutDate) {
-      findManyOptions.where = {
-        ...findManyOptions.where,
-        AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
-      };
+    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
+
+    findManyOptions.where = {
+      ...findManyOptions.where,
+      AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
+    };
+  }
+
+  private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
+    const result =
+      (!checkIn && checkOut) ||
+      (checkIn && !checkOut) ||
+      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn)));
+    return result;
   }
 
   private makeAddressConditions(location: string) {
