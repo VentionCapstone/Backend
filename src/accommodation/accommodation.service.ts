@@ -328,6 +328,8 @@ export class AccommodationService {
     }
 
     if (checkInDate && checkOutDate) {
+      if (dayjs(checkOutDate).isSameOrBefore(dayjs(checkInDate)))
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_INVALID_DATES);
       findManyOptions.where = {
         ...findManyOptions.where,
         AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
