@@ -1,4 +1,5 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -154,37 +155,40 @@ export class AccommodationService {
   }
 
   async getOneAccommodation(id: string) {
-    let accommodation;
     try {
-      accommodation = await this.prisma.accommodation.findUnique({
+      const accommodation = await this.prisma.accommodation.findUnique({
         where: { id },
         include: {
           address: true,
           media: true,
           amenities: true,
-          owner: {
+        },
+      });
+
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
+
+      const owner = await this.prisma.user.findUnique({
+        where: { id: accommodation.ownerId },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          createdAt: true,
+          isVerified: true,
+          profile: {
             select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              createdAt: true,
-              isVerified: true,
-              profile: {
-                select: {
-                  language: true,
-                  country: true,
-                  imageUrl: true,
-                },
-              },
+              language: true,
+              country: true,
+              imageUrl: true,
             },
           },
         },
       });
+
+      return { accommodation, owner };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
-    if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
-    return accommodation;
   }
 
   async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
@@ -372,7 +376,7 @@ export class AccommodationService {
       orderByPrice,
       orderByRoom,
     } = options;
-    const findManyOptions: any = {
+    const findManyOptions: Prisma.AccommodationFindManyArgs = {
       select: {
         id: true,
         thumbnailUrl: true,
@@ -390,6 +394,7 @@ export class AccommodationService {
       },
 
       where: {
+        available: true,
         isDeleted: false,
         price: {
           gte: minPrice,
