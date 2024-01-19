@@ -2,14 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -74,6 +79,27 @@ export class UserController {
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: AuthUser) {
     return this.userService.createUserProfile(createUserDto, user);
+  }
+
+  @UseGuards(UserGuard)
+  @ApiOperation({ summary: 'Add profile image' })
+  @LangQuery()
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('image'))
+  addImageToProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      })
+    )
+    file: Express.Multer.File,
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.userService.addProfileImage(id, userId, file);
   }
 
   @UseGuards(UserGuard)
