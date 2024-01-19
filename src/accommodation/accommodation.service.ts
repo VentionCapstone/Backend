@@ -346,23 +346,41 @@ export class AccommodationService {
     const result =
       (!checkIn && checkOut) ||
       (checkIn && !checkOut) ||
-      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn)));
+      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day')) ||
+      (checkIn && checkOut && dayjs(checkIn).isBefore(dayjs(), 'day')) ||
+      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(), 'day'));
     return result;
   }
 
   private makeAddressConditions(location: string) {
     const addressConditions: any = {};
     const { country, city, street } = this.parseAddress(location);
+
+    if (!city && !street) {
+      const createArray = <T>(...items: T[]) => items;
+      addressConditions.OR = createArray(
+        { country: { startsWith: normalizeCountryName(location), mode: 'insensitive' } },
+        { city: { startsWith: normalizeCityName(location), mode: 'insensitive' } },
+        { street: { startsWith: location, mode: 'insensitive' } }
+      );
+      return addressConditions;
+    }
+
     const addAddressCondition = (addressCondition: string, addressQuery: string | undefined) => {
       if (!addressQuery) return;
+      if (addressCondition === 'street' && addressQuery.split(' ').length > 1) {
+        addressQuery = addressQuery.split(' ')[0];
+      }
       addressConditions[addressCondition] = {
-        contains: addressQuery,
+        startsWith: addressQuery,
         mode: 'insensitive',
       };
     };
+
     addAddressCondition('country', normalizeCountryName(country));
     addAddressCondition('city', normalizeCityName(city));
     addAddressCondition('street', street);
+
     return addressConditions;
   }
 
