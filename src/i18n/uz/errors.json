@@ -65,6 +65,7 @@
   "USER_PROFILE_FAILED_TO_UPDATE": "Foydalanuvchi profilini yangilab bo'lmadi",
   "USER_PROFILE_FAILED_TO_GET": "Foydalanuvchi profili olishda xatolik",
   "USER_PROFILE_FAILED_TO_DELETE": "Foydalanuvchi profilini o'chirib bo'lmadi",
+  "USER_FAILED_TO_STORE_IMAGES_TO_STORAGE": "Rasmlarni xotiraga yuklab bo'lmadi",
   "AMENITIES_FAILED_TO_GET_LIST": "Qulayliklar ro'yxatini olishda xatolik",
   "AMENITIES_FAILED_TO_ADD": "Qulayliklarni yaratishda xatolik",
   "AMENITIES_FAILED_TO_UPDATE": "Qulayliklarni yangilab bo'lmadi",

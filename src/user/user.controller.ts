@@ -25,6 +25,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { IMAGES_FILE_TYPES, PROFILE_IMAGE_MAX_SIZE } from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
@@ -90,8 +91,8 @@ export class UserController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new MaxFileSizeValidator({ maxSize: PROFILE_IMAGE_MAX_SIZE * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
         ],
       })
     )
