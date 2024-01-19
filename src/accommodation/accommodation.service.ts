@@ -207,7 +207,10 @@ export class AccommodationService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            throw new GlobalException(ErrorsTypes.FAILED_TO_STORE_IMAGES_TO_STORAGE, error.message);
+            throw new GlobalException(
+              ErrorsTypes.ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_STORAGE,
+              error.message
+            );
           })
         )
     );
@@ -219,6 +222,8 @@ export class AccommodationService {
     images: Express.Multer.File[],
     ownerId: string
   ): Promise<any> {
+    console.log(images);
+
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({

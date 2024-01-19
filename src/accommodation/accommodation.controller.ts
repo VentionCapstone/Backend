@@ -147,7 +147,7 @@ export class AccommodationController {
     @CurrentUser('id') userId: string
   ) {
     if (!images || images.length < ACCOMMODATION_IMAGES_MIN_LENGTH) {
-      throw new BadRequestException(ErrorsTypes.NOT_ENOUGH_IMAGES_TO_UPLOAD);
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPLOAD);
     }
 
     await this.accommodationService.addFileToAccommodation(id, images, userId);
