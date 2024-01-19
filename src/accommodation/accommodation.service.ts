@@ -400,7 +400,9 @@ export class AccommodationService {
       };
     }
 
-    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+    if (!checkInDate && !checkOutDate) return;
+
+    if (!this.isValidDateRange(checkInDate, checkOutDate)) {
       throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
@@ -410,13 +412,17 @@ export class AccommodationService {
     };
   }
 
-  private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    if (!checkIn || !checkOut) return true;
-    return (
+  private isValidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
+    if (
+      !checkIn ||
+      !checkOut ||
       dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
       dayjs(checkIn).isBefore(dayjs(), 'day') ||
       dayjs(checkOut).isSameOrBefore(dayjs(), 'day')
-    );
+    )
+      return false;
+
+    return true;
   }
 
   private makeAddressConditions(location: string) {
