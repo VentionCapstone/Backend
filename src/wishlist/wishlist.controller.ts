@@ -1,8 +1,9 @@
 import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -18,16 +19,13 @@ export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 
   @ApiOperation({ summary: 'Get all from wishlist' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: WishlistResponseDto,
   })
-  @ApiResponse({
-    status: 500,
+  @ApiInternalServerErrorResponse({
     description: 'Internal Server Error',
   })
   @ApiUnauthorizedResponse({
-    status: 401,
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
@@ -37,16 +35,13 @@ export class WishlistController {
   }
 
   @ApiOperation({ summary: 'Add to wishlist' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: WishlisResponse,
   })
-  @ApiResponse({
-    status: 500,
+  @ApiInternalServerErrorResponse({
     description: 'Internal Server Error',
   })
   @ApiUnauthorizedResponse({
-    status: 401,
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
@@ -59,16 +54,13 @@ export class WishlistController {
   }
 
   @ApiOperation({ summary: 'Delete from wishlist' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     type: WishlisResponse,
   })
-  @ApiResponse({
-    status: 500,
+  @ApiInternalServerErrorResponse({
     description: 'Internal Server Error',
   })
   @ApiUnauthorizedResponse({
-    status: 401,
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
