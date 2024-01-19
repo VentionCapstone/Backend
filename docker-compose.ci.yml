@@ -1,4 +1,9 @@
 version: '3.8'
+
+networks:
+  vention-network:
+    name: vention-network
+
 services:
   postgres:
     image: postgres:alpine
@@ -13,6 +18,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - vention-network
     volumes:
       - ./data:/var/lib/postgresql/data
     ports:
@@ -27,6 +34,8 @@ services:
     ports:
       - 3000:3000
       - 5555:5555
+    networks:
+      - vention-network
     depends_on:
       postgres:
         condition: service_healthy
