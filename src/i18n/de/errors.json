@@ -82,6 +82,7 @@
   "REVIEWS_FAILED_TO_GET_LIST": "Bewertungsliste konnte nicht abgerufen werden",
   "BAD_REQUEST_INVALID_DATE_RANGE": "Der Datumsbereich ist ungültig",
   "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Die Unterkunft ist vorübergehend nicht buchbar",
+  "BOOKING_FAILED_TO_GET_USER_BOOKINGS": "Benutzerbuchungen konnten nicht abgerufen werden",
   "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Die Unterkunft wurde bereits zur Wunschliste hinzugefügt",
   "WISHLIST_FAILED_TO_GET_LIST": "Fehler beim Abrufen der Unterkünfte von der Wunschliste",
   "WISHLIST_FAILED_TO_ADD": "Fehler beim Hinzufügen zur Wunschliste",

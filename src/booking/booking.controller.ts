@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -7,9 +7,12 @@ import {
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
+import { PaginationDto } from 'src/accommodation/dto/pagination.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { BookingService } from './booking.service';
 import { AvailableDatesResDto, BookingReqDto, BookingResDto } from './dto';
@@ -50,5 +53,29 @@ export class BookingController {
       success: true,
       data,
     };
+  }
+
+  @Get('/my-bookings')
+  @LangQuery()
+  @ApiOperation({ summary: 'Get user bookings' })
+  @ApiOkResponse({
+    description: 'Returns array of bookings',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        data: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(BookingResDto),
+          },
+        },
+        totalCount: {
+          type: 'number',
+        },
+      },
+    },
+  })
+  async getUserBookings(@Query() options: PaginationDto, @CurrentUser() user: AuthUser) {
+    return this.bookingService.getUserBookings(user, options);
   }
 }
