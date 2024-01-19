@@ -63,7 +63,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            docker-compose down
-            docker-compose rm -f ${{env.DOCKER_CONTAINER_NAME}}
-            docker-compose pull ${{env.DOCKER_CONTAINER_NAME}}
-            docker-compose up -d ${{env.DOCKER_CONTAINER_NAME}}
+            docker compose down
+            docker compose rm -f ${{env.DOCKER_CONTAINER_NAME}}
+            docker compose pull ${{env.DOCKER_CONTAINER_NAME}}
+            docker compose up -d ${{env.DOCKER_CONTAINER_NAME}}
