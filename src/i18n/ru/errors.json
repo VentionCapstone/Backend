@@ -81,5 +81,10 @@
   "HOST_PROFILE_FAILED_TO_GET": "Не удалось получить профиль хоста",
   "REVIEWS_FAILED_TO_GET_LIST": "Не удалось получить список отзывов.",
   "BAD_REQUEST_INVALID_DATE_RANGE": "Недопустимый диапазон дат",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Апартамент временно недоступен для бронирования"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Апартамент временно недоступен для бронирования",
+  "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Размещение уже добавлено в список желаний",
+  "WISHLIST_FAILED_TO_GET_LIST": "Не удалось получить список желаний",
+  "WISHLIST_FAILED_TO_ADD": "Не удалось добавить в список желаний",
+  "WISHLIST_FAILED_TO_FIND": "Не удалось найти в списке желаний",
+  "WISHLIST_FAILED_TO_DELETE": "Не удалось удалить из списка желаний"
 }

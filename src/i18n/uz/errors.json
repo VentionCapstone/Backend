@@ -81,5 +81,10 @@
   "HOST_PROFILE_FAILED_TO_GET": "Xost profilini olib bo'lmadi",
   "REVIEWS_FAILED_TO_GET_LIST": "Sharhlar ro'yxatini olib bo'lmadi",
   "BAD_REQUEST_INVALID_DATE_RANGE": "Sana oralig‘i noto‘g‘ri",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Turar joyni vaqtinchalik bron qilib bo'lmaydi"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Turar joyni vaqtinchalik bron qilib bo'lmaydi",
+  "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Turar joy allaqachon xohish ro'yxatiga qo'shilgan",
+  "WISHLIST_FAILED_TO_GET_LIST": "Xohish ro'yxatidan turar joylarni olishda xatolik",
+  "WISHLIST_FAILED_TO_ADD": "Xohish ro'yxatiga qo'shishda xatolik",
+  "WISHLIST_FAILED_TO_FIND": "Xohish ro'yxatidan topilmadi",
+  "WISHLIST_FAILED_TO_DELETE": "Xohish ro'yxatidan o'chirishda xatolik"
 }
