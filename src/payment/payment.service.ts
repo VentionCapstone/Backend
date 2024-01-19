@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Status } from '@prisma/client';
+import * as dayjs from 'dayjs';
 import { I18nService } from 'nestjs-i18n';
 import { translateMessage } from 'src/helpers/translateMessage.helper';
 import MessagesTypes from 'src/messages/messages.enum';
@@ -7,9 +8,8 @@ import ErrorsTypes from '../errors/errors.enum';
 import { GlobalException } from '../exceptions/global.exception';
 import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from '../stripe/stripe.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import * as dayjs from 'dayjs';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
+import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -48,7 +48,7 @@ export class PaymentService {
     } = {
       succeeded: async () => {
         await this.prismaService.booking.update({
-          data: { status: Status.COMPLETED },
+          data: { status: Status.ACTIVE },
           where: { id: confirmPaymentDto.bookingId },
         });
         const paymentId = await this.getPaymentId(confirmPaymentDto.bookingId);
@@ -98,7 +98,7 @@ export class PaymentService {
 
       await this.prismaService.booking.updateMany({
         where: { id: createPaymentDto.bookingId, status: Status.PENDING },
-        data: { status: Status.COMPLETED },
+        data: { status: Status.ACTIVE },
       });
 
       return {
