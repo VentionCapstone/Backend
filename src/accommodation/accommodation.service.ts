@@ -402,7 +402,7 @@ export class AccommodationService {
 
     if (!checkInDate && !checkOutDate) return;
 
-    if (!this.isValidDateRange(checkInDate, checkOutDate)) {
+    if (!checkInDate || !checkOutDate || this.isInvalidDateRange(checkInDate, checkOutDate)) {
       throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
@@ -412,17 +412,12 @@ export class AccommodationService {
     };
   }
 
-  private isValidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    if (
-      !checkIn ||
-      !checkOut ||
+  private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
+    return (
       dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
       dayjs(checkIn).isBefore(dayjs(), 'day') ||
       dayjs(checkOut).isSameOrBefore(dayjs(), 'day')
-    )
-      return false;
-
-    return true;
+    );
   }
 
   private makeAddressConditions(location: string) {
