@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
 import { WinstonModule } from 'nest-winston';
 import { I18nService } from 'nestjs-i18n';
 import { format, transports } from 'winston';
@@ -48,6 +49,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(CookieParser());
+  app.use(json({ limit: '20mb' }));
+  app.use(urlencoded({ extended: true, limit: '20mb' }));
   app.enableCors({
     origin: process.env.ANY_ORIGIN === 'true' ? true : process.env.FRONTEND_URL,
     credentials: true,

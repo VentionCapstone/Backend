@@ -14,7 +14,10 @@
   "USER_PROFILE_DELETE_SUCCESS": "Профиль успешно удален",
 
   "BOOKING_PAYMENT_SUCCESS": "Оплата успешно обработана",
-  "BOOKING_PAYMENT_PROCESSING": "Ваш платеж обрабатывается.",
-  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Ваш платеж не был успешным, пожалуйста, попробуйте еще раз.",
-  "BOOKING_PAYMENT_FAILED": "Что-то пошло не так."
+  "BOOKING_PAYMENT_PROCESSING": "Ваш платеж обрабатывается",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Ваш платеж не был успешным, пожалуйста, попробуйте еще раз",
+  "BOOKING_PAYMENT_FAILED": "Что-то пошло не так",
+
+  "WISHLIST_ADD_SUCCESS": "Размещение успешно добавлено в список желаний",
+  "WISHLIST_DELETE_SUCCESS": "Размещение успешно удалено из списка желаний"
 }

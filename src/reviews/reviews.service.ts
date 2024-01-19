@@ -35,7 +35,7 @@ export class ReviewsService {
 
   async createReview(createReviewBody: any, bookingId: string) {
     try {
-      const bookking = await this.prisma.booking.findUnique({
+      const booking = await this.prisma.booking.findUnique({
         where: {
           id: bookingId,
           userId: createReviewBody.userId,
@@ -48,10 +48,10 @@ export class ReviewsService {
         },
       });
 
-      if (!bookking) throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
+      if (!booking) throw new NotFoundException(ErrorsTypes.NOT_FOUND_BOOKING);
 
       const currentDate = dayjs();
-      const bookingEndDate = dayjs(bookking?.endDate);
+      const bookingEndDate = dayjs(booking?.endDate);
 
       if (!currentDate.isAfter(bookingEndDate, 'day'))
         throw new BadRequestException(ErrorsTypes.BAD_REQUEST_REVIEW_ONLY_AFTER_THE_BOOKING_END);

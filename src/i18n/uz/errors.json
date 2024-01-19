@@ -35,6 +35,9 @@
   "UNAUTHORIZED": "Foydalanuvchiga ruxsat berilmagan",
   "UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN": "Token muddati tugagan",
   "BAD_REQUEST_INVALID_PHONE_NUMBER": "phoneNumber bo'sh bo'lmasligi kerak",
+  "BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPLOAD": "Eng kamida 5 ta rasm yuklanishi kerak",
+  "ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_STORAGE": "Turar joy rasmlarini bazaga yuklashda xatolik",
+  "ACCOMMODATION_FAILED_TO_STORE_IMAGES": "Turar joy rasmlarini yuklashda xatolik",
   "ACCOMMODATION_FAILED_TO_GET_LIST": "Turar joy ro'yxatini olishda xatolik",
   "ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING": "Yangilanish uchun turar joy topilmadi",
   "ACCOMMODATION_FAILED_TO_CREATE": "Turar joy yaratib bo'lmadi",
@@ -81,5 +84,10 @@
   "HOST_PROFILE_FAILED_TO_GET": "Xost profilini olib bo'lmadi",
   "REVIEWS_FAILED_TO_GET_LIST": "Sharhlar ro'yxatini olib bo'lmadi",
   "BAD_REQUEST_INVALID_DATE_RANGE": "Sana oralig‘i noto‘g‘ri",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Turar joyni vaqtinchalik bron qilib bo'lmaydi"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Turar joyni vaqtinchalik bron qilib bo'lmaydi",
+  "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Turar joy allaqachon xohish ro'yxatiga qo'shilgan",
+  "WISHLIST_FAILED_TO_GET_LIST": "Xohish ro'yxatidan turar joylarni olishda xatolik",
+  "WISHLIST_FAILED_TO_ADD": "Xohish ro'yxatiga qo'shishda xatolik",
+  "WISHLIST_FAILED_TO_FIND": "Xohish ro'yxatidan topilmadi",
+  "WISHLIST_FAILED_TO_DELETE": "Xohish ro'yxatidan o'chirishda xatolik"
 }

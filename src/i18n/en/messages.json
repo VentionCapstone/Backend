@@ -14,7 +14,10 @@
   "USER_PROFILE_DELETE_SUCCESS": "Profile successfully deleted",
 
   "BOOKING_PAYMENT_SUCCESS": "Payment processed successfully",
-  "BOOKING_PAYMENT_PROCESSING": "Your payment is processing.",
-  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Your payment was not successful, please try again.",
-  "BOOKING_PAYMENT_FAILED": "Something went wrong."
+  "BOOKING_PAYMENT_PROCESSING": "Your payment is processing",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Your payment was not successful, please try again",
+  "BOOKING_PAYMENT_FAILED": "Something went wrong",
+
+  "WISHLIST_ADD_SUCCESS": "Accommodation is added to wishlist successfully",
+  "WISHLIST_DELETE_SUCCESS": "Accommodation is deleted from wishlist successfully"
 }
