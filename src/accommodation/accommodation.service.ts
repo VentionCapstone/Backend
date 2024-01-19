@@ -343,13 +343,12 @@ export class AccommodationService {
   }
 
   private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    const result =
-      (!checkIn && checkOut) ||
-      (checkIn && !checkOut) ||
-      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day')) ||
-      (checkIn && checkOut && dayjs(checkIn).isBefore(dayjs(), 'day')) ||
-      (checkIn && checkOut && dayjs(checkOut).isSameOrBefore(dayjs(), 'day'));
-    return result;
+    if (!checkIn || !checkOut) return true;
+    return (
+      dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
+      dayjs(checkIn).isBefore(dayjs(), 'day') ||
+      dayjs(checkOut).isSameOrBefore(dayjs(), 'day')
+    );
   }
 
   private makeAddressConditions(location: string) {
