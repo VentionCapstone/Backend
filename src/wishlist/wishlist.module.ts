@@ -5,7 +5,7 @@ import { WishlistController } from './wishlist.controller';
 import { WishlistService } from './wishlist.service';
 
 @Module({
-  imports: [JwtModule],
+  imports: [JwtModule.register({})],
   controllers: [WishlistController],
   providers: [WishlistService, PrismaService],
 })

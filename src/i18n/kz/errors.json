@@ -80,5 +80,10 @@
   "NOT_FOUND_HOST_PROFILE": "Хост профилі табылмады",
   "HOST_PROFILE_FAILED_TO_GET": "Хост профилін алу мүмкін болмады",
   "REVIEWS_FAILED_TO_GET_LIST": "Пікірлер тізімін алу мүмкін болмады",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Брондау үшін тұру уақытша қолжетімсіз"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Брондау үшін тұру уақытша қолжетімсіз",
+  "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Нысан тілектер тізіміне қосылды",
+  "WISHLIST_FAILED_TO_GET_LIST": "Тілектер тізімінен объектілерді алу мүмкін болмады",
+  "WISHLIST_FAILED_TO_ADD": "Тілектер тізіміне қосу мүмкін болмады",
+  "WISHLIST_FAILED_TO_FIND": "Тілектер тізімінен табу мүмкін болмады",
+  "WISHLIST_FAILED_TO_DELETE": "Тілектер тізімінен жою мүмкін болмады"
 }

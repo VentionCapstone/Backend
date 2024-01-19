@@ -146,6 +146,7 @@ model Wishlist {
   id              String        @id @default(uuid())
   userId          String
   accommodationId String
+  createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
 }

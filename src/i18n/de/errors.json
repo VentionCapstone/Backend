@@ -80,5 +80,10 @@
   "NOT_FOUND_HOST_PROFILE": "Hostprofil nicht gefunden",
   "HOST_PROFILE_FAILED_TO_GET": "Hostprofil konnte nicht abgerufen werden",
   "REVIEWS_FAILED_TO_GET_LIST": "Bewertungsliste konnte nicht abgerufen werden",
-  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Die Unterkunft ist vorübergehend nicht buchbar"
+  "BAD_REQUEST_BOOKING_NOT_AVAILABLE": "Die Unterkunft ist vorübergehend nicht buchbar",
+  "CONFLICT_ALREADY_ADDED_TO_WISHLIST": "Die Unterkunft wurde bereits zur Wunschliste hinzugefügt",
+  "WISHLIST_FAILED_TO_GET_LIST": "Fehler beim Abrufen der Unterkünfte von der Wunschliste",
+  "WISHLIST_FAILED_TO_ADD": "Fehler beim Hinzufügen zur Wunschliste",
+  "WISHLIST_FAILED_TO_FIND": "Fehler beim Suchen in der Wunschliste",
+  "WISHLIST_FAILED_TO_DELETE": "Fehler beim Löschen von der Wunschliste"
 }
