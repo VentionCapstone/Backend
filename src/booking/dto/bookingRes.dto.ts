@@ -1,15 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BookingResDto {
-  @ApiProperty()
   id: string;
-
-  @ApiProperty()
+  accommodationId: string;
   startDate: string;
-
-  @ApiProperty()
   endDate: string;
-
   @ApiProperty({ example: 'PENDING' })
   status: string;
 }

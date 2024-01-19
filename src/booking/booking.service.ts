@@ -22,6 +22,7 @@ export class BookingService {
       const accommodation = await this.prismaService.accommodation.findUnique({
         where: { id: accommodationId },
         select: {
+          available: true,
           timezoneOffset: true,
           availableFrom: true,
           availableTo: true,
@@ -47,6 +48,14 @@ export class BookingService {
 
       if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
 
+      const notAvailableRes = {
+        accommodationId,
+        available: false,
+        availableDates: null,
+      };
+
+      if (!accommodation.available) return notAvailableRes;
+
       let availableFrom = this.getTimeInZone(
         accommodation.availableFrom,
         accommodation.timezoneOffset
@@ -59,11 +68,6 @@ export class BookingService {
         .utcOffset(-accommodation.timezoneOffset)
         .add(1, 'day')
         .startOf('day');
-
-      const notAvailableRes = {
-        id: accommodationId,
-        availableDates: null,
-      };
 
       if (tomorrow.isAfter(availableTo)) return notAvailableRes;
 
@@ -79,6 +83,7 @@ export class BookingService {
 
       return {
         accommodationId,
+        available: true,
         availableDates,
       };
     } catch (error) {
@@ -95,6 +100,7 @@ export class BookingService {
         where: { id: accommodationId },
         select: {
           timezoneOffset: true,
+          available: true,
           availableFrom: true,
           availableTo: true,
           booking: {
@@ -115,6 +121,8 @@ export class BookingService {
       });
 
       if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
+      if (!accommodation.available)
+        throw new BadRequestException(ErrorsTypes.BAD_REQUEST_BOOKING_NOT_AVAILABLE);
 
       const bookingStart = this.getTimeInZone(startDate, accommodation.timezoneOffset);
       const bookingEnd = this.getTimeInZone(endDate, accommodation.timezoneOffset);
@@ -171,6 +179,7 @@ export class BookingService {
 
       return {
         id: booking.id,
+        accommodationId,
         startDate: booking.startDate,
         endDate: booking.endDate,
         status: booking.status,

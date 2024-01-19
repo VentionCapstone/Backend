@@ -43,6 +43,7 @@ import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import { OrderAndFilterReviewDto } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
+import ListOfAccommodationsResponseDto from './dto/list-of-accommodations.dto';
 import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
 import SingleAccommodationResponseDto from './dto/single-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
@@ -281,17 +282,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'All available accommodations list',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          type: 'array',
-          items: {
-            $ref: getSchemaPath(AccommodationDto),
-          },
-        },
-      },
-    },
+    type: ListOfAccommodationsResponseDto,
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
@@ -299,7 +290,7 @@ export class AccommodationController {
     return { success: true, ...data };
   }
 
-  @ApiOperation({ summary: 'Get all your accommodations' })
+  @ApiOperation({ summary: 'Get all accommodations, of one user. By provided userId ' })
   @ApiResponse({
     status: 200,
     description: 'Accommodations list',
@@ -311,6 +302,9 @@ export class AccommodationController {
           items: {
             $ref: getSchemaPath(AccommodationDto),
           },
+        },
+        totalCount: {
+          type: 'number',
         },
       },
     },
@@ -324,8 +318,8 @@ export class AccommodationController {
     @Param('userId') userId: string,
     @Query() options: GetUserAccommodationsDto
   ) {
-    const accommodations = await this.accommodationService.getUserAccommodations(userId, options);
-    return { success: true, data: accommodations };
+    const data = await this.accommodationService.getUserAccommodations(userId, options);
+    return { success: true, ...data };
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })
@@ -348,6 +342,9 @@ export class AccommodationController {
           },
         },
         averageRate: {
+          type: 'number',
+        },
+        totalCount: {
           type: 'number',
         },
       },
@@ -396,7 +393,7 @@ export class AccommodationController {
   @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodations = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodations };
+    const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data: { ...accommodation, owner } };
   }
 }

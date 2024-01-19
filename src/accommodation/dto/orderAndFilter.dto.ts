@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import { PaginationDto } from './pagination.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum OrderBy {
   PRICE = 'price',
@@ -69,4 +70,24 @@ export class OrderAndFilterDto extends PaginationDto {
   @Min(0)
   @Max(parseNumberOrDefault(ACCOMMODATION_MAX_PEOPLE))
   maxPeople?: number = parseInt(ACCOMMODATION_MAX_PEOPLE || '0');
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: 'Eastchester, Bronx, United States',
+    description: 'street?, city?, country?',
+  })
+  location?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
+  @ApiProperty({ example: '2021-01-01', description: 'YYYY-MM-DD' })
+  checkInDate?: Date;
+
+  @IsOptional()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
+  @ApiProperty({ example: '2021-01-01', description: 'YYYY-MM-DD' })
+  checkOutDate?: Date;
 }
