@@ -66,6 +66,7 @@
   "USER_PROFILE_FAILED_TO_GET": "Benutzerprofil konnte nicht abgerufen werden",
   "USER_PROFILE_FAILED_TO_DELETE": "Benutzerprofil konnte nicht gelöscht werden",
   "AMENITIES_FAILED_TO_GET_LIST": "Die Ausstattungsliste konnte nicht abgerufen werden",
+  "USER_FAILED_TO_STORE_IMAGES_TO_STORAGE": "Fehler beim Hochladen von Bildern in den Speicher",
   "AMENITIES_FAILED_TO_ADD": "Das Hinzufügen von Annehmlichkeiten ist fehlgeschlagen",
   "AMENITIES_FAILED_TO_UPDATE": "Die Ausstattung konnte nicht aktualisiert werden",
   "REVIEW_FAILED_TO_CREATE": "Es konnte keine Bewertung für diese Unterkunft erstellt werden",

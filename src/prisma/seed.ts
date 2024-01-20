@@ -33,6 +33,17 @@ async function main() {
 
   // Create Accommodation
   for (const accommodation of accommodations) {
+    // Increase number of media if lower than 5
+    if (accommodation.media.length <= 5) {
+      for (let i = accommodation.media.length; i < 5; i++) {
+        const lastMedia = accommodation.media.at(-1);
+        const newMedia = {
+          ...lastMedia,
+          id: lastMedia.id + 1,
+        };
+        accommodation.media.push(newMedia);
+      }
+    }
     await prisma.accommodation.create({
       data: {
         ...accommodation,
