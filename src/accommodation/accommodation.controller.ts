@@ -282,6 +282,10 @@ export class AccommodationController {
     description: 'All available accommodations list',
     type: ListOfAccommodationsResponseDto,
   })
+  @ApiOperation({
+    description:
+      'Not required auth, If user logined, it will return wish list accommodations with property {isInWishlist} set to true if accommodation in user wish list, If not all {isInWishlist} will be set to false',
+  })
   @ApiBearerAuth()
   @UseGuards(ExtendedUserGuard)
   @Get('/')
