@@ -22,8 +22,6 @@ export class GoogleService {
     private readonly authService: AuthService
   ) {}
   async googleLogin(token: string, res: Response) {
-    console.log('GoogleService ~ googleLogin ~ token:', token);
-
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -43,7 +41,6 @@ export class GoogleService {
     } = user;
 
     if (!email) {
-      console.error('Email not available.');
       return 'ERROR HERE';
     }
     let userFromDb = await this.prismaService.user.findUnique({
@@ -65,7 +62,6 @@ export class GoogleService {
           authType: 'GOOGLE',
         },
       });
-      console.log('GoogleService ~ googleLogin ~ savedUser:', userFromDb);
 
       await this.mailerService.sendHtmlEmail(
         email,
@@ -75,13 +71,9 @@ export class GoogleService {
     }
 
     const tokens = await this.authService.getTokens(userFromDb.id, email, userFromDb.role);
-    console.log('GoogleService ~ googleLogin ~ data:', tokens);
+    this.authService.setRefreshTokenCookie(tokens.refresh_token, res);
 
-    const setRefresh = this.authService.setRefreshTokenCookie(tokens.refresh_token, res);
-    console.log('GoogleService ~ googleLogin ~ setRefresh:', setRefresh);
-    throw new Error('from back');
-
-    // return { tokens, id: userFromDb.id };
+    return { tokens, id: userFromDb.id };
   }
 
   private generateEmailBody(email: string, password: string): string {
