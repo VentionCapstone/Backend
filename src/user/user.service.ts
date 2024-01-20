@@ -20,7 +20,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 interface UploadImageType {
-  filename: string;
+  mimetype: string;
   base64Image: string;
 }
 
@@ -251,7 +251,7 @@ export class UserService {
 
   async uploadImageToS3(file: Express.Multer.File): Promise<UploadImageResponse> {
     const requestBody: UploadImageType = {
-      filename: this.generateRandomImageFileName(file.mimetype),
+      mimetype: file.mimetype,
       base64Image: file.buffer.toString('base64url'),
     };
 
@@ -267,11 +267,5 @@ export class UserService {
         )
     );
     return data;
-  }
-
-  generateRandomImageFileName(mimetype: string) {
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const timestamp = new Date().getTime();
-    return `${timestamp}_${randomString}.${mimetype.split('/')[1]}`;
   }
 }
