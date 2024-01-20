@@ -1,6 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { I18nService } from 'nestjs-i18n';
 import ErrorsTypes from 'src/errors/errors.enum';
 import PrismaErrorCodes from 'src/errors/prismaErrorCodes.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -9,10 +8,7 @@ import { AmenitiesRequestDto } from './dto';
 
 @Injectable()
 export class AmenitiesService {
-  constructor(
-    private prisma: PrismaService,
-    private readonly i18n: I18nService
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getAmenitiesList() {
     try {
@@ -33,21 +29,6 @@ export class AmenitiesService {
       return amenitiesList;
     } catch (error) {
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET_LIST, error.message);
-    }
-  }
-
-  async getAmenities(id: string) {
-    try {
-      const amenities = await this.prisma.amenity.findUnique({
-        where: {
-          accommodationId: id,
-        },
-      });
-      if (!amenities) throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID);
-      return amenities;
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_GET, error.message);
     }
   }
 
@@ -89,27 +70,6 @@ export class AmenitiesService {
         }
       }
       throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_UPDATE, error.message);
-    }
-  }
-
-  async deleteAmenities(id: string, userId: string) {
-    try {
-      await this.prisma.amenity.delete({
-        where: {
-          accommodationId: id,
-          accommodation: {
-            ownerId: userId,
-          },
-        },
-      });
-      return;
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
-          throw new NotFoundException(ErrorsTypes.NOT_FOUND_AMENITIES_FOR_THIS_ID_OWNERID);
-        }
-      }
-      throw new GlobalException(ErrorsTypes.AMENITIES_FAILED_TO_DELETE, error.message);
     }
   }
 }

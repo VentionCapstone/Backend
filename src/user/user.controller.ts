@@ -2,29 +2,50 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
+  Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { IMAGES_FILE_TYPES, PROFILE_IMAGE_MAX_SIZE } from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUser } from 'src/common/types/AuthUser.type';
+import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { UserGuard } from '../common/guards/user.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { HostReviewsDto, HostUserDto } from './dto/host-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { HostService } from './host.service';
 import { PhoneNumberTransformInterceptor } from './phone-validation/phoneNumberTransform.interceptor';
 import { UserService } from './user.service';
-import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly hostService: HostService
+  ) {}
 
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Get all users' })
@@ -62,6 +83,27 @@ export class UserController {
   }
 
   @UseGuards(UserGuard)
+  @ApiOperation({ summary: 'Add profile image' })
+  @LangQuery()
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('image'))
+  addImageToProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: PROFILE_IMAGE_MAX_SIZE * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
+        ],
+      })
+    )
+    file: Express.Multer.File,
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.userService.addProfileImage(id, userId, file);
+  }
+
+  @UseGuards(UserGuard)
   @UseInterceptors(PhoneNumberTransformInterceptor)
   @ApiOperation({ summary: 'Update user profile id' })
   @ApiParam({ name: 'id', description: 'User profile id' })
@@ -81,5 +123,26 @@ export class UserController {
   @LangQuery()
   removeProfile(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.userService.removeUserProfile(id, user);
+  }
+
+  @ApiOperation({ summary: 'Get host by id' })
+  @ApiParam({ name: 'id', description: 'Host id' })
+  @ApiOkResponse({ description: 'Returns host user with details', type: HostUserDto })
+  @ApiBadRequestResponse({ description: 'Not a host profile' })
+  @ApiNotFoundResponse({ description: 'Host profile not found' })
+  @LangQuery()
+  @Get('/host/:id')
+  getHostUserProfile(@Param('id') id: string) {
+    return this.hostService.getHostUserProfile(id);
+  }
+
+  @ApiOperation({ summary: 'Get host comment by page' })
+  @ApiParam({ name: 'id', description: 'Host id' })
+  @ApiQuery({ name: 'page', description: 'Page number' })
+  @ApiOkResponse({ description: 'Returns host reviews', type: HostReviewsDto })
+  @LangQuery()
+  @Get('/host/:id/comments')
+  getHostComments(@Param('id') id: string, @Query('page') page: number) {
+    return this.hostService.getHostComments(id, page);
   }
 }

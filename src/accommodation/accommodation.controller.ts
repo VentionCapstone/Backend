@@ -1,22 +1,22 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
-  NotFoundException,
   Param,
   ParseFilePipe,
   Patch,
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -28,15 +28,22 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import {
+  ACCOMMODATION_IMAGES_MIN_LENGTH,
+  ACCOMMODATION_IMAGE_MAX_UPLOAD_MB,
+  IMAGES_FILE_TYPES,
+} from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
+import ErrorsTypes from 'src/errors/errors.enum';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { AccommodationService } from './accommodation.service';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import { OrderAndFilterReviewDto } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
+import ListOfAccommodationsResponseDto from './dto/list-of-accommodations.dto';
 import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
 import SingleAccommodationResponseDto from './dto/single-accommodation.dto';
 import UpdateAccommodationDto from './dto/update-accommodation.dto';
@@ -80,7 +87,7 @@ export class AccommodationController {
     return { success: true, data: createdAccommodation };
   }
 
-  @ApiOperation({ summary: 'Add image to accommodation' })
+  @ApiOperation({ summary: 'Add images to accommodation' })
   @ApiResponse({
     status: 201,
     description: 'Updated accommodation',
@@ -111,43 +118,39 @@ export class AccommodationController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'Image file (only .jpg, .jpeg, .png allowed), size < 10MB!',
-        },
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {},
       },
+      description: `Images file (only ${IMAGES_FILE_TYPES} allowed), size < ${ACCOMMODATION_IMAGE_MAX_UPLOAD_MB}mb!`,
     },
   })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @LangQuery()
   @Post('/:id/file')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('images', 10))
   async updateAccommodationAddFile(
-    @UploadedFile(
+    @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+          new MaxFileSizeValidator({ maxSize: ACCOMMODATION_IMAGE_MAX_UPLOAD_MB * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
         ],
       })
     )
-    file: Express.Multer.File,
+    images: Array<Express.Multer.File>,
     @Param('id') id: string,
     @CurrentUser('id') userId: string
   ) {
-    if (!file) throw new NotFoundException('File for updation not provided');
+    if (!images || images.length < ACCOMMODATION_IMAGES_MIN_LENGTH) {
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPLOAD);
+    }
 
-    const updatedAccommodation = await this.accommodationService.addFileToAccommodation(
-      id,
-      file,
-      userId
-    );
+    await this.accommodationService.addFileToAccommodation(id, images, userId);
 
-    return { success: true, data: updatedAccommodation };
+    return { success: true, data: {} };
   }
 
   @ApiOperation({ summary: 'Update accommodation' })
@@ -276,17 +279,7 @@ export class AccommodationController {
   @ApiResponse({
     status: 200,
     description: 'All available accommodations list',
-    schema: {
-      properties: {
-        success: { type: 'boolean' },
-        data: {
-          type: 'array',
-          items: {
-            $ref: getSchemaPath(AccommodationDto),
-          },
-        },
-      },
-    },
+    type: ListOfAccommodationsResponseDto,
   })
   @Get('/')
   async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
@@ -294,7 +287,7 @@ export class AccommodationController {
     return { success: true, ...data };
   }
 
-  @ApiOperation({ summary: 'Get all your accommodations' })
+  @ApiOperation({ summary: 'Get all accommodations, of one user. By provided userId ' })
   @ApiResponse({
     status: 200,
     description: 'Accommodations list',
@@ -306,6 +299,9 @@ export class AccommodationController {
           items: {
             $ref: getSchemaPath(AccommodationDto),
           },
+        },
+        totalCount: {
+          type: 'number',
         },
       },
     },
@@ -319,8 +315,8 @@ export class AccommodationController {
     @Param('userId') userId: string,
     @Query() options: GetUserAccommodationsDto
   ) {
-    const accommodations = await this.accommodationService.getUserAccommodations(userId, options);
-    return { success: true, data: accommodations };
+    const data = await this.accommodationService.getUserAccommodations(userId, options);
+    return { success: true, ...data };
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })
@@ -343,6 +339,9 @@ export class AccommodationController {
           },
         },
         averageRate: {
+          type: 'number',
+        },
+        totalCount: {
           type: 'number',
         },
       },
@@ -391,7 +390,7 @@ export class AccommodationController {
   @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const accommodations = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: accommodations };
+    const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data: { ...accommodation, owner } };
   }
 }

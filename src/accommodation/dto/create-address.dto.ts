@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
 import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
 
 export default class CreateAddressDto {
@@ -9,6 +10,7 @@ export default class CreateAddressDto {
 
   @IsNotEmpty()
   @IsString()
+  @Transform(({ value }) => normalizeCityName(value))
   city: string;
 
   @IsNotEmpty()

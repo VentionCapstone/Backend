@@ -1,17 +1,38 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { AxiosError } from 'axios';
 import * as dayjs from 'dayjs';
+import { catchError, firstValueFrom } from 'rxjs';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
+import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
+import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
-import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
+
+interface UploadImageType {
+  mimetype: string;
+  base64Image: string;
+}
+
+interface UploadImageResponse {
+  message: string;
+  data: {
+    imageUrl: string;
+    thumbnailUrl: string;
+  };
+}
 
 @Injectable()
 export class AccommodationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService
+  ) {}
 
   async createAccommodation(createAccommodationBody: any) {
     try {
@@ -153,9 +174,8 @@ export class AccommodationService {
   }
 
   async getOneAccommodation(id: string) {
-    let accommodation;
     try {
-      accommodation = await this.prisma.accommodation.findUnique({
+      const accommodation = await this.prisma.accommodation.findUnique({
         where: { id },
         include: {
           address: true,
@@ -163,18 +183,65 @@ export class AccommodationService {
           amenities: true,
         },
       });
+
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
+
+      const owner = await this.prisma.user.findUnique({
+        where: { id: accommodation.ownerId },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          createdAt: true,
+          isVerified: true,
+          profile: {
+            select: {
+              language: true,
+              country: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+
+      return { accommodation, owner };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
-    if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
-    return accommodation;
   }
 
-  async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
+  async uploadImageToS3(file: Express.Multer.File): Promise<UploadImageResponse> {
+    const requestBody: UploadImageType = {
+      mimetype: file.mimetype,
+      base64Image: file.buffer.toString('base64url'),
+    };
+
+    const { data } = await firstValueFrom(
+      this.httpService
+        .post(process.env.FILE_UPLOAD_URL!, requestBody, {
+          timeout: 20000,
+        })
+        .pipe(
+          catchError((error: AxiosError) => {
+            throw new GlobalException(
+              ErrorsTypes.ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_STORAGE,
+              error.message
+            );
+          })
+        )
+    );
+    return data;
+  }
+
+  async addFileToAccommodation(
+    accommodationId: string,
+    images: Express.Multer.File[],
+    ownerId: string
+  ): Promise<any> {
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({
-        where: { id, ownerId },
+        where: { id: accommodationId, ownerId },
       });
     } catch (error) {
       throw new GlobalException(
@@ -186,21 +253,36 @@ export class AccommodationService {
     if (!existingAccommodation)
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_UPDATING);
 
-    const base64Data = file.buffer.toString('base64');
-
-    const updateAccommodationAndAdress = {
-      previewImgUrl: base64Data,
-      thumbnailUrl: base64Data,
-    };
-
     try {
+      const uploadedImagesResponse = await Promise.all(
+        images.map((image) => {
+          return this.uploadImageToS3(image);
+        })
+      );
+
+      const imagesToCreate = uploadedImagesResponse.map((image) => ({
+        imageUrl: image.data.imageUrl,
+        thumbnailUrl: image.data.thumbnailUrl,
+        accommodationId,
+      }));
+
+      await this.prisma.media.createMany({
+        data: imagesToCreate,
+      });
+
+      const [firstImage] = imagesToCreate;
+
       const updatedAccommodation = await this.prisma.accommodation.update({
-        where: { id },
-        data: updateAccommodationAndAdress,
+        where: { id: accommodationId },
+        data: {
+          previewImgUrl: firstImage.imageUrl,
+          thumbnailUrl: firstImage.thumbnailUrl,
+        },
       });
 
       return updatedAccommodation;
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
     }
   }
@@ -230,7 +312,23 @@ export class AccommodationService {
           isDeleted: false,
         };
       }
-      return await this.prisma.accommodation.findMany(findAccommodationsQueryObj);
+      const countAccommodationsQuery = this.prisma.accommodation.count({
+        where: { ownerId },
+      });
+
+      const findAccommodationsQuery = this.prisma.accommodation.findMany(
+        findAccommodationsQueryObj
+      );
+
+      const [accommodations, totalCount] = await Promise.all([
+        findAccommodationsQuery,
+        countAccommodationsQuery,
+      ]);
+
+      return {
+        totalCount,
+        data: accommodations,
+      };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
@@ -279,6 +377,7 @@ export class AccommodationService {
         data: accommodations,
       };
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
     }
   }
@@ -294,27 +393,55 @@ export class AccommodationService {
       };
     }
 
-    if (checkInDate && checkOutDate) {
-      findManyOptions.where = {
-        ...findManyOptions.where,
-        AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
-      };
+    if (!checkInDate && !checkOutDate) return;
+
+    if (!checkInDate || !checkOutDate || this.isInvalidDateRange(checkInDate, checkOutDate)) {
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
+
+    findManyOptions.where = {
+      ...findManyOptions.where,
+      AND: [{ availableFrom: { lte: checkInDate } }, { availableTo: { gte: checkOutDate } }],
+    };
+  }
+
+  private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
+    return (
+      dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
+      dayjs(checkIn).isBefore(dayjs(), 'day') ||
+      dayjs(checkOut).isSameOrBefore(dayjs(), 'day')
+    );
   }
 
   private makeAddressConditions(location: string) {
     const addressConditions: any = {};
     const { country, city, street } = this.parseAddress(location);
+
+    if (!city && !street) {
+      const createArray = <T>(...items: T[]) => items;
+      addressConditions.OR = createArray(
+        { country: { startsWith: normalizeCountryName(location), mode: 'insensitive' } },
+        { city: { startsWith: normalizeCityName(location), mode: 'insensitive' } },
+        { street: { startsWith: location, mode: 'insensitive' } }
+      );
+      return addressConditions;
+    }
+
     const addAddressCondition = (addressCondition: string, addressQuery: string | undefined) => {
       if (!addressQuery) return;
+      if (addressCondition === 'street' && addressQuery.split(' ').length > 1) {
+        addressQuery = addressQuery.split(' ')[0];
+      }
       addressConditions[addressCondition] = {
-        contains: addressQuery,
+        startsWith: addressQuery,
         mode: 'insensitive',
       };
     };
+
     addAddressCondition('country', normalizeCountryName(country));
-    addAddressCondition('city', city);
+    addAddressCondition('city', normalizeCityName(city));
     addAddressCondition('street', street);
+
     return addressConditions;
   }
 
@@ -339,7 +466,7 @@ export class AccommodationService {
       orderByPrice,
       orderByRoom,
     } = options;
-    const findManyOptions: any = {
+    const findManyOptions: Prisma.AccommodationFindManyArgs = {
       select: {
         id: true,
         thumbnailUrl: true,
@@ -357,6 +484,7 @@ export class AccommodationService {
       },
 
       where: {
+        available: true,
         isDeleted: false,
         price: {
           gte: minPrice,

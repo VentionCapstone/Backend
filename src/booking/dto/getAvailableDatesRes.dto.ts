@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AvailableDatesResDto {
-  @ApiProperty()
   accommodationId: string;
+  available: boolean;
 
   @ApiProperty({
     example: [

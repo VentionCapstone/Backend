@@ -11,5 +11,13 @@
   "AMENITY_UPDATE_SUCCESS": "Erfolgreiche Aktualisierung der Annehmlichkeiten",
   "AMENITY_DELETE_SUCCESS": "Erfolgreiche Löschung der Annehmlichkeiten",
 
-  "USER_PROFILE_DELETE_SUCCESS": "Profil erfolgreich gelöscht"
+  "USER_PROFILE_DELETE_SUCCESS": "Profil erfolgreich gelöscht",
+
+  "BOOKING_PAYMENT_SUCCESS": "Zahlung erfolgreich verarbeitet",
+  "BOOKING_PAYMENT_PROCESSING": "Ihre Zahlung wird verarbeitet",
+  "BOOKING_PAYMENT_REQUEIRED_METHOD": "Ihre Zahlung war nicht erfolgreich, bitte versuchen Sie es erneut",
+  "BOOKING_PAYMENT_FAILED": "Etwas ist schiefgelaufen",
+
+  "WISHLIST_ADD_SUCCESS": "Unterkunft erfolgreich zur Wunschliste hinzugefügt",
+  "WISHLIST_DELETE_SUCCESS": "Unterkunft erfolgreich von der Wunschliste gelöscht"
 }

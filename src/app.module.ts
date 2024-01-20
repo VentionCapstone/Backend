@@ -9,8 +9,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
 import { HealthModule } from './health-check/health.module';
+import { PaymentModule } from './payment/payment.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { StripeModule } from './stripe/stripe.module';
 import { UserModule } from './user/user.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -38,7 +41,10 @@ import { UserModule } from './user/user.module';
     AccommodationModule,
     BookingModule,
     HealthModule,
+    PaymentModule,
+    StripeModule,
     ReviewsModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

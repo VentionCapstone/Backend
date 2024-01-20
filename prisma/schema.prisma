@@ -10,6 +10,7 @@ model User {
   isDeleted          Boolean        @default(false)
   authType           AuthType       @default(EMAIL)
   authSocialSign     String?
+  createdAt          DateTime       @default(now())
   hashedRefreshToken String?
   activationLink     String?
   passwordResetToken String?
@@ -17,6 +18,7 @@ model User {
   booking            Booking[]
   review             Review[]
   notifications      Notification[]
+  Wishlist           Wishlist[]
 }
 
 model UserProfile {
@@ -26,7 +28,7 @@ model UserProfile {
   gender      Gender
   country     String
   language    String
-  uiTheme     UiTheme @default(LIGHT)
+  uiTheme     UiTheme @default(light)
   description String?
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id])
@@ -47,7 +49,7 @@ model Booking {
 }
 
 model Accommodation {
-  id                    String    @id @default(uuid())
+  id                    String     @id @default(uuid())
   title                 String
   addressId             String
   thumbnailUrl          String?
@@ -56,17 +58,19 @@ model Accommodation {
   numberOfRooms         Int
   price                 Int
   allowedNumberOfPeople Int
-  availableFrom         DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
-  availableTo           DateTime  @db.Date
+  available             Boolean    @default(true)
+  availableFrom         DateTime   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  availableTo           DateTime   @db.Date
   timezoneOffset        Int
   description           String?
   previewImgUrl         String?
-  isDeleted             Boolean   @default(false)
-  address               Address   @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  isDeleted             Boolean    @default(false)
+  address               Address    @relation(fields: [addressId], references: [id], onDelete: Cascade)
   amenities             Amenity[]
   media                 Media[]
   reviews               Review[]
   booking               Booking[]
+  Wishlist              Wishlist[]
 }
 
 model Amenity {
@@ -110,7 +114,7 @@ model Notification {
 model Payment {
   id            String    @id @default(uuid())
   type          String
-  transactionId String
+  transactionId String?
   totalAmount   Float
   status        Status
   booking       Booking[]
@@ -140,6 +144,15 @@ model Review {
   booking         Booking       @relation(fields: [bookingId], references: [id])
 }
 
+model Wishlist {
+  id              String        @id @default(uuid())
+  userId          String
+  accommodationId String
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id])
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+}
+
 enum Role {
   USER
   ADMIN
@@ -151,9 +164,9 @@ enum Gender {
 }
 
 enum UiTheme {
-  LIGHT
-  DARK
-  SYSTEM
+  light
+  dark
+  system
 }
 
 enum Status {
