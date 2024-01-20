@@ -34,6 +34,7 @@ import {
   IMAGES_FILE_TYPES,
 } from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { ExtendedUserGuard } from 'src/common/guards/user-optional.guard';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -281,9 +282,14 @@ export class AccommodationController {
     description: 'All available accommodations list',
     type: ListOfAccommodationsResponseDto,
   })
+  @ApiBearerAuth()
+  @UseGuards(ExtendedUserGuard)
   @Get('/')
-  async getAllAccommodations(@Query() orderAndFilter: OrderAndFilterDto) {
-    const data = await this.accommodationService.getAllAccommodations(orderAndFilter);
+  async getAllAccommodations(
+    @Query() orderAndFilter: OrderAndFilterDto,
+    @CurrentUser('id') userId?: string
+  ) {
+    const data = await this.accommodationService.getAllAccommodations(orderAndFilter, userId);
     return { success: true, ...data };
   }
 

@@ -334,7 +334,7 @@ export class AccommodationService {
     }
   }
 
-  async getAllAccommodations(options: OrderAndFilterDto) {
+  async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
@@ -361,6 +361,24 @@ export class AccommodationService {
         totalPriceStatsQuery,
       ]);
 
+      const accommodationsWithWishlist = await Promise.all(
+        accommodations.map(async (accommodation) => {
+          let isInWishlist;
+          if (userId) {
+            isInWishlist = await this.prisma.wishlist.findFirst({
+              where: {
+                userId: userId,
+                accommodationId: accommodation.id,
+              },
+            });
+          }
+          return {
+            ...accommodation,
+            isInWishlist: !!isInWishlist,
+          };
+        })
+      );
+
       const {
         _min: { price: curMinPrice },
         _max: { price: curMaxPrice },
@@ -374,7 +392,7 @@ export class AccommodationService {
       return {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
         totalCount,
-        data: accommodations,
+        data: accommodationsWithWishlist,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
