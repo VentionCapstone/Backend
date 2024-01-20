@@ -58,6 +58,8 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Failed to send verification email",
   "AUTH_FAILED_TOKEN_VERIFY": "Failed to verify user token",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Failed to send email to set a new password",
+  "AUTH_GOOGLE_FAILED_TO_LOGIN": "Google authentication failed",
+  "AUTH_GOOGLE_FAILED_GET_USER_DATA": "Failed to fetch user information from Google",
   "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Invalid reset token",
   "USER_FAILED_TO_GET_LIST": "Failed to get users list",
   "USER_FAILED_TO_GET": "Failed to get user",

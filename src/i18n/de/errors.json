@@ -58,6 +58,8 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Bestätigungs-E-Mail konnte nicht gesendet werden",
   "AUTH_FAILED_TOKEN_VERIFY": "Benutzertoken konnte nicht überprüft werden",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Das Senden einer E-Mail zum Festlegen eines neuen Passworts ist fehlgeschlagen",
+  "AUTH_GOOGLE_FAILED_TO_LOGIN": "Google-Authentifizierung fehlgeschlagen",
+  "AUTH_GOOGLE_FAILED_GET_USER_DATA": "Fehler beim Abrufen von Benutzerinformationen von Google",
   "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Ungültiges Reset-Token",
   "USER_FAILED_TO_GET_LIST": "Benutzerliste konnte nicht abgerufen werden",
   "USER_FAILED_TO_GET": "Benutzer konnte nicht abgerufen werden",

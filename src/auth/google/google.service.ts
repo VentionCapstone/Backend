@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import ErrorsTypes from 'src/errors/errors.enum';
+import { GlobalException } from 'src/exceptions/global.exception';
 import { MailerService } from 'src/mailer/mailer.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from '../auth.service';
@@ -22,68 +24,76 @@ export class GoogleService {
     private readonly authService: AuthService
   ) {}
   async googleLogin(token: string, res: Response) {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const user = ticket.getPayload();
-
-    if (!user) {
-      return 'ERORR HERE';
-    }
-    const {
-      email,
-      sub,
-      given_name: firstName,
-      family_name: lastName,
-      email_verified: isEmailVerified,
-    } = user;
-
-    if (!email) {
-      return 'ERROR HERE';
-    }
-    let userFromDb = await this.prismaService.user.findUnique({
-      where: { email },
-    });
-    const password = this.passwordService.generatePassword();
-
-    if (!userFromDb) {
-      const hashedPassword: string = await bcrypt.hash(password, SaltLength);
-
-      userFromDb = await this.prismaService.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-          firstName,
-          lastName,
-          isEmailVerified,
-          authSocialSign: sub,
-          authType: 'GOOGLE',
-        },
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
       });
 
-      await this.mailerService.sendHtmlEmail(
+      const user = ticket.getPayload();
+
+      if (!user) {
+        throw new UnauthorizedException(ErrorsTypes.AUTH_GOOGLE_FAILED_TO_LOGIN);
+      }
+      const {
         email,
-        'Your credentials',
-        this.generateEmailBody(email, password)
-      );
+        sub,
+        given_name: firstName,
+        family_name: lastName,
+        email_verified: isEmailVerified,
+      } = user;
+
+      if (!email) {
+        throw new UnauthorizedException(ErrorsTypes.AUTH_GOOGLE_FAILED_GET_USER_DATA);
+      }
+      let userFromDb = await this.prismaService.user.findUnique({
+        where: { email },
+      });
+      const password = this.passwordService.generatePassword();
+
+      if (!userFromDb) {
+        const hashedPassword: string = await bcrypt.hash(password, SaltLength);
+
+        userFromDb = await this.prismaService.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+            firstName,
+            lastName,
+            isEmailVerified,
+            authSocialSign: sub,
+            authType: 'GOOGLE',
+          },
+        });
+
+        await this.mailerService.sendHtmlEmail(
+          email,
+          'Your credentials',
+          this.generateEmailBody(email, password)
+        );
+      }
+
+      const tokens = await this.authService.getTokens(userFromDb.id, email, userFromDb.role);
+      this.authService.setRefreshTokenCookie(tokens.refresh_token, res);
+
+      return { tokens, id: userFromDb.id };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TO_LOGIN, error.message);
     }
-
-    const tokens = await this.authService.getTokens(userFromDb.id, email, userFromDb.role);
-    this.authService.setRefreshTokenCookie(tokens.refresh_token, res);
-
-    return { tokens, id: userFromDb.id };
   }
 
   private generateEmailBody(email: string, password: string): string {
     return `
-     <div style="background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px; max-width: 400px; margin: auto;">
-        <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Your credentials to login without using Google service (but you can also login with Google)</div>
-        <div style="font-weight: bold;">Email:</div>
-        <div style="margin-bottom: 10px;">${email}</div>
-        <div style="font-weight: bold;">Password:</div>
+      <div style="border: 2px solid #FF385C; border-radius: 12px; padding: 20px; max-width: 400px; margin: auto;">
+        <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+          Your credentials to log in without using Google service (you can also log in with Google)
+       </div>
+       <div style="font-weight: bold;">Email:</div>
+       <div style="margin-bottom: 10px;">${email}</div>
+       <div style="font-weight: bold;">Password:</div>
         <div style="margin-bottom: 10px;">${password}</div>
-  </div>`;
+      </div>
+`;
   }
 }
