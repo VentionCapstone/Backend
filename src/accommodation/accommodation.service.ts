@@ -400,7 +400,9 @@ export class AccommodationService {
       };
     }
 
-    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+    if (!checkInDate && !checkOutDate) return;
+
+    if (!checkInDate || !checkOutDate || this.isInvalidDateRange(checkInDate, checkOutDate)) {
       throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
@@ -411,7 +413,6 @@ export class AccommodationService {
   }
 
   private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    if (!checkIn || !checkOut) return true;
     return (
       dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
       dayjs(checkIn).isBefore(dayjs(), 'day') ||
