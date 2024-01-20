@@ -1,9 +1,9 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { AxiosError } from 'axios';
 import * as dayjs from 'dayjs';
 import { catchError, firstValueFrom } from 'rxjs';
-import { Prisma } from '@prisma/client';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -15,7 +15,7 @@ import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
 
 interface UploadImageType {
-  filename: string;
+  mimetype: string;
   base64Image: string;
 }
 
@@ -210,15 +210,9 @@ export class AccommodationService {
     }
   }
 
-  generateRandomImageFileName(mimetype: string) {
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const timestamp = new Date().getTime();
-    return `${timestamp}_${randomString}.${mimetype.split('/')[1]}`;
-  }
-
   async uploadImageToS3(file: Express.Multer.File): Promise<UploadImageResponse> {
     const requestBody: UploadImageType = {
-      filename: this.generateRandomImageFileName(file.mimetype),
+      mimetype: file.mimetype,
       base64Image: file.buffer.toString('base64url'),
     };
 
@@ -244,8 +238,6 @@ export class AccommodationService {
     images: Express.Multer.File[],
     ownerId: string
   ): Promise<any> {
-    console.log(images);
-
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({
@@ -290,6 +282,7 @@ export class AccommodationService {
 
       return updatedAccommodation;
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
     }
   }
@@ -400,7 +393,9 @@ export class AccommodationService {
       };
     }
 
-    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+    if (!checkInDate && !checkOutDate) return;
+
+    if (!checkInDate || !checkOutDate || this.isInvalidDateRange(checkInDate, checkOutDate)) {
       throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
@@ -411,7 +406,6 @@ export class AccommodationService {
   }
 
   private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    if (!checkIn || !checkOut) return true;
     return (
       dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
       dayjs(checkIn).isBefore(dayjs(), 'day') ||

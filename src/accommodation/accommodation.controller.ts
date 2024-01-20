@@ -30,7 +30,7 @@ import {
 } from '@nestjs/swagger';
 import {
   ACCOMMODATION_IMAGES_MIN_LENGTH,
-  ACCOMMODATION_IMAGE_MAX_SIZE,
+  ACCOMMODATION_IMAGE_MAX_UPLOAD_MB,
   IMAGES_FILE_TYPES,
 } from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -121,12 +121,9 @@ export class AccommodationController {
       type: 'array',
       items: {
         type: 'object',
-        properties: {
-          filename: { type: 'string' },
-          base64Image: { type: 'string' },
-        },
+        properties: {},
       },
-      description: `Images file (only ${IMAGES_FILE_TYPES} allowed), size < ${ACCOMMODATION_IMAGE_MAX_SIZE}mb!`,
+      description: `Images file (only ${IMAGES_FILE_TYPES} allowed), size < ${ACCOMMODATION_IMAGE_MAX_UPLOAD_MB}mb!`,
     },
   })
   @ApiBearerAuth()
@@ -138,7 +135,7 @@ export class AccommodationController {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: ACCOMMODATION_IMAGE_MAX_SIZE * 1024 * 1024 }),
+          new MaxFileSizeValidator({ maxSize: ACCOMMODATION_IMAGE_MAX_UPLOAD_MB * 1024 * 1024 }),
           new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
         ],
       })

@@ -1,4 +1,9 @@
 version: '3.8'
+
+networks:
+  vention-network:
+    name: vention-network
+
 services:
   postgres:
     image: postgres:alpine
@@ -8,11 +13,15 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - vention-network
     volumes:
       - ./data:/var/lib/postgresql/data
     ports:
@@ -27,6 +36,8 @@ services:
     ports:
       - 3000:3000
       - 5555:5555
+    networks:
+      - vention-network
     depends_on:
       postgres:
         condition: service_healthy
