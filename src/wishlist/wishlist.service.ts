@@ -43,10 +43,15 @@ export class WishlistService {
           createdAt: 'desc',
         },
       });
-
+      const accommodationsWithWishlist = accommadationsFromWishlist.map((accom) => {
+        return {
+          ...accom,
+          isInWishlist: true,
+        };
+      });
       return {
         success: true,
-        data: accommadationsFromWishlist,
+        data: accommodationsWithWishlist,
       };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.WISHLIST_FAILED_TO_GET_LIST, error.message);
