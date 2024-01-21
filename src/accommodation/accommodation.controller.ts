@@ -401,14 +401,6 @@ export class AccommodationController {
     description: 'Accommodation with provided id',
     type: MediaAllDto,
   })
-  @ApiUnauthorizedResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not found',
-  })
   @ApiResponse({
     status: 500,
     description: 'Internal Server Error',
@@ -421,7 +413,8 @@ export class AccommodationController {
   })
   @Get('/:id/media')
   async getMedia(@Param('id') id: string) {
-    const media = await this.accommodationService.getMedia(id);
-    return { succes: true, data: { ...media } };
+    const media = await this.accommodationService.getAllMedia(id);
+
+    return { succes: true, data: media };
   }
 }

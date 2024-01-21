@@ -210,18 +210,15 @@ export class AccommodationService {
     }
   }
 
-  async getMedia(id: string) {
+  async getAllMedia(id: string) {
     try {
-      const allMedia = await this.prisma.accommodation.findUnique({
-        where: { id },
-        select: {
-          media: true,
-        },
+      const allMedia = await this.prisma.media.findMany({
+        where: { accommodationId: id },
       });
 
       return allMedia;
     } catch (error) {
-      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_IMAGES, error.message);
     }
   }
 
