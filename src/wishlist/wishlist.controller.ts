@@ -64,8 +64,11 @@ export class WishlistController {
     description: 'Unauthorized',
   })
   @ApiBearerAuth()
-  @Delete(':wishlistId')
-  deleteFromWishlist(@Param('wishlistId') wishlistId: string, @CurrentUser('id') userId: string) {
-    return this.wishlistService.deleteFromWishlist(wishlistId, userId);
+  @Delete(':accommodationId')
+  deleteFromWishlist(
+    @Param('accommodationId') accommodationId: string,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.wishlistService.deleteFromWishlist(accommodationId, userId);
   }
 }
