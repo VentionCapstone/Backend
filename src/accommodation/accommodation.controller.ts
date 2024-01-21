@@ -393,4 +393,10 @@ export class AccommodationController {
     const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: { ...accommodation, owner } };
   }
+
+  @Get('/:id/media')
+  async getMedia(@Param('id') id: string) {
+    const media = await this.accommodationService.getMedia(id);
+    return { succes: true, data: { ...media } };
+  }
 }
