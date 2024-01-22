@@ -39,6 +39,7 @@ import { LangQuery } from 'src/customDecorators/langQuery.decorator';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { ReviewDto } from 'src/reviews/dto/review-response.dto';
 import { AccommodationService } from './accommodation.service';
+import { MediaAllDto } from './dto/accommodation-media.dto';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
 import { OrderAndFilterReviewDto } from './dto/get-review.dto';
@@ -392,5 +393,28 @@ export class AccommodationController {
   async findOne(@Param('id') id: string) {
     const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
     return { success: true, data: { ...accommodation, owner } };
+  }
+
+  @ApiOperation({ summary: 'get all media of single accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Accommodation with provided id',
+    type: MediaAllDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation ID',
+    required: true,
+  })
+  @Get('/:id/media')
+  async getMedia(@Param('id') id: string) {
+    const media = await this.accommodationService.getAllMedia(id);
+
+    return { succes: true, data: media };
   }
 }

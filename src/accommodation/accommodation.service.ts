@@ -210,6 +210,18 @@ export class AccommodationService {
     }
   }
 
+  async getAllMedia(id: string) {
+    try {
+      const allMedia = await this.prisma.media.findMany({
+        where: { accommodationId: id },
+      });
+
+      return allMedia;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_IMAGES, error.message);
+    }
+  }
+
   async uploadImageToS3(file: Express.Multer.File): Promise<UploadImageResponse> {
     const requestBody: UploadImageType = {
       mimetype: file.mimetype,
