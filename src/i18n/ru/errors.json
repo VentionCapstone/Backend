@@ -31,6 +31,7 @@
   "BAD_REQUEST_BOOKING_INVALID_DATES": "Неверные даты бронирования",
   "BAD_REQUEST_BOOKING_ALREADY_BOOKED": "К сожалению, на некоторые из этих дат жилье уже забронировано",
   "BOOKING_FAILED_TO_GET_AVAILABLE_DATES": "Error occurred while getting available dates",
+  "BOOKING_FAILED_TO_GET_USER_BOOKINGS": "Не удалось получить бронирования пользователя",
   "UNAUTHORIZED_TOKEN_NOT_FOUND": "Токен не найден",
   "UNAUTHORIZED": "Пользователь не авторизован",
   "UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN": "Срок действия токена доступа истек",

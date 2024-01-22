@@ -4,7 +4,9 @@ import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as utc from 'dayjs/plugin/utc';
+import { PaginationDto } from 'src/accommodation/dto/pagination.dto';
 import { DEFAULT_DATE_FORMAT } from 'src/common/constants/date';
+import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -187,6 +189,35 @@ export class BookingService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.BOOKING_FAILED_TO_BOOK, error.message);
+    }
+  }
+
+  async getUserBookings(user: AuthUser, options: PaginationDto) {
+    const { page, limit } = options;
+    try {
+      const [bookings, totalCount] = await this.prismaService.$transaction([
+        this.prismaService.booking.findMany({
+          where: {
+            userId: user.id,
+          },
+          skip: (page! - 1) * limit!,
+          take: limit,
+        }),
+        this.prismaService.booking.count({
+          where: {
+            userId: user.id,
+          },
+        }),
+      ]);
+
+      return {
+        bookings,
+        totalCount,
+        success: true,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.BOOKING_FAILED_TO_GET_USER_BOOKINGS, error.message);
     }
   }
 

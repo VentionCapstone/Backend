@@ -31,6 +31,7 @@
   "BAD_REQUEST_BOOKING_INVALID_DATES": "Bron qilish sanalari noto'g'ri",
   "BAD_REQUEST_BOOKING_ALREADY_BOOKED": "Kechirasiz, ushbu sanalarning ayrimlarida turar joy band qilingan",
   "BOOKING_FAILED_TO_GET_AVAILABLE_DATES": "Mavjud sanalarni olishda xatolik yuz berdi",
+  "BOOKING_FAILED_TO_GET_USER_BOOKINGS": "Foydalanuvchi bronlarini olishda xatolik yuz berdi",
   "UNAUTHORIZED_TOKEN_NOT_FOUND": "Token topilmadi",
   "UNAUTHORIZED": "Foydalanuvchiga ruxsat berilmagan",
   "UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN": "Token muddati tugagan",

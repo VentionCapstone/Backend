@@ -31,6 +31,7 @@
   "BAD_REQUEST_BOOKING_INVALID_DATES": "Брондау күндері жарамсыз",
   "BAD_REQUEST_BOOKING_ALREADY_BOOKED": "Кешіріңіз, осы күндердің кейбірінде тұруға тапсырыс берілген",
   "BOOKING_FAILED_TO_GET_AVAILABLE_DATES": "Қолжетімді күндерді алу кезінде қате орын алды",
+  "BOOKING_FAILED_TO_GET_USER_BOOKINGS": "Пайдаланушының брондауларын алу кезінде қате орын алды",
   "UNAUTHORIZED_TOKEN_NOT_FOUND": "Токен табылмады",
   "UNAUTHORIZED": "Пайдаланушы рұқсатсыз",
   "UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN": "Қатынас токенінің мерзімі аяқталды",
