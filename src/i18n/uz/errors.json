@@ -58,6 +58,8 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Tasdiqlash xati yuborilmadi",
   "AUTH_FAILED_TOKEN_VERIFY": "Tokenni tasdiqlashda xatolik",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Yangi parol oʻrnatish uchun xat yuborishda xatolik",
+  "AUTH_GOOGLE_FAILED_TO_LOGIN": "Google autentifikatsiyasi muvaffaqiyatsiz tugadi",
+  "AUTH_GOOGLE_FAILED_GET_USER_DATA": "Google dan foydalanuvchi ma'lumotlari olish muvaffaqiyatsiz tugadi",
   "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Noto'g'ri tiklash tokeni",
   "USER_FAILED_TO_GET_LIST": "Foydalanuvchilar ro'yxatini olib bo'lmadi",
   "USER_FAILED_TO_GET": "Foydalanuvchini topib bo'lmadi",

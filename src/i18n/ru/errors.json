@@ -58,6 +58,8 @@
   "AUTH_FAILED_SEND_VERIFICATION_EMAIL": "Не удалось отправить письмо с подтверждением",
   "AUTH_FAILED_TOKEN_VERIFY": "Не удалось проверить токен пользователя",
   "AUTH_FORGOT_PASSWORD_FAILED_TO_SEND_EMAIL": "Не удалось отправить электронное письмо для установки нового пароля.",
+  "AUTH_GOOGLE_FAILED_TO_LOGIN": "Авторизация через Google не удалась",
+  "AUTH_GOOGLE_FAILED_GET_USER_DATA": "Не удалось получить информацию о пользователе от Google",
   "FORBIDDEN_FORGOT_PASSWORD_INVALID_TOKEN": "Неверный токен сброса",
   "USER_FAILED_TO_GET_LIST": "Не удалось получить список пользователей",
   "USER_FAILED_TO_GET": "Не удалось получить пользователя",

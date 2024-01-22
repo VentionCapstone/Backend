@@ -38,6 +38,7 @@ import {
   RegisterDto,
 } from './dto';
 import { PasswordUpdateDto } from './dto/update-password.dto';
+import { GoogleService } from './google/google.service';
 import { VerificationSerivce } from './verification.service';
 
 @ApiTags('auth')
@@ -45,7 +46,8 @@ import { VerificationSerivce } from './verification.service';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly verificationService: VerificationSerivce
+    private readonly verificationService: VerificationSerivce,
+    private readonly googleService: GoogleService
   ) {}
 
   @ApiOperation({ summary: 'Sign up user' })
@@ -184,5 +186,10 @@ export class AuthController {
   @Patch('forgot-password-reset')
   forgotPasswordReset(@Body() body: ForgotPasswordResetDto) {
     return this.authService.resetForgotPassword(body);
+  }
+
+  @Post('google/login')
+  async googleAuth(@Body('token') token: string, @Res({ passthrough: true }) res: Response) {
+    return await this.googleService.googleLogin(token, res);
   }
 }

@@ -9,6 +9,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "1",
@@ -32,6 +33,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "2",
@@ -55,6 +57,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "3",
@@ -78,6 +81,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "4",
@@ -101,6 +105,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "5",
@@ -124,6 +129,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "6",
@@ -147,6 +153,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "7",
@@ -170,6 +177,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "8",
@@ -193,6 +201,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "9",
@@ -216,6 +225,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "10",
