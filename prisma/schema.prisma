@@ -149,6 +149,8 @@ model Wishlist {
   createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+
+  @@unique([userId, accommodationId], name: "uniqueUserAccommodation")
 }
 
 enum Role {

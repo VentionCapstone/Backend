@@ -5,6 +5,7 @@ export class ListOfAccommodationsDto {
   numberOfRooms: number;
   allowedNumberOfPeople: number;
   price: number;
+  isInWishlist: boolean;
   address: {
     country: string;
   };
