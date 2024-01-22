@@ -8,6 +8,8 @@ model User {
   isEmailVerified    Boolean        @default(false)
   isVerified         Boolean        @default(false)
   isDeleted          Boolean        @default(false)
+  authType           AuthType       @default(EMAIL)
+  authSocialSign     String?
   createdAt          DateTime       @default(now())
   hashedRefreshToken String?
   activationLink     String?
@@ -149,6 +151,8 @@ model Wishlist {
   createdAt       DateTime      @default(now())
   user            User          @relation(fields: [userId], references: [id])
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+
+  @@unique([userId, accommodationId], name: "uniqueUserAccommodation")
 }
 
 enum Role {
@@ -172,6 +176,11 @@ enum Status {
   INACTIVE
   PENDING
   COMPLETED
+}
+
+enum AuthType {
+  EMAIL
+  GOOGLE
 }
 
 generator client {

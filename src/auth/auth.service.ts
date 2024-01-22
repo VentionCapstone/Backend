@@ -360,8 +360,8 @@ export class AuthService {
     return token;
   }
 
-  /** SET REFRESH TOKEN COKKIE PRIVATE FUNCTION */
-  private setRefreshTokenCookie(refresh_token: string, res: Response) {
+  /** SET REFRESH TOKEN COKKIE FUNCTION */
+  setRefreshTokenCookie(refresh_token: string, res: Response) {
     const maxAge = parseInt(MAX_REFRESH_TOKEN_AGE || '0', 10);
     res.cookie('refresh_token', refresh_token, {
       maxAge,

@@ -1,6 +1,9 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { AxiosError } from 'axios';
 import * as dayjs from 'dayjs';
+import { catchError, firstValueFrom } from 'rxjs';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -11,9 +14,25 @@ import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
 
+interface UploadImageType {
+  mimetype: string;
+  base64Image: string;
+}
+
+interface UploadImageResponse {
+  message: string;
+  data: {
+    imageUrl: string;
+    thumbnailUrl: string;
+  };
+}
+
 @Injectable()
 export class AccommodationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService
+  ) {}
 
   async createAccommodation(createAccommodationBody: any) {
     try {
@@ -191,11 +210,50 @@ export class AccommodationService {
     }
   }
 
-  async addFileToAccommodation(id: string, file: any, ownerId: string): Promise<any> {
+  async getAllMedia(id: string) {
+    try {
+      const allMedia = await this.prisma.media.findMany({
+        where: { accommodationId: id },
+      });
+
+      return allMedia;
+    } catch (error) {
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_IMAGES, error.message);
+    }
+  }
+
+  async uploadImageToS3(file: Express.Multer.File): Promise<UploadImageResponse> {
+    const requestBody: UploadImageType = {
+      mimetype: file.mimetype,
+      base64Image: file.buffer.toString('base64url'),
+    };
+
+    const { data } = await firstValueFrom(
+      this.httpService
+        .post(process.env.FILE_UPLOAD_URL!, requestBody, {
+          timeout: 20000,
+        })
+        .pipe(
+          catchError((error: AxiosError) => {
+            throw new GlobalException(
+              ErrorsTypes.ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_STORAGE,
+              error.message
+            );
+          })
+        )
+    );
+    return data;
+  }
+
+  async addFileToAccommodation(
+    accommodationId: string,
+    images: Express.Multer.File[],
+    ownerId: string
+  ): Promise<any> {
     let existingAccommodation;
     try {
       existingAccommodation = await this.prisma.accommodation.findUnique({
-        where: { id, ownerId },
+        where: { id: accommodationId, ownerId },
       });
     } catch (error) {
       throw new GlobalException(
@@ -207,21 +265,36 @@ export class AccommodationService {
     if (!existingAccommodation)
       throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_UPDATING);
 
-    const base64Data = file.buffer.toString('base64');
-
-    const updateAccommodationAndAdress = {
-      previewImgUrl: base64Data,
-      thumbnailUrl: base64Data,
-    };
-
     try {
+      const uploadedImagesResponse = await Promise.all(
+        images.map((image) => {
+          return this.uploadImageToS3(image);
+        })
+      );
+
+      const imagesToCreate = uploadedImagesResponse.map((image) => ({
+        imageUrl: image.data.imageUrl,
+        thumbnailUrl: image.data.thumbnailUrl,
+        accommodationId,
+      }));
+
+      await this.prisma.media.createMany({
+        data: imagesToCreate,
+      });
+
+      const [firstImage] = imagesToCreate;
+
       const updatedAccommodation = await this.prisma.accommodation.update({
-        where: { id },
-        data: updateAccommodationAndAdress,
+        where: { id: accommodationId },
+        data: {
+          previewImgUrl: firstImage.imageUrl,
+          thumbnailUrl: firstImage.thumbnailUrl,
+        },
       });
 
       return updatedAccommodation;
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
     }
   }
@@ -273,7 +346,7 @@ export class AccommodationService {
     }
   }
 
-  async getAllAccommodations(options: OrderAndFilterDto) {
+  async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
     try {
       const findManyOptions = this.generateFindAllQueryObj(options);
 
@@ -300,6 +373,24 @@ export class AccommodationService {
         totalPriceStatsQuery,
       ]);
 
+      const accommodationsWithWishlist = await Promise.all(
+        accommodations.map(async (accommodation) => {
+          let isInWishlist;
+          if (userId) {
+            isInWishlist = await this.prisma.wishlist.findFirst({
+              where: {
+                userId: userId,
+                accommodationId: accommodation.id,
+              },
+            });
+          }
+          return {
+            ...accommodation,
+            isInWishlist: !!isInWishlist,
+          };
+        })
+      );
+
       const {
         _min: { price: curMinPrice },
         _max: { price: curMaxPrice },
@@ -313,7 +404,7 @@ export class AccommodationService {
       return {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
         totalCount,
-        data: accommodations,
+        data: accommodationsWithWishlist,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -332,7 +423,9 @@ export class AccommodationService {
       };
     }
 
-    if (this.isInvalidDateRange(checkInDate, checkOutDate)) {
+    if (!checkInDate && !checkOutDate) return;
+
+    if (!checkInDate || !checkOutDate || this.isInvalidDateRange(checkInDate, checkOutDate)) {
       throw new BadRequestException(ErrorsTypes.BAD_REQUEST_INVALID_DATE_RANGE);
     }
 
@@ -343,7 +436,6 @@ export class AccommodationService {
   }
 
   private isInvalidDateRange(checkIn: Date | undefined, checkOut: Date | undefined) {
-    if (!checkIn || !checkOut) return true;
     return (
       dayjs(checkOut).isSameOrBefore(dayjs(checkIn), 'day') ||
       dayjs(checkIn).isBefore(dayjs(), 'day') ||

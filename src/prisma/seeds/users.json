@@ -9,6 +9,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "1",
@@ -16,7 +17,7 @@
         "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/486.jpg",
         "gender": "FEMALE",
         "country": "Cameroon",
-        "language": "French",
+        "language": "ru",
         "uiTheme": "dark",
         "description": "Surgo neque solus. Delectatio tristis quis armarium paens pax villa deripio talis assumenda. Desolo aspernatur sunt atrox cupio auditor delectatio utpote."
       }
@@ -32,6 +33,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "2",
@@ -39,7 +41,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/18864935",
         "gender": "MALE",
         "country": "Niue",
-        "language": "English",
+        "language": "en",
         "uiTheme": "light",
         "description": "Tempora solio testimonium cum perferendis. Canis suffragium spoliatio utrimque caecus capitulus vomica vigor vulticulus quam. Decens una ademptio depono spargo dicta."
       }
@@ -55,6 +57,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "3",
@@ -62,7 +65,7 @@
         "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/568.jpg",
         "gender": "FEMALE",
         "country": "Palestine",
-        "language": "French",
+        "language": "de",
         "uiTheme": "dark",
         "description": "Doloribus condico succedo laudantium ventosus ter ulciscor paulatim amiculum audacia. Aperiam coepi depereo subito cunabula. Arcesso synagoga theatrum depromo approbo."
       }
@@ -78,6 +81,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "4",
@@ -85,7 +89,7 @@
         "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/630.jpg",
         "gender": "MALE",
         "country": "Lao People's Democratic Republic",
-        "language": "English",
+        "language": "en",
         "uiTheme": "light",
         "description": "Adhuc alias caute tantillus carus teneo. Angelus complectus atque. Ager ustulo amplexus terreo ceno."
       }
@@ -101,6 +105,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "5",
@@ -108,7 +113,7 @@
         "imageUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/556.jpg",
         "gender": "FEMALE",
         "country": "Serbia",
-        "language": "French",
+        "language": "uz",
         "uiTheme": "dark",
         "description": "Tredecim delinquo totus callide coadunatio clementia spoliatio defessus color harum. Voluptatem vereor debitis approbo aspernatur testimonium ea necessitatibus. Subiungo ars minus."
       }
@@ -124,6 +129,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "6",
@@ -131,7 +137,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/28593354",
         "gender": "MALE",
         "country": "Curacao",
-        "language": "English",
+        "language": "kz",
         "uiTheme": "light",
         "description": "Tandem vapulus vere carus suadeo cumque. Ad vorax peccatus vomica. Sollicito carus depopulo clementia vinco tergeo saepe."
       }
@@ -147,6 +153,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "7",
@@ -154,7 +161,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/98747872",
         "gender": "FEMALE",
         "country": "Afghanistan",
-        "language": "French",
+        "language": "ru",
         "uiTheme": "dark",
         "description": "Tutis depono ante. Voluptas cursus terga aperte cunabula vos amoveo. Aer argumentum placeat advoco tendo."
       }
@@ -170,6 +177,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "8",
@@ -177,7 +185,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/97063706",
         "gender": "MALE",
         "country": "Germany",
-        "language": "English",
+        "language": "de",
         "uiTheme": "light",
         "description": "Depraedor campana delectatio. Culpa nesciunt volva sed comitatus virga. Veritas amplitudo terebro aranea arbitro adduco pauci decretum."
       }
@@ -193,6 +201,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "9",
@@ -200,7 +209,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/37763074",
         "gender": "FEMALE",
         "country": "Chad",
-        "language": "French",
+        "language": "uz",
         "uiTheme": "dark",
         "description": "Attonbitus pecco adipisci acer debeo chirographum supplanto caterva angustus theatrum. Theca distinctio universe. Administratio acidus repudiandae totidem theatrum civis sollicito demitto."
       }
@@ -216,6 +225,7 @@
     "isEmailVerified": true,
     "isVerified": true,
     "isDeleted": false,
+    "authType": "EMAIL",
     "profile": {
       "create": {
         "id": "10",
@@ -223,7 +233,7 @@
         "imageUrl": "https://avatars.githubusercontent.com/u/91608254",
         "gender": "MALE",
         "country": "Denmark",
-        "language": "English",
+        "language": "ru",
         "uiTheme": "light",
         "description": "Ducimus sursum adsidue solium ademptio tenax conculco. Vicissitudo derelinquo autem summisse trans carbo vitiosus. Nisi basium tametsi spes quam vix cum."
       }

@@ -43,10 +43,15 @@ export class WishlistService {
           createdAt: 'desc',
         },
       });
-
+      const accommodationsWithWishlist = accommadationsFromWishlist.map((accom) => {
+        return {
+          ...accom,
+          isInWishlist: true,
+        };
+      });
       return {
         success: true,
-        data: accommadationsFromWishlist,
+        data: accommodationsWithWishlist,
       };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.WISHLIST_FAILED_TO_GET_LIST, error.message);
@@ -55,6 +60,14 @@ export class WishlistService {
 
   async addToWishlist(accommodationId: string, userId: string) {
     try {
+      const accommodation = await this.prismaService.accommodation.findFirst({
+        where: { id: accommodationId },
+      });
+
+      if (!accommodation) {
+        throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
+      }
+
       const foundAccommodation = await this.prismaService.wishlist.findFirst({
         where: {
           userId,
@@ -83,12 +96,11 @@ export class WishlistService {
     }
   }
 
-  async deleteFromWishlist(wishlistId: string, userId: string) {
+  async deleteFromWishlist(accommodationId: string, userId: string) {
     try {
       await this.prismaService.wishlist.delete({
         where: {
-          id: wishlistId,
-          userId,
+          uniqueUserAccommodation: { userId, accommodationId },
         },
       });
 

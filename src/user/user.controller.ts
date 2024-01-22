@@ -2,14 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -20,6 +25,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { IMAGES_FILE_TYPES, PROFILE_IMAGE_MAX_SIZE } from 'src/common/constants/media';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import { LangQuery } from 'src/customDecorators/langQuery.decorator';
@@ -74,6 +80,27 @@ export class UserController {
   @Post('profile')
   createProfile(@Body() createUserDto: CreateUserDto, @CurrentUser() user: AuthUser) {
     return this.userService.createUserProfile(createUserDto, user);
+  }
+
+  @UseGuards(UserGuard)
+  @ApiOperation({ summary: 'Add profile image' })
+  @LangQuery()
+  @Post(':id/image')
+  @UseInterceptors(FileInterceptor('image'))
+  addImageToProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: PROFILE_IMAGE_MAX_SIZE * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
+        ],
+      })
+    )
+    file: Express.Multer.File,
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string
+  ) {
+    return this.userService.addProfileImage(id, userId, file);
   }
 
   @UseGuards(UserGuard)
