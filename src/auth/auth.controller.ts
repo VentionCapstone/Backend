@@ -190,10 +190,6 @@ export class AuthController {
 
   @Post('google/login')
   async googleAuth(@Body('token') token: string, @Res({ passthrough: true }) res: Response) {
-    console.log('AuthController ~ googleAuth ~ token:', token);
-
-    const a = await this.googleService.googleLogin(token, res);
-    console.log('AuthController ~ googleAuth ~ a:', a);
-    return a;
+    return await this.googleService.googleLogin(token, res);
   }
 }
