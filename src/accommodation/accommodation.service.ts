@@ -499,6 +499,7 @@ export class AccommodationService {
     const findManyOptions: Prisma.AccommodationFindManyArgs = {
       select: {
         id: true,
+        title: true,
         thumbnailUrl: true,
         squareMeters: true,
         numberOfRooms: true,
@@ -509,6 +510,8 @@ export class AccommodationService {
             street: true,
             city: true,
             country: true,
+            latitude: true,
+            longitude: true,
           },
         },
       },

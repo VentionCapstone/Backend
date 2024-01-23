@@ -45,8 +45,12 @@ export class WishlistService {
       });
       const accommodationsWithWishlist = accommadationsFromWishlist.map((accom) => {
         return {
-          ...accom,
-          isInWishlist: true,
+          id: accom.id,
+          createdAt: accom.createdAt,
+          accommodation: {
+            ...accom.accommodation,
+            isInWishlist: true,
+          },
         };
       });
       return {
