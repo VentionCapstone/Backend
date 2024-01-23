@@ -192,13 +192,24 @@ export class BookingService {
     }
   }
 
-  async getUserBookings(user: AuthUser, options: PaginationDto) {
-    const { page, limit } = options;
+  async getUserBookings(user: AuthUser, options: PaginationDto & { status?: Status }) {
+    const { page, limit, status } = options;
     try {
       const [bookings, totalCount] = await this.prismaService.$transaction([
         this.prismaService.booking.findMany({
           where: {
             userId: user.id,
+            status: status,
+          },
+          include: {
+            accommodation: {
+              select: {
+                title: true,
+                thumbnailUrl: true,
+                previewImgUrl: true,
+                price: true,
+              },
+            },
           },
           skip: (page! - 1) * limit!,
           take: limit,
@@ -206,14 +217,15 @@ export class BookingService {
         this.prismaService.booking.count({
           where: {
             userId: user.id,
+            status: status,
           },
         }),
       ]);
 
       return {
-        bookings,
-        totalCount,
         success: true,
+        data: bookings,
+        totalCount: totalCount,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
