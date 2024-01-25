@@ -204,7 +204,7 @@ export class AccommodationService {
         },
       });
 
-      return { accommodation, owner };
+      return { ...accommodation, owner, amenities: accommodation.amenities[0] };
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
@@ -364,6 +364,10 @@ export class AccommodationService {
       const totalPriceStatsQuery = this.prisma.accommodation.aggregate({
         _min: { price: true },
         _max: { price: true },
+        where: {
+          available: true,
+          isDeleted: false,
+        },
       });
 
       const [accommodations, totalCount, curPriceStats, totalPriceStats] = await Promise.all([
@@ -501,6 +505,7 @@ export class AccommodationService {
         id: true,
         title: true,
         thumbnailUrl: true,
+        previewImgUrl: true,
         squareMeters: true,
         numberOfRooms: true,
         allowedNumberOfPeople: true,

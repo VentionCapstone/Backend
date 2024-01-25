@@ -401,8 +401,8 @@ export class AccommodationController {
   @LangQuery()
   @Get('/:id')
   async findOne(@Param('id') id: string) {
-    const { accommodation, owner } = await this.accommodationService.getOneAccommodation(id);
-    return { success: true, data: { ...accommodation, owner } };
+    const data = await this.accommodationService.getOneAccommodation(id);
+    return { success: true, data };
   }
 
   @ApiOperation({ summary: 'get all media of single accommodation' })

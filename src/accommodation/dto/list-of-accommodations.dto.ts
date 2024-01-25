@@ -1,6 +1,7 @@
 export class ListOfAccommodationsDto {
   id: string;
   thumbnailUrl: string;
+  previewImgUrl: string;
   squareMeters: number;
   numberOfRooms: number;
   allowedNumberOfPeople: number;
