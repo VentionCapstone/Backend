@@ -1,5 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import * as path from 'path';
 import { AccommodationModule } from './accommodation/accommodation.module';
@@ -35,6 +36,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
         AcceptLanguageResolver,
       ],
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     AmenitiesModule,
