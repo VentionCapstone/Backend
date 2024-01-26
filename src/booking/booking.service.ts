@@ -1,10 +1,12 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as utc from 'dayjs/plugin/utc';
 import { PaginationDto } from 'src/accommodation/dto/pagination.dto';
+import { STANDARD_CHECKOUT_HOUR } from 'src/common/constants/booking';
 import { DEFAULT_DATE_FORMAT } from 'src/common/constants/date';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -265,5 +267,66 @@ export class BookingService {
 
   private getTimeInZone(date: Date, offset: number) {
     return dayjs(date).utcOffset(-offset).add(offset, 'minutes');
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async checkBookingEnd() {
+    const serverUtcOffset = dayjs().utcOffset();
+    const tomorrow = dayjs()
+      .add(1, 'day')
+      .startOf('day')
+      .add(serverUtcOffset, 'minutes')
+      .toISOString();
+
+    const bookings = await this.prismaService.booking.findMany({
+      select: {
+        id: true,
+        endDate: true,
+        accommodation: {
+          select: {
+            timezoneOffset: true,
+          },
+        },
+      },
+      where: {
+        status: Status.ACTIVE,
+        endDate: {
+          lte: tomorrow,
+        },
+      },
+    });
+
+    const completedBookingsIds = [];
+    const now = dayjs();
+
+    for (const booking of bookings) {
+      const {
+        id,
+        endDate,
+        accommodation: { timezoneOffset },
+      } = booking;
+
+      const bookingEnd = this.getTimeInZone(endDate, timezoneOffset).add(
+        STANDARD_CHECKOUT_HOUR,
+        'hours'
+      );
+
+      if (bookingEnd.isBefore(now)) {
+        completedBookingsIds.push(id);
+      }
+    }
+
+    if (completedBookingsIds.length > 0) {
+      await this.prismaService.booking.updateMany({
+        where: {
+          id: {
+            in: completedBookingsIds,
+          },
+        },
+        data: {
+          status: Status.COMPLETED,
+        },
+      });
+    }
   }
 }
