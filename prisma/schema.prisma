@@ -46,6 +46,7 @@ model Booking {
   accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   payment         Payment?      @relation(fields: [paymentId], references: [id])
   review          Review?
+  createdAt       DateTime      @default(now())
 }
 
 model Accommodation {
@@ -176,6 +177,7 @@ enum Status {
   INACTIVE
   PENDING
   COMPLETED
+  UPCOMING
 }
 
 enum AuthType {

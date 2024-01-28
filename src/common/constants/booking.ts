@@ -1,1 +1,2 @@
 export const STANDARD_CHECKOUT_HOUR = 11;
+export const STANDARD_CHECKIN_HOUR = 15;
