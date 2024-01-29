@@ -24,6 +24,7 @@ export class WishlistService {
           accommodation: {
             select: {
               id: true,
+              title: true,
               thumbnailUrl: true,
               squareMeters: true,
               numberOfRooms: true,
