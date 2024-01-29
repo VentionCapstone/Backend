@@ -6,7 +6,7 @@ import { Dayjs } from 'dayjs';
 import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as utc from 'dayjs/plugin/utc';
 import { PaginationDto } from 'src/accommodation/dto/pagination.dto';
-import { STANDARD_CHECKOUT_HOUR } from 'src/common/constants/booking';
+import { STANDARD_CHECKIN_HOUR, STANDARD_CHECKOUT_HOUR } from 'src/common/constants/booking';
 import { DEFAULT_DATE_FORMAT } from 'src/common/constants/date';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -37,7 +37,7 @@ export class BookingService {
             },
             where: {
               status: {
-                in: [Status.ACTIVE, Status.PENDING],
+                in: [Status.ACTIVE, Status.PENDING, Status.UPCOMING],
               },
               endDate: {
                 gt: dayjs().toISOString(),
@@ -114,7 +114,7 @@ export class BookingService {
             },
             where: {
               status: {
-                in: [Status.ACTIVE, Status.PENDING],
+                in: [Status.ACTIVE, Status.PENDING, Status.UPCOMING],
               },
               endDate: {
                 gt: dayjs().toISOString(),
@@ -209,6 +209,7 @@ export class BookingService {
                 title: true,
                 thumbnailUrl: true,
                 previewImgUrl: true,
+                timezoneOffset: true,
                 price: true,
               },
             },
@@ -328,5 +329,42 @@ export class BookingService {
         },
       });
     }
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async inactivateUnpaidBookings() {
+    await this.prismaService.booking.updateMany({
+      where: {
+        status: Status.PENDING,
+        createdAt: {
+          lte: dayjs().subtract(1, 'hour').toISOString(),
+        },
+        payment: {
+          status: {
+            not: Status.COMPLETED,
+          },
+        },
+      },
+      data: {
+        status: Status.INACTIVE,
+      },
+    });
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async activateUpcomingBookings() {
+    await this.prismaService.$executeRaw`
+      WITH upcoming AS (
+        SELECT b.*, a."timezoneOffset" 
+        FROM "Booking" b
+        JOIN "Accommodation" a ON a.id = b."accommodationId" 
+        JOIN "Payment" p ON p.id = b."paymentId"
+        WHERE p.status = 'COMPLETED' AND b.status = 'UPCOMING' AND
+          b."startDate" + INTERVAL '1 HOUR'  * ${STANDARD_CHECKIN_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
+      )
+      UPDATE "Booking" b
+      SET status = 'ACTIVE'
+      FROM upcoming u
+      WHERE b.id = u.id;`;
   }
 }
