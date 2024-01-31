@@ -1,10 +1,12 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Status } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import * as isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as utc from 'dayjs/plugin/utc';
 import { PaginationDto } from 'src/accommodation/dto/pagination.dto';
+import { STANDARD_CHECKIN_HOUR, STANDARD_CHECKOUT_HOUR } from 'src/common/constants/booking';
 import { DEFAULT_DATE_FORMAT } from 'src/common/constants/date';
 import { AuthUser } from 'src/common/types/AuthUser.type';
 import ErrorsTypes from 'src/errors/errors.enum';
@@ -35,7 +37,7 @@ export class BookingService {
             },
             where: {
               status: {
-                in: [Status.ACTIVE, Status.PENDING],
+                in: [Status.ACTIVE, Status.PENDING, Status.UPCOMING],
               },
               endDate: {
                 gt: dayjs().toISOString(),
@@ -112,7 +114,7 @@ export class BookingService {
             },
             where: {
               status: {
-                in: [Status.ACTIVE, Status.PENDING],
+                in: [Status.ACTIVE, Status.PENDING, Status.UPCOMING],
               },
               endDate: {
                 gt: dayjs().toISOString(),
@@ -192,13 +194,25 @@ export class BookingService {
     }
   }
 
-  async getUserBookings(user: AuthUser, options: PaginationDto) {
-    const { page, limit } = options;
+  async getUserBookings(user: AuthUser, options: PaginationDto & { status?: Status }) {
+    const { page, limit, status } = options;
     try {
       const [bookings, totalCount] = await this.prismaService.$transaction([
         this.prismaService.booking.findMany({
           where: {
             userId: user.id,
+            status: status,
+          },
+          include: {
+            accommodation: {
+              select: {
+                title: true,
+                thumbnailUrl: true,
+                previewImgUrl: true,
+                timezoneOffset: true,
+                price: true,
+              },
+            },
           },
           skip: (page! - 1) * limit!,
           take: limit,
@@ -206,14 +220,15 @@ export class BookingService {
         this.prismaService.booking.count({
           where: {
             userId: user.id,
+            status: status,
           },
         }),
       ]);
 
       return {
-        bookings,
-        totalCount,
         success: true,
+        data: bookings,
+        totalCount: totalCount,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -253,5 +268,58 @@ export class BookingService {
 
   private getTimeInZone(date: Date, offset: number) {
     return dayjs(date).utcOffset(-offset).add(offset, 'minutes');
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async checkBookingEnd() {
+    await this.prismaService.$executeRaw`
+      WITH completed AS (
+        SELECT bk.id
+        FROM "Booking" bk
+        JOIN "Accommodation" a ON a.id = bk."accommodationId"
+        WHERE bk.status = ${Status.ACTIVE}::"Status"
+        AND bk."endDate" + INTERVAL '1 HOURS' * ${STANDARD_CHECKOUT_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
+      )
+      UPDATE "Booking" b
+      SET status = ${Status.COMPLETED}::"Status"
+      FROM completed c
+      WHERE b.id = c.id;`;
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async inactivateUnpaidBookings() {
+    await this.prismaService.booking.updateMany({
+      where: {
+        status: Status.PENDING,
+        createdAt: {
+          lte: dayjs().subtract(1, 'hour').toISOString(),
+        },
+        payment: {
+          status: {
+            not: Status.COMPLETED,
+          },
+        },
+      },
+      data: {
+        status: Status.INACTIVE,
+      },
+    });
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async activateUpcomingBookings() {
+    await this.prismaService.$executeRaw`
+      WITH upcoming AS (
+        SELECT b.id,
+        FROM "Booking" b
+        JOIN "Accommodation" a ON a.id = b."accommodationId" 
+        JOIN "Payment" p ON p.id = b."paymentId"
+        WHERE p.status = ${Status.COMPLETED}::"Status" AND b.status = ${Status.UPCOMING}::"Status" AND
+          b."startDate" + INTERVAL '1 HOUR'  * ${STANDARD_CHECKIN_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
+      )
+      UPDATE "Booking" b
+      SET status = ${Status.ACTIVE}::"Status"
+      FROM upcoming u
+      WHERE b.id = u.id;`;
   }
 }

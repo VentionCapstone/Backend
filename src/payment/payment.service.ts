@@ -48,7 +48,7 @@ export class PaymentService {
     } = {
       succeeded: async () => {
         await this.prismaService.booking.update({
-          data: { status: Status.ACTIVE },
+          data: { status: Status.UPCOMING },
           where: { id: confirmPaymentDto.bookingId },
         });
         const paymentId = await this.getPaymentId(confirmPaymentDto.bookingId);
@@ -98,7 +98,7 @@ export class PaymentService {
 
       await this.prismaService.booking.updateMany({
         where: { id: createPaymentDto.bookingId, status: Status.PENDING },
-        data: { status: Status.ACTIVE },
+        data: { status: Status.UPCOMING },
       });
 
       return {
