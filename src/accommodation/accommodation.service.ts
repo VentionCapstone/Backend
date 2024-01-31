@@ -1,6 +1,5 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { AxiosError } from 'axios';
 import * as dayjs from 'dayjs';
 import { catchError, firstValueFrom } from 'rxjs';
@@ -500,7 +499,7 @@ export class AccommodationService {
       orderByPrice,
       orderByRoom,
     } = options;
-    const findManyOptions: Prisma.AccommodationFindManyArgs = {
+    const findManyOptions: any = {
       select: {
         id: true,
         title: true,
@@ -624,6 +623,96 @@ export class AccommodationService {
     } catch (error) {
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
+  }
+
+  async getAllAccommodationsForMap(options: any, res: any) {
+    try {
+      const { bbox } = options;
+      const [latitude1, longitude1, latitude2, longitude2] = bbox.split(',');
+
+      const findManyOptions = this.generateFindAllQueryObj(options);
+
+      this.updateQueryWithSearchOptions(findManyOptions, options);
+
+      if (!findManyOptions.where?.address) {
+        findManyOptions.where.address = {};
+      }
+
+      findManyOptions.where.address = {
+        ...findManyOptions.where.address,
+        latitude: {
+          gte: +latitude1,
+          lte: +latitude2,
+        },
+        longitude: {
+          gte: +longitude1,
+          lte: +longitude2,
+        },
+      };
+
+      const accommodations = await this.prisma.accommodation.findMany({
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          thumbnailUrl: true,
+          address: {
+            select: {
+              latitude: true,
+              longitude: true,
+            },
+          },
+        },
+        where: findManyOptions.where,
+      });
+
+      const features = [];
+
+      if (!accommodations.length) {
+        return res.jsonp({
+          type: 'FeatureCollection',
+          features: [],
+        });
+      }
+
+      for (const item of accommodations) {
+        const num = Intl.NumberFormat('en', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0,
+        }).format(item.price);
+
+        const newObj = {
+          type: 'Feature',
+          id: item.id,
+          geometry: { type: 'Point', coordinates: [item.address.latitude, item.address.longitude] },
+          properties: {
+            iconCaption: num,
+            accommodationId: item.id,
+            price: '$' + this.splitStringAfterThreeFromEnd(item.price),
+            thumbnailUrl: item.thumbnailUrl,
+            balloonAccommTitle: item.title,
+            balloonContent: 'Контент балуна',
+            hintContent: `<strong>${item.title}</strong>`,
+          },
+        };
+        features.push(newObj);
+      }
+
+      return res.jsonp({
+        type: 'FeatureCollection',
+        features,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
+    }
+  }
+
+  private splitStringAfterThreeFromEnd(inputString: number) {
+    const reversedString: string = inputString.toString().split('').reverse().join('');
+    const result = reversedString.match(/.{1,3}/g)!.join(' ');
+    return result.split('').reverse().join('');
   }
 
   private getCountByRating(ratingCounts: { rating: number; _count: number }[]) {

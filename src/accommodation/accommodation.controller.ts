@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -294,6 +295,8 @@ export class AccommodationController {
     @Query() orderAndFilter: OrderAndFilterDto,
     @CurrentUser('id') userId?: string
   ) {
+    console.log('AccommodationController ~ orderAndFilter111:', orderAndFilter);
+
     const data = await this.accommodationService.getAllAccommodations(orderAndFilter, userId);
     return { success: true, ...data };
   }
@@ -328,6 +331,18 @@ export class AccommodationController {
   ) {
     const data = await this.accommodationService.getUserAccommodations(userId, options);
     return { success: true, ...data };
+  }
+
+  @Get('map')
+  async getAllAccommodationsForMap(@Query() orderAndFilter: OrderAndFilterDto, @Res() res: any) {
+    console.log(
+      'AccommodationController ~ getAllAccommodationsForMap ~ orderAndFilter:',
+      orderAndFilter
+    );
+
+    const data = await this.accommodationService.getAllAccommodationsForMap(orderAndFilter, res);
+
+    return data;
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })
