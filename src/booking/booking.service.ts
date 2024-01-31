@@ -272,63 +272,18 @@ export class BookingService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async checkBookingEnd() {
-    const serverUtcOffset = dayjs().utcOffset();
-    const tomorrow = dayjs()
-      .add(1, 'day')
-      .startOf('day')
-      .add(serverUtcOffset, 'minutes')
-      .toISOString();
-
-    const bookings = await this.prismaService.booking.findMany({
-      select: {
-        id: true,
-        endDate: true,
-        accommodation: {
-          select: {
-            timezoneOffset: true,
-          },
-        },
-      },
-      where: {
-        status: Status.ACTIVE,
-        endDate: {
-          lte: tomorrow,
-        },
-      },
-    });
-
-    const completedBookingsIds = [];
-    const now = dayjs();
-
-    for (const booking of bookings) {
-      const {
-        id,
-        endDate,
-        accommodation: { timezoneOffset },
-      } = booking;
-
-      const bookingEnd = this.getTimeInZone(endDate, timezoneOffset).add(
-        STANDARD_CHECKOUT_HOUR,
-        'hours'
-      );
-
-      if (bookingEnd.isBefore(now)) {
-        completedBookingsIds.push(id);
-      }
-    }
-
-    if (completedBookingsIds.length > 0) {
-      await this.prismaService.booking.updateMany({
-        where: {
-          id: {
-            in: completedBookingsIds,
-          },
-        },
-        data: {
-          status: Status.COMPLETED,
-        },
-      });
-    }
+    await this.prismaService.$executeRaw`
+      WITH completed AS (
+        SELECT bk.id
+        FROM "Booking" bk
+        JOIN "Accommodation" a ON a.id = bk."accommodationId"
+        WHERE bk.status = ${Status.ACTIVE}::"Status"
+        AND bk."endDate" + INTERVAL '1 HOURS' * ${STANDARD_CHECKOUT_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
+      )
+      UPDATE "Booking" b
+      SET status = ${Status.COMPLETED}::"Status"
+      FROM completed c
+      WHERE b.id = c.id;`;
   }
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -355,15 +310,15 @@ export class BookingService {
   async activateUpcomingBookings() {
     await this.prismaService.$executeRaw`
       WITH upcoming AS (
-        SELECT b.*, a."timezoneOffset" 
+        SELECT b.id,
         FROM "Booking" b
         JOIN "Accommodation" a ON a.id = b."accommodationId" 
         JOIN "Payment" p ON p.id = b."paymentId"
-        WHERE p.status = 'COMPLETED' AND b.status = 'UPCOMING' AND
+        WHERE p.status = ${Status.COMPLETED}::"Status" AND b.status = ${Status.UPCOMING}::"Status" AND
           b."startDate" + INTERVAL '1 HOUR'  * ${STANDARD_CHECKIN_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
       )
       UPDATE "Booking" b
-      SET status = 'ACTIVE'
+      SET status = ${Status.ACTIVE}::"Status"
       FROM upcoming u
       WHERE b.id = u.id;`;
   }
