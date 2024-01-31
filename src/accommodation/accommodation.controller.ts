@@ -333,16 +333,14 @@ export class AccommodationController {
     return { success: true, ...data };
   }
 
+  @ApiOperation({ summary: 'Get all accommodations for map' })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
   @Get('map')
   async getAllAccommodationsForMap(@Query() orderAndFilter: OrderAndFilterDto, @Res() res: any) {
-    console.log(
-      'AccommodationController ~ getAllAccommodationsForMap ~ orderAndFilter:',
-      orderAndFilter
-    );
-
-    const data = await this.accommodationService.getAllAccommodationsForMap(orderAndFilter, res);
-
-    return data;
+    return await this.accommodationService.getAllAccommodationsForMap(orderAndFilter, res);
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })

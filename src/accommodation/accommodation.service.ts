@@ -660,6 +660,8 @@ export class AccommodationService {
             select: {
               latitude: true,
               longitude: true,
+              country: true,
+              city: true,
             },
           },
         },
@@ -689,11 +691,9 @@ export class AccommodationService {
           properties: {
             iconCaption: num,
             accommodationId: item.id,
-            price: '$' + this.splitStringAfterThreeFromEnd(item.price),
             thumbnailUrl: item.thumbnailUrl,
             balloonAccommTitle: item.title,
-            balloonContent: 'Контент балуна',
-            hintContent: `<strong>${item.title}</strong>`,
+            balloonAdress: `${item.address.country}, ${item.address.city}`,
           },
         };
         features.push(newObj);
