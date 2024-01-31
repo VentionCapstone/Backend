@@ -709,12 +709,6 @@ export class AccommodationService {
     }
   }
 
-  private splitStringAfterThreeFromEnd(inputString: number) {
-    const reversedString: string = inputString.toString().split('').reverse().join('');
-    const result = reversedString.match(/.{1,3}/g)!.join(' ');
-    return result.split('').reverse().join('');
-  }
-
   private getCountByRating(ratingCounts: { rating: number; _count: number }[]) {
     const countByRating: Record<number, number> = {};
 
