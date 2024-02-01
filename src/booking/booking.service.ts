@@ -294,11 +294,18 @@ export class BookingService {
         createdAt: {
           lte: dayjs().subtract(1, 'hour').toISOString(),
         },
-        payment: {
-          status: {
-            not: Status.COMPLETED,
+        OR: [
+          {
+            paymentId: null,
           },
-        },
+          {
+            payment: {
+              status: {
+                not: Status.COMPLETED,
+              },
+            },
+          },
+        ],
       },
       data: {
         status: Status.INACTIVE,
@@ -310,7 +317,7 @@ export class BookingService {
   async activateUpcomingBookings() {
     await this.prismaService.$executeRaw`
       WITH upcoming AS (
-        SELECT b.id,
+        SELECT b.id
         FROM "Booking" b
         JOIN "Accommodation" a ON a.id = b."accommodationId" 
         JOIN "Payment" p ON p.id = b."paymentId"
