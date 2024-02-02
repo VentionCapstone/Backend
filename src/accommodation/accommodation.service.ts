@@ -3,6 +3,7 @@ import { BadRequestException, HttpException, Injectable, NotFoundException } fro
 import { AxiosError } from 'axios';
 import * as dayjs from 'dayjs';
 import { catchError, firstValueFrom } from 'rxjs';
+import { Currency } from 'src/enums/currency.enum';
 import { SortOrder } from 'src/enums/sortOrder.enum';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
@@ -680,7 +681,7 @@ export class AccommodationService {
       for (const item of accommodations) {
         const num = Intl.NumberFormat('en', {
           style: 'currency',
-          currency: 'USD',
+          currency: Currency.CAD,
           maximumFractionDigits: 0,
         }).format(item.price);
 

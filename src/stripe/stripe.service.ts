@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Currency } from 'src/enums/currency.enum';
 import Stripe from 'stripe';
 import ErrorsTypes from '../errors/errors.enum';
 import { GlobalException } from '../exceptions/global.exception';
@@ -30,7 +31,7 @@ export class StripeService {
   async createPaymentIntent(amount: number): Promise<Stripe.PaymentIntent> {
     return this.stripe.paymentIntents.create({
       amount,
-      currency: 'usd',
+      currency: Currency.USD,
     });
   }
 }

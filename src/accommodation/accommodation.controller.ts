@@ -295,8 +295,6 @@ export class AccommodationController {
     @Query() orderAndFilter: OrderAndFilterDto,
     @CurrentUser('id') userId?: string
   ) {
-    console.log('AccommodationController ~ orderAndFilter111:', orderAndFilter);
-
     const data = await this.accommodationService.getAllAccommodations(orderAndFilter, userId);
     return { success: true, ...data };
   }
