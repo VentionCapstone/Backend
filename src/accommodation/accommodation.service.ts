@@ -681,7 +681,7 @@ export class AccommodationService {
       for (const item of accommodations) {
         const num = Intl.NumberFormat('en', {
           style: 'currency',
-          currency: Currency.CAD,
+          currency: Currency.USD,
           maximumFractionDigits: 0,
         }).format(item.price);
 
