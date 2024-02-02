@@ -299,6 +299,80 @@ export class AccommodationService {
     }
   }
 
+  async updateAccommodationFiles(
+    accommodationId: string,
+    ownerId: string,
+    images: Express.Multer.File[] = [],
+    deletedImages: string[] = []
+  ) {
+    let existingAccommodation;
+    try {
+      existingAccommodation = await this.prisma.accommodation.findUnique({
+        include: { media: true },
+        where: { id: accommodationId, ownerId },
+      });
+    } catch (error) {
+      throw new GlobalException(
+        ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_FOR_UPDATING,
+        error.message
+      );
+    }
+
+    if (!existingAccommodation)
+      throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION_FOR_UPDATING);
+
+    if (existingAccommodation.media.length - deletedImages.length + images.length < 5)
+      throw new BadRequestException(ErrorsTypes.BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPDATE);
+
+    try {
+      const uploadedImagesResponse = await Promise.all(
+        images.map((image) => {
+          return this.uploadImageToS3(image);
+        })
+      );
+      const imagesToCreate = uploadedImagesResponse.map((image) => ({
+        imageUrl: image.data.imageUrl,
+        thumbnailUrl: image.data.thumbnailUrl,
+        accommodationId,
+      }));
+
+      const createdImages = await this.prisma.$transaction(
+        imagesToCreate.map((image) => {
+          return this.prisma.media.create({
+            data: image,
+          });
+        })
+      );
+
+      let currentImages = existingAccommodation.media;
+      currentImages.push(...createdImages);
+
+      if (deletedImages.length > 0) {
+        await this.prisma.media.deleteMany({
+          where: {
+            id: {
+              in: deletedImages,
+            },
+          },
+        });
+
+        currentImages = currentImages.filter((image) => !deletedImages.includes(image.id));
+        await this.prisma.accommodation.update({
+          where: { id: accommodationId },
+          data: {
+            previewImgUrl: currentImages[0].imageUrl,
+            thumbnailUrl: currentImages[0].thumbnailUrl,
+          },
+        });
+      }
+
+      return currentImages;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_UPDATE, error.message);
+    }
+  }
+
   async getUserAccommodations(ownerId: string, options: GetUserAccommodationsDto) {
     try {
       const { page, limit, includeDeleted } = options;

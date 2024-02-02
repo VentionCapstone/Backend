@@ -18,9 +18,11 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -153,6 +155,56 @@ export class AccommodationController {
     await this.accommodationService.addFileToAccommodation(id, images, userId);
 
     return { success: true, data: {} };
+  }
+
+  @ApiOperation({ summary: 'Update images of accommodation' })
+  @ApiOkResponse({ description: 'Files updated', type: MediaAllDto })
+  @ApiBadRequestResponse({ description: 'File is required' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation ID',
+    required: true,
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {},
+      },
+      description: `Images file (only ${IMAGES_FILE_TYPES} allowed), size < ${ACCOMMODATION_IMAGE_MAX_UPLOAD_MB}mb!`,
+    },
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @LangQuery()
+  @Put('/:id/file')
+  @UseInterceptors(FilesInterceptor('images', 10))
+  async updateAccommodationUpdateFiles(
+    @UploadedFiles(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [
+          new MaxFileSizeValidator({ maxSize: ACCOMMODATION_IMAGE_MAX_UPLOAD_MB * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: IMAGES_FILE_TYPES }),
+        ],
+      })
+    )
+    images: Array<Express.Multer.File>,
+    @Body('deleted') deletedImages: string[] | string,
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string
+  ) {
+    const media = await this.accommodationService.updateAccommodationFiles(
+      id,
+      userId,
+      images,
+      typeof deletedImages === 'string' ? [deletedImages] : deletedImages
+    );
+
+    return { success: true, media };
   }
 
   @ApiOperation({ summary: 'Update accommodation' })

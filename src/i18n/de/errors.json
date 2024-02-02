@@ -36,6 +36,7 @@
   "UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN": "Zugriffstoken ist abgelaufen",
   "BAD_REQUEST_INVALID_PHONE_NUMBER": "phoneNumber muss eine nicht leere Zeichenfolge sein",
   "BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPLOAD": "Es müssen mindestens 5 Bilder hochgeladen werden",
+  "BAD_REQUEST_NOT_ENOUGH_IMAGES_TO_UPDATE": "Die Unterkunft muss mindestens 5 Bilder haben",
   "ACCOMMODATION_FAILED_TO_STORE_IMAGES_TO_STORAGE": "Bilder konnten nicht im Speicher abgelegt werden",
   "ACCOMMODATION_FAILED_TO_STORE_IMAGES": "Bilder konnten nicht gespeichert werden",
   "ACCOMMODATION_FAILED_TO_GET_LIST": "Liste der Unterkünfte konnte nicht abgerufen werden",
