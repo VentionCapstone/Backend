@@ -74,6 +74,14 @@ export class GoogleService {
       }
 
       const tokens = await this.authService.getTokens(userFromDb.id, email, userFromDb.role);
+
+      const hashedRefreshToken = await bcrypt.hash(tokens.refresh_token, SaltLength);
+
+      await this.prismaService.user.update({
+        data: { hashedRefreshToken },
+        where: { id: userFromDb.id },
+      });
+
       this.authService.setRefreshTokenCookie(tokens.refresh_token, res);
 
       return { tokens, id: userFromDb.id };

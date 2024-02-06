@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -380,6 +381,16 @@ export class AccommodationController {
   ) {
     const data = await this.accommodationService.getUserAccommodations(userId, options);
     return { success: true, ...data };
+  }
+
+  @ApiOperation({ summary: 'Get all accommodations for map' })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @Get('map')
+  async getAllAccommodationsForMap(@Query() orderAndFilter: OrderAndFilterDto, @Res() res: any) {
+    return await this.accommodationService.getAllAccommodationsForMap(orderAndFilter, res);
   }
 
   @ApiOperation({ summary: 'Get reviews to this accommodation' })
