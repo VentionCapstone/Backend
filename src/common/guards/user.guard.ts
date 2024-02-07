@@ -45,7 +45,9 @@ export class UserGuard implements CanActivate {
       if (error instanceof TokenExpiredError)
         throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN);
       if (error instanceof UnauthorizedException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY, error.message, undefined, {
+        logoutUser: true,
+      });
     }
   }
 }

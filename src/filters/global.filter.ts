@@ -37,12 +37,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       let errorObj = exception;
       let key = ErrorsTypes.DEFAULT;
       let message = exception.message;
+      let options = {};
 
       if (knownException) {
         status = exception.getStatus();
         errorObj = exception.getResponse();
         key = errorObj?.key || errorObj?.message;
         message = translateErrorMessage(this.i18n, key);
+        options = errorObj.options;
       }
 
       this.logger.error(
@@ -54,6 +56,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       response.status(status).json({
         success: false,
         error: { statusCode: status, message: message || defaultErrorMessage },
+        options,
       });
     } catch (error) {
       response.status(defaultStatusCode).json(defaultResponse);
