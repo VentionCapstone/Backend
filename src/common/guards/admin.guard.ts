@@ -49,7 +49,7 @@ export class AdminGuard implements CanActivate {
       if (error instanceof JsonWebTokenError)
         throw new UnauthorizedException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
       if (error instanceof UnauthorizedException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY, error.message);
     }
   }
 }
