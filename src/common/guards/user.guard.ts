@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import ErrorsTypes from 'src/errors/errors.enum';
 import { GlobalException } from 'src/exceptions/global.exception';
 import { User } from '../../auth/entities/auth.entity';
@@ -44,8 +44,10 @@ export class UserGuard implements CanActivate {
     } catch (error) {
       if (error instanceof TokenExpiredError)
         throw new UnauthorizedException(ErrorsTypes.UNAUTHORIZED_AUTH_EXPIRED_ACCESS_TOKEN);
+      if (error instanceof JsonWebTokenError)
+        throw new UnauthorizedException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
       if (error instanceof UnauthorizedException) throw error;
-      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY);
+      throw new GlobalException(ErrorsTypes.AUTH_FAILED_TOKEN_VERIFY, error.message);
     }
   }
 }
