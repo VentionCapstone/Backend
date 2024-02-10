@@ -433,43 +433,19 @@ export class AccommodationService {
     }
   }
 
-  private isDefaultOptions(options: OrderAndFilterDto): boolean {
-    return (
-      options.limit === 12 &&
-      options.minPrice === 0 &&
-      options.maxPrice === AccommodationMaxPrice &&
-      options.minRooms === 0 &&
-      options.maxRooms === AccommodationMaxRooms &&
-      options.minPeople === 0 &&
-      options.maxPeople === AccommodationMaxPeople
-    );
-  }
   async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
-    console.log('AccommodationService ~ getAllAccommodations ~ options:', options);
-    const isDefaultOptions = this.isDefaultOptions(options);
-    console.log(
-      'AccommodationService ~ getAllAccommodations ~ isDefaultOptions:',
-      isDefaultOptions
-    );
-
     try {
       const { page, limit } = options;
       const key = `accommodations?page=${page}&limit=${limit}`;
       const dataFromCache = await this.cacheManager.get(key);
-      console.log('AccommodationService ~ getAllAccommodations ~ key:', key);
 
       if (dataFromCache) {
-        console.log('GOT FROM CACHE');
         return dataFromCache;
       }
 
       const findManyOptions = this.generateFindAllQueryObj(options);
 
       this.updateQueryWithSearchOptions(findManyOptions, options);
-      console.log(
-        'AccommodationService ~ getAllAccommodations ~ findManyOptions:',
-        findManyOptions
-      );
 
       const findAccommodationsQuery = this.prisma.accommodation.findMany(findManyOptions);
       const countAccommodationsQuery = this.prisma.accommodation.count({
@@ -524,19 +500,18 @@ export class AccommodationService {
         _max: { price: totalMaxPrice },
       } = totalPriceStats;
 
-      console.log('SETTING TO CACHE');
-      await this.cacheManager.set(key, {
-        priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
-        totalCount,
-        data: accommodationsWithWishlist,
-      });
-      console.log('SETTED');
-
-      return {
+      const isDefaultOptions = this.isDefaultOptions(options);
+      const resultObj = {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
         totalCount,
         data: accommodationsWithWishlist,
       };
+
+      if (isDefaultOptions) {
+        await this.cacheManager.set(key, resultObj);
+      }
+
+      return resultObj;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
@@ -861,5 +836,17 @@ export class AccommodationService {
     }
 
     return orderingObjsArray;
+  }
+
+  private isDefaultOptions(options: OrderAndFilterDto): boolean {
+    return (
+      (options.limit ?? 12) === 12 &&
+      (options.minPrice ?? 0) === 0 &&
+      (options.maxPrice ?? AccommodationMaxPrice) === AccommodationMaxPrice &&
+      (options.minRooms ?? 0) === 0 &&
+      (options.maxRooms ?? AccommodationMaxRooms) === AccommodationMaxRooms &&
+      (options.minPeople ?? 0) === 0 &&
+      (options.maxPeople ?? AccommodationMaxPeople) === AccommodationMaxPeople
+    );
   }
 }

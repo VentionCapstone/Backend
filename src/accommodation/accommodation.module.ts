@@ -9,7 +9,6 @@ import { AccommodationService } from './accommodation.service';
 
 const { CACHE_TIMEOUT } = process.env;
 const CacheTimeout = parseInt(CACHE_TIMEOUT!);
-console.log('CacheTimeout:', CacheTimeout);
 
 @Module({
   imports: [

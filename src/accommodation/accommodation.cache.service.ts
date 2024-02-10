@@ -1,25 +1,22 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
-
-import { Cache } from 'cache-manager';
-import { AccommodationService } from './accommodation.service'; // Import the service where retrieveAccommodations method is defined
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { AccommodationService } from './accommodation.service';
 import { OrderAndFilterDto } from './dto/orderAndFilter.dto';
+
+const { CACHING_PAGES, CACHING_PAGES_LIMIT } = process.env;
+const CachingPages = parseInt(CACHING_PAGES!);
+const CachingPagesLimit = parseInt(CACHING_PAGES_LIMIT!);
 
 @Injectable()
 export class CacheService implements OnApplicationBootstrap {
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private accommodationService: AccommodationService // Inject the AccommodationService
-  ) {}
+  constructor(private accommodationService: AccommodationService) {}
 
   async onApplicationBootstrap() {
-    await this.cacheFirst20Pages();
+    await this.cacheMainPages();
   }
 
-  async cacheFirst20Pages() {
-    for (let page = 1; page <= 90; page++) {
-      console.log(page);
-      const options: OrderAndFilterDto = { page, limit: 12 };
+  async cacheMainPages() {
+    for (let page = 1; page <= CachingPages; page++) {
+      const options: OrderAndFilterDto = { page, limit: CachingPagesLimit };
       await this.accommodationService.getAllAccommodations(options);
     }
   }
