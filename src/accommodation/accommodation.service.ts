@@ -34,10 +34,16 @@ interface UploadImageResponse {
   };
 }
 
-const { ACCOMMODATION_MAX_PRICE, ACCOMMODATION_MAX_PEOPLE, ACCOMMODATION_MAX_ROOMS } = process.env;
+const {
+  ACCOMMODATION_MAX_PRICE,
+  ACCOMMODATION_MAX_PEOPLE,
+  ACCOMMODATION_MAX_ROOMS,
+  CACHING_PAGES_LIMIT,
+} = process.env;
 const AccommodationMaxPrice = parseInt(ACCOMMODATION_MAX_PRICE!);
 const AccommodationMaxPeople = parseInt(ACCOMMODATION_MAX_PEOPLE!);
 const AccommodationMaxRooms = parseInt(ACCOMMODATION_MAX_ROOMS!);
+const CachingPagesLimit = parseInt(CACHING_PAGES_LIMIT!);
 
 @Injectable()
 export class AccommodationService {
@@ -507,6 +513,10 @@ export class AccommodationService {
         data: accommodationsWithWishlist,
       };
 
+      console.log(
+        'AccommodationService ~ getAllAccommodations ~ isDefaultOptions:',
+        isDefaultOptions
+      );
       if (isDefaultOptions) {
         await this.cacheManager.set(key, resultObj);
       }
@@ -840,7 +850,7 @@ export class AccommodationService {
 
   private isDefaultOptions(options: OrderAndFilterDto): boolean {
     return (
-      (options.limit ?? 12) === 12 &&
+      (options.limit ?? CachingPagesLimit) === CachingPagesLimit &&
       (options.minPrice ?? 0) === 0 &&
       (options.maxPrice ?? AccommodationMaxPrice) === AccommodationMaxPrice &&
       (options.minRooms ?? 0) === 0 &&
