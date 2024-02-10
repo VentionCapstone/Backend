@@ -513,10 +513,6 @@ export class AccommodationService {
         data: accommodationsWithWishlist,
       };
 
-      console.log(
-        'AccommodationService ~ getAllAccommodations ~ isDefaultOptions:',
-        isDefaultOptions
-      );
       if (isDefaultOptions) {
         await this.cacheManager.set(key, resultObj);
       }
