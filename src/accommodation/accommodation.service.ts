@@ -845,14 +845,23 @@ export class AccommodationService {
   }
 
   private isDefaultOptions(options: OrderAndFilterDto): boolean {
+    const {
+      limit = CachingPagesLimit,
+      minPrice = 0,
+      maxPrice = AccommodationMaxPrice,
+      minRooms = 0,
+      maxRooms = AccommodationMaxRooms,
+      minPeople = 0,
+      maxPeople = AccommodationMaxPeople,
+    } = options;
     return (
-      (options.limit ?? CachingPagesLimit) === CachingPagesLimit &&
-      (options.minPrice ?? 0) === 0 &&
-      (options.maxPrice ?? AccommodationMaxPrice) === AccommodationMaxPrice &&
-      (options.minRooms ?? 0) === 0 &&
-      (options.maxRooms ?? AccommodationMaxRooms) === AccommodationMaxRooms &&
-      (options.minPeople ?? 0) === 0 &&
-      (options.maxPeople ?? AccommodationMaxPeople) === AccommodationMaxPeople
+      limit === CachingPagesLimit &&
+      minPrice === 0 &&
+      maxPrice === AccommodationMaxPrice &&
+      minRooms === 0 &&
+      maxRooms === AccommodationMaxRooms &&
+      minPeople === 0 &&
+      maxPeople === AccommodationMaxPeople
     );
   }
 }
