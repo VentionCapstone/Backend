@@ -1,6 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import {
+  BadRequestException,
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AxiosError } from 'axios';
+import { Cache } from 'cache-manager';
 import * as dayjs from 'dayjs';
 import { catchError, firstValueFrom } from 'rxjs';
 import { Currency } from 'src/enums/currency.enum';
@@ -13,7 +21,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
-
 interface UploadImageType {
   mimetype: string;
   base64Image: string;
@@ -27,11 +34,17 @@ interface UploadImageResponse {
   };
 }
 
+const { ACCOMMODATION_MAX_PRICE, ACCOMMODATION_MAX_PEOPLE, ACCOMMODATION_MAX_ROOMS } = process.env;
+const AccommodationMaxPrice = parseInt(ACCOMMODATION_MAX_PRICE!);
+const AccommodationMaxPeople = parseInt(ACCOMMODATION_MAX_PEOPLE!);
+const AccommodationMaxRooms = parseInt(ACCOMMODATION_MAX_ROOMS!);
+
 @Injectable()
 export class AccommodationService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async createAccommodation(createAccommodationBody: any) {
@@ -420,11 +433,43 @@ export class AccommodationService {
     }
   }
 
+  private isDefaultOptions(options: OrderAndFilterDto): boolean {
+    return (
+      options.limit === 12 &&
+      options.minPrice === 0 &&
+      options.maxPrice === AccommodationMaxPrice &&
+      options.minRooms === 0 &&
+      options.maxRooms === AccommodationMaxRooms &&
+      options.minPeople === 0 &&
+      options.maxPeople === AccommodationMaxPeople
+    );
+  }
   async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
+    console.log('AccommodationService ~ getAllAccommodations ~ options:', options);
+    const isDefaultOptions = this.isDefaultOptions(options);
+    console.log(
+      'AccommodationService ~ getAllAccommodations ~ isDefaultOptions:',
+      isDefaultOptions
+    );
+
     try {
+      const { page, limit } = options;
+      const key = `accommodations?page=${page}&limit=${limit}`;
+      const dataFromCache = await this.cacheManager.get(key);
+      console.log('AccommodationService ~ getAllAccommodations ~ key:', key);
+
+      if (dataFromCache) {
+        console.log('GOT FROM CACHE');
+        return dataFromCache;
+      }
+
       const findManyOptions = this.generateFindAllQueryObj(options);
 
       this.updateQueryWithSearchOptions(findManyOptions, options);
+      console.log(
+        'AccommodationService ~ getAllAccommodations ~ findManyOptions:',
+        findManyOptions
+      );
 
       const findAccommodationsQuery = this.prisma.accommodation.findMany(findManyOptions);
       const countAccommodationsQuery = this.prisma.accommodation.count({
@@ -478,6 +523,14 @@ export class AccommodationService {
         _min: { price: totalMinPrice },
         _max: { price: totalMaxPrice },
       } = totalPriceStats;
+
+      console.log('SETTING TO CACHE');
+      await this.cacheManager.set(key, {
+        priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
+        totalCount,
+        data: accommodationsWithWishlist,
+      });
+      console.log('SETTED');
 
       return {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
