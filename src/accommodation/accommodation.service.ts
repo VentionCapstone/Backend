@@ -1,6 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import {
+  BadRequestException,
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AxiosError } from 'axios';
+import { Cache } from 'cache-manager';
 import * as dayjs from 'dayjs';
 import { catchError, firstValueFrom } from 'rxjs';
 import { Currency } from 'src/enums/currency.enum';
@@ -13,7 +21,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
-
 interface UploadImageType {
   mimetype: string;
   base64Image: string;
@@ -27,11 +34,23 @@ interface UploadImageResponse {
   };
 }
 
+const {
+  ACCOMMODATION_MAX_PRICE,
+  ACCOMMODATION_MAX_PEOPLE,
+  ACCOMMODATION_MAX_ROOMS,
+  CACHING_PAGES_LIMIT,
+} = process.env;
+const AccommodationMaxPrice = parseInt(ACCOMMODATION_MAX_PRICE!);
+const AccommodationMaxPeople = parseInt(ACCOMMODATION_MAX_PEOPLE!);
+const AccommodationMaxRooms = parseInt(ACCOMMODATION_MAX_ROOMS!);
+const CachingPagesLimit = parseInt(CACHING_PAGES_LIMIT!);
+
 @Injectable()
 export class AccommodationService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async createAccommodation(createAccommodationBody: any) {
@@ -422,6 +441,14 @@ export class AccommodationService {
 
   async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
     try {
+      const { page, limit } = options;
+      const key = `accommodations?page=${page}&limit=${limit}`;
+      const dataFromCache = await this.cacheManager.get(key);
+
+      if (dataFromCache) {
+        return dataFromCache;
+      }
+
       const findManyOptions = this.generateFindAllQueryObj(options);
 
       this.updateQueryWithSearchOptions(findManyOptions, options);
@@ -479,11 +506,18 @@ export class AccommodationService {
         _max: { price: totalMaxPrice },
       } = totalPriceStats;
 
-      return {
+      const isDefaultOptions = this.isDefaultOptions(options);
+      const resultObj = {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
         totalCount,
         data: accommodationsWithWishlist,
       };
+
+      if (isDefaultOptions) {
+        await this.cacheManager.set(key, resultObj);
+      }
+
+      return resultObj;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
@@ -808,5 +842,26 @@ export class AccommodationService {
     }
 
     return orderingObjsArray;
+  }
+
+  private isDefaultOptions(options: OrderAndFilterDto): boolean {
+    const {
+      limit = CachingPagesLimit,
+      minPrice = 0,
+      maxPrice = AccommodationMaxPrice,
+      minRooms = 0,
+      maxRooms = AccommodationMaxRooms,
+      minPeople = 0,
+      maxPeople = AccommodationMaxPeople,
+    } = options;
+    return (
+      limit === CachingPagesLimit &&
+      minPrice === 0 &&
+      maxPrice === AccommodationMaxPrice &&
+      minRooms === 0 &&
+      maxRooms === AccommodationMaxRooms &&
+      minPeople === 0 &&
+      maxPeople === AccommodationMaxPeople
+    );
   }
 }
