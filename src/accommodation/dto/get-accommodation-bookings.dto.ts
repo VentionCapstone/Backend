@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsOptional } from 'class-validator';
+import { IsDate, IsEnum, IsOptional } from 'class-validator';
+import { SortOrder } from 'src/enums/sortOrder.enum';
 
 export default class AccommodationBookingsDto {
   @IsOptional()
@@ -11,4 +12,8 @@ export default class AccommodationBookingsDto {
   @Transform(({ value }) => new Date(value))
   @IsDate()
   nextMonth?: Date;
+
+  @IsEnum(SortOrder)
+  @IsOptional()
+  public orderByStartDate?: SortOrder;
 }

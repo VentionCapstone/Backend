@@ -830,7 +830,7 @@ export class AccommodationService {
     options: AccommodationBookingsDto
   ) {
     try {
-      const { currentMonth, nextMonth } = options;
+      const { currentMonth, nextMonth, orderByStartDate } = options;
 
       const accommodation = await this.prisma.accommodation.findUnique({
         include: { booking: true },
@@ -898,7 +898,7 @@ export class AccommodationService {
 
       const data = await this.prisma.booking.findMany({
         ...findBookingQuery,
-        orderBy: { startDate: 'asc' },
+        orderBy: { startDate: orderByStartDate },
       });
       return data;
     } catch (error) {
