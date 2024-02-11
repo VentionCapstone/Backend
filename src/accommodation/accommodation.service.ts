@@ -35,6 +35,11 @@ interface UploadImageResponse {
   };
 }
 
+type BookingWhereInput = {
+  accommodationId: string;
+  OR?: ({ startDate: { gte: string } } | { endDate: { gte: string } })[];
+};
+
 const {
   ACCOMMODATION_MAX_PRICE,
   ACCOMMODATION_MAX_PEOPLE,
@@ -836,11 +841,6 @@ export class AccommodationService {
       });
 
       if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
-
-      type BookingWhereInput = {
-        accommodationId: string;
-        OR?: ({ startDate: { gte: string } } | { endDate: { gte: string } })[];
-      };
 
       const findBookingQuery = {
         select: {
