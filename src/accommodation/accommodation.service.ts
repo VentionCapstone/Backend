@@ -18,6 +18,7 @@ import { GlobalException } from 'src/exceptions/global.exception';
 import { normalizeCityName } from 'src/helpers/normalizeCityName.helper';
 import { normalizeCountryName } from 'src/helpers/normalizeCountryName.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
+import AccommodationBookingsDto from './dto/get-accommodation-bookings.dto';
 import { OrderAndFilterReviewDto, reviewOrderBy } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import { OrderAndFilterDto, OrderBy } from './dto/orderAndFilter.dto';
@@ -815,6 +816,90 @@ export class AccommodationService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET_LIST, error.message);
+    }
+  }
+
+  async getAllBookings(accommodationId: string, userId: string, options: AccommodationBookingsDto) {
+    try {
+      const { currentMonth, nextMonth } = options;
+
+      const accommodation = await this.prisma.accommodation.findUnique({
+        include: { booking: true },
+        where: {
+          id: accommodationId,
+          ownerId: userId,
+        },
+      });
+
+      if (!accommodation) throw new NotFoundException(ErrorsTypes.NOT_FOUND_ACCOMMODATION);
+
+      type BookingWhereInput = {
+        accommodationId: string;
+        OR?: ({ startDate: { gte: string } } | { endDate: { gte: string } })[];
+      };
+
+      const findBookingQuery = {
+        select: {
+          id: true,
+          userId: true,
+          startDate: true,
+          endDate: true,
+          status: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profile: {
+                select: {
+                  imageUrl: true,
+                },
+              },
+            },
+          },
+          payment: {
+            select: {
+              totalAmount: true,
+            },
+          },
+        },
+
+        where: {
+          accommodationId: accommodation.id,
+        } as BookingWhereInput,
+      };
+
+      if (currentMonth && nextMonth) {
+        currentMonth.setDate(1);
+        currentMonth.setUTCHours(0, 0, 0, 0);
+
+        nextMonth.setDate(1);
+        nextMonth.setUTCHours(0, 0, 0, 0);
+
+        findBookingQuery.where = {
+          accommodationId: accommodation.id,
+          OR: [
+            {
+              startDate: {
+                gte: currentMonth.toISOString(),
+              },
+            },
+            {
+              endDate: {
+                gte: currentMonth.toISOString(),
+              },
+            },
+          ],
+        };
+      }
+
+      const data = await this.prisma.booking.findMany({
+        ...findBookingQuery,
+        orderBy: { startDate: 'asc' },
+      });
+      return data;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new GlobalException(ErrorsTypes.ACCOMMODATION_FAILED_TO_GET, error.message);
     }
   }
 
