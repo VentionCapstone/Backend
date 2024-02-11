@@ -495,7 +495,7 @@ export class AccommodationController {
   @ApiOperation({ summary: 'Get all reservations, for one accommodation' })
   @ApiResponse({
     status: 200,
-    description: 'Restored accommodation',
+    description: 'All reservations',
     type: AccommodationResponseDto,
   })
   @ApiUnauthorizedResponse({
@@ -519,12 +519,12 @@ export class AccommodationController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('/:id/reservations')
-  async getAllBookings(
+  async getAllReservations(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
     @Query() options: AccommodationBookingsDto
   ) {
-    const data = await this.accommodationService.getAllBookings(id, userId, options);
+    const data = await this.accommodationService.getAllReservations(id, userId, options);
     return {
       succes: true,
       data,

@@ -819,7 +819,11 @@ export class AccommodationService {
     }
   }
 
-  async getAllBookings(accommodationId: string, userId: string, options: AccommodationBookingsDto) {
+  async getAllReservations(
+    accommodationId: string,
+    userId: string,
+    options: AccommodationBookingsDto
+  ) {
     try {
       const { currentMonth, nextMonth } = options;
 
