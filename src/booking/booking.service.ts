@@ -320,8 +320,7 @@ export class BookingService {
         SELECT b.id
         FROM "Booking" b
         JOIN "Accommodation" a ON a.id = b."accommodationId" 
-        JOIN "Payment" p ON p.id = b."paymentId"
-        WHERE p.status = ${Status.COMPLETED}::"Status" AND b.status = ${Status.UPCOMING}::"Status" AND
+        WHERE b.status = ${Status.UPCOMING}::"Status" AND
           b."startDate" + INTERVAL '1 HOUR'  * ${STANDARD_CHECKIN_HOUR} <= NOW() AT TIME ZONE 'UTC' - INTERVAL '1 minute' * a."timezoneOffset"
       )
       UPDATE "Booking" b
