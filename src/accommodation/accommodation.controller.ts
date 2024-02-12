@@ -46,6 +46,7 @@ import { AccommodationService } from './accommodation.service';
 import { MediaAllDto } from './dto/accommodation-media.dto';
 import AccommodationResponseDto, { AccommodationDto } from './dto/accommodation-response.dto';
 import CreateAccommodationDto from './dto/create-accommodation.dto';
+import AccommodationBookingsDto from './dto/get-accommodation-bookings.dto';
 import { OrderAndFilterReviewDto } from './dto/get-review.dto';
 import { GetUserAccommodationsDto } from './dto/get-user-accommodations.dto';
 import ListOfAccommodationsResponseDto from './dto/list-of-accommodations.dto';
@@ -489,5 +490,44 @@ export class AccommodationController {
     const media = await this.accommodationService.getAllMedia(id);
 
     return { succes: true, data: media };
+  }
+
+  @ApiOperation({ summary: 'Get all reservations, for one accommodation' })
+  @ApiResponse({
+    status: 200,
+    description: 'All reservations',
+    type: AccommodationResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Accommodation id',
+    required: true,
+  })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('/:id/reservations')
+  async getAllReservations(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Query() options: AccommodationBookingsDto
+  ) {
+    const data = await this.accommodationService.getAllReservations(id, userId, options);
+    return {
+      succes: true,
+      data,
+    };
   }
 }
