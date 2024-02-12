@@ -448,10 +448,12 @@ export class AccommodationService {
   async getAllAccommodations(options: OrderAndFilterDto, userId?: string) {
     try {
       const { page, limit } = options;
+      const isDefaultOptions = this.isDefaultOptions(options);
+
       const key = `accommodations?page=${page}&limit=${limit}`;
       const dataFromCache = await this.cacheManager.get(key);
 
-      if (dataFromCache) {
+      if (dataFromCache && isDefaultOptions) {
         return dataFromCache;
       }
 
@@ -512,7 +514,6 @@ export class AccommodationService {
         _max: { price: totalMaxPrice },
       } = totalPriceStats;
 
-      const isDefaultOptions = this.isDefaultOptions(options);
       const resultObj = {
         priceRange: { curMinPrice, curMaxPrice, totalMinPrice, totalMaxPrice },
         totalCount,
@@ -942,7 +943,14 @@ export class AccommodationService {
       maxRooms = AccommodationMaxRooms,
       minPeople = 0,
       maxPeople = AccommodationMaxPeople,
+      location,
+      checkInDate,
+      checkOutDate,
+      orderByPeople,
+      orderByPrice,
+      orderByRoom,
     } = options;
+
     return (
       limit === CachingPagesLimit &&
       minPrice === 0 &&
@@ -950,7 +958,13 @@ export class AccommodationService {
       minRooms === 0 &&
       maxRooms === AccommodationMaxRooms &&
       minPeople === 0 &&
-      maxPeople === AccommodationMaxPeople
+      maxPeople === AccommodationMaxPeople &&
+      !location &&
+      !checkInDate &&
+      !checkOutDate &&
+      !orderByPeople &&
+      !orderByPrice &&
+      !orderByRoom
     );
   }
 }
